@@ -12,6 +12,7 @@ import '../../features/student/presentation/pages/student_detail_screen.dart';
 import '../../features/student/presentation/pages/student_list_screen.dart';
 import '../../features/teacher/presentation/pages/teacher_detail_screen.dart';
 import '../../features/teacher/presentation/pages/teacher_list_screen.dart';
+import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
 /// Handles all navigation throughout the app
@@ -34,6 +35,7 @@ class AppRouter {
 
   /// GoRouter configuration
   static final GoRouter router = GoRouter(
+    navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: true,
     initialLocation: splash,
     routes: [

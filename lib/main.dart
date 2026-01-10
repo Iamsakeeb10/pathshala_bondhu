@@ -8,10 +8,16 @@ import 'app/router/app_router.dart';
 import 'app/theme/app_theme.dart';
 import 'app/theme/providers/auth_provider.dart';
 import 'app/theme/providers/theme_provider.dart';
+// 🔹 Network connectivity imports
+import 'core/services/connectivity_service.dart';
+import 'core/widgets/no_internet_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final prefs = await SharedPreferences.getInstance();
+
+  await ConnectivityService().init();
 
   runApp(
     MultiProvider(
@@ -31,21 +37,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(375, 812), // Standard mobile design size
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        final themeProvider = Provider.of<ThemeProvider>(context);
-        final languageProvider = Provider.of<LanguageProvider>(context);
+        final themeProvider = context.watch<ThemeProvider>();
+        final languageProvider = context.watch<LanguageProvider>();
 
         return MaterialApp.router(
           title: 'Pathshala Bondhu',
           debugShowCheckedModeBanner: false,
+
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.themeMode,
+
           locale: languageProvider.currentLocale,
           routerConfig: AppRouter.router,
+
+          // ✅ GLOBAL no-internet overlay
+          builder: (context, routerChild) {
+            return NoInternetOverlay(
+              child: routerChild ?? const SizedBox.shrink(),
+            );
+          },
         );
       },
     );
