@@ -3,15 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/pages/login_screen.dart';
 import '../../features/auth/presentation/pages/onboarding_screen.dart';
-import '../../features/auth/presentation/pages/signup_screen.dart';
 import '../../features/auth/presentation/pages/splash_screen.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
-import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
-import '../../features/student/presentation/pages/student_detail_screen.dart';
-import '../../features/student/presentation/pages/student_list_screen.dart';
-import '../../features/teacher/presentation/pages/teacher_detail_screen.dart';
-import '../../features/teacher/presentation/pages/teacher_list_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -21,13 +15,7 @@ class AppRouter {
   static const String splash = '/';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
-  static const String signup = '/signup';
   static const String dashboard = '/dashboard';
-  static const String studentList = '/students';
-  static const String studentDetail = '/students/:id';
-  static const String teacherList = '/teachers';
-  static const String teacherDetail = '/teachers/:id';
-  static const String profile = '/profile';
   static const String settings = '/settings';
 
   // Private constructor
@@ -61,11 +49,6 @@ class AppRouter {
       ),
 
       // Signup Screen
-      GoRoute(
-        path: signup,
-        name: 'signup',
-        builder: (context, state) => const SignupScreen(),
-      ),
 
       // Dashboard Screen
       GoRoute(
@@ -75,41 +58,6 @@ class AppRouter {
       ),
 
       // Student Routes
-      GoRoute(
-        path: studentList,
-        name: 'student-list',
-        builder: (context, state) => const StudentListScreen(),
-      ),
-      GoRoute(
-        path: studentDetail,
-        name: 'student-detail',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return StudentDetailScreen(studentId: id);
-        },
-      ),
-
-      // Teacher Routes
-      GoRoute(
-        path: teacherList,
-        name: 'teacher-list',
-        builder: (context, state) => const TeacherListScreen(),
-      ),
-      GoRoute(
-        path: teacherDetail,
-        name: 'teacher-detail',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return TeacherDetailScreen(teacherId: id);
-        },
-      ),
-
-      // Profile Screen
-      GoRoute(
-        path: profile,
-        name: 'profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
 
       // Settings Screen
       GoRoute(

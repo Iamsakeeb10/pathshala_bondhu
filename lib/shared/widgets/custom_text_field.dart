@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../utils/app_colors.dart';
-
 class CustomTextField extends StatelessWidget {
   final String? label;
   final String? hint;
@@ -46,10 +44,7 @@ class CustomTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          Text(
-            label!,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text(label!, style: Theme.of(context).textTheme.titleMedium),
           SizedBox(height: 8.h),
         ],
         TextFormField(
@@ -66,6 +61,7 @@ class CustomTextField extends StatelessWidget {
           readOnly: readOnly,
           style: Theme.of(context).textTheme.bodyLarge,
           decoration: InputDecoration(
+            counterText: '',
             hintText: hint,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,

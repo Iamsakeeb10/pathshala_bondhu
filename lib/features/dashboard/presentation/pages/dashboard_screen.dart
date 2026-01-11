@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../profile/presentation/pages/profile_screen.dart';
-import '../../../student/presentation/pages/student_list_screen.dart';
-import '../../../teacher/presentation/pages/teacher_list_screen.dart';
+import '../../../home/presentation/screens/home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -18,10 +16,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // Note: We're using the screens directly.
   // Ideally, we might want a minimal version for the tab or the full screen is fine.
   final List<Widget> _pages = [
-    const Center(child: Text('Home')), // Placeholder for Home
-    const StudentListScreen(),
-    const TeacherListScreen(),
-    const ProfileScreen(),
+    const HomeScreen(),
+    const Center(child: Text('Test 2')), // Placeholder for Home
+    const Center(child: Text('Test 3')), // Placeholder for Home
+    const Center(child: Text('Test 4')), // Placeholder for Home
   ];
 
   @override

@@ -2,7 +2,9 @@
 // 8. lib/core/widgets/no_internet_overlay.dart
 // ============================================================================
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../shared/utils/app_colors.dart';
 import '../services/connectivity_service.dart';
 
 class NoInternetOverlay extends StatefulWidget {
@@ -108,61 +110,62 @@ class _NoInternetFullScreen extends StatelessWidget {
       child: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // 🌀 GIF instead of Icon
                 Image.asset(
                   'assets/animations/no_internet.gif',
-                  width: 220,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 24),
 
                 // 🧭 Title
-                const Text(
+                Text(
                   'No Internet Connection',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors.textPrimary,
                     decoration: TextDecoration.none,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14.h),
 
                 // 💬 Subtitle
                 Text(
                   'It seems you are offline.\nPlease check your Wi-Fi or mobile data.',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 15.sp,
                     color: Colors.grey[600],
                     height: 1.5,
                     decoration: TextDecoration.none,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 40.h),
 
                 // 🔁 Retry Button
                 ElevatedButton.icon(
                   onPressed: onRetry,
                   icon: const Icon(Icons.refresh_rounded),
-                  label: const Text(
+                  label: Text(
                     'Try Again',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 16,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 40.w,
+                      vertical: 16.h,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
                 ),
