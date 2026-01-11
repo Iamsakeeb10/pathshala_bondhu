@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       'icon': Icons.school_outlined,
-      'label': 'Teacher\nDashboard',
+      'label': 'Dashboard',
       'color': Color(0xFFEE9C70),
     },
     {
@@ -56,12 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       'icon': Icons.analytics_outlined,
-      'label': 'Subjectwise\nAttendance',
+      'label': 'Attendance',
       'color': Color(0xFF06B6D4),
     },
     {
       'icon': Icons.people_outline,
-      'label': 'Employee\nAttendance',
+      'label': 'Employees',
       'color': Color(0xFFEFC45D),
     },
   ];
@@ -70,25 +70,70 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTopSection(),
+            SizedBox(height: 24.h),
+            _buildSectionTitle(), // Add this
+            SizedBox(height: 16.h), // Add spacing between title and categories
+            _buildCategoriesSection(),
+            SizedBox(height: 24.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              _buildTopSection(),
-              SizedBox(height: 16.h),
-              _buildCategoriesSection(),
-              SizedBox(height: 24.h),
+              Container(
+                width: 4.w,
+                height: 24.h,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                'Quick Access',
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                  letterSpacing: 0.3,
+                ),
+              ),
             ],
           ),
-        ),
+          SizedBox(height: 4.h),
+          Padding(
+            padding: EdgeInsets.only(left: 12.w),
+            child: Text(
+              'Explore all features',
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildTopSection() {
     return Container(
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -113,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildWelcomeSection(),
-            SizedBox(height: 16.h),
+            SizedBox(height: 28.h),
             _buildGalleryHeader(),
             SizedBox(height: 16.h),
             _buildSlider(),
@@ -292,34 +337,28 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCategoriesSection() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Quick Access',
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              letterSpacing: 0.2,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 14.w,
-              mainAxisSpacing: 14.h,
-              childAspectRatio: 0.95,
-            ),
-            itemCount: _categories.length,
-            itemBuilder: (context, index) {
-              return _buildCategoryCard(_categories[index]);
-            },
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Calculate item width (same as GridView)
+          final itemWidth =
+              (constraints.maxWidth - (2 * 14.w)) /
+              3; // 2 spacings between 3 items
+
+          // Calculate item height based on childAspectRatio
+          final itemHeight = itemWidth / 0.95; // childAspectRatio: 0.95
+
+          return Wrap(
+            spacing: 14.w, // crossAxisSpacing
+            runSpacing: 14.h, // mainAxisSpacing
+            children: _categories.map((category) {
+              return SizedBox(
+                width: itemWidth,
+                height: itemHeight,
+                child: _buildCategoryCard(category),
+              );
+            }).toList(),
+          );
+        },
       ),
     );
   }
