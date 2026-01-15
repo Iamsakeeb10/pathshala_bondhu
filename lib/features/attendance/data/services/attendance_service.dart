@@ -11,15 +11,17 @@ class AttendanceService {
   AttendanceService() : _dioClient = DioClient();
 
   /// Get attendance with filters
+  /// [month] - Month number (1-12)
+  /// [year] - Year (e.g., 2026)
   Future<AttendanceResponse> getAttendance({
-    required String monthName,
+    required int month,
     required int year,
   }) async {
     try {
       final response = await _dioClient.get(
         ApiEndpoints.studentAttendance,
         queryParameters: {
-          'month_name': monthName,
+          'month': month,
           'year': year,
         },
       );

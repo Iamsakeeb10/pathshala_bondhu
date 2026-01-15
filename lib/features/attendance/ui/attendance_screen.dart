@@ -73,12 +73,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
+                child: DropdownButton<int>(
                   value: provider.selectedMonth,
                   isExpanded: true,
-                  items: AttendanceProvider.months.map((month) {
-                    return DropdownMenuItem(value: month, child: Text(month));
-                  }).toList(),
+                  items: List.generate(12, (index) {
+                    final monthNum = index + 1;
+                    final monthName = AttendanceProvider.months[index];
+                    return DropdownMenuItem(
+                      value: monthNum,
+                      child: Text(monthName),
+                    );
+                  }),
                   onChanged: (value) {
                     if (value != null) provider.setMonth(value);
                   },
