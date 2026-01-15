@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "100251645969",
+    "project_id": "pathshala-bondhu",
+    "storage_bucket": "pathshala-bondhu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:100251645969:android:bd40941da48c64ff57d9b0",
+        "android_client_info": {
+          "package_name": "com.pathshala.bondhu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEF_bvh0Gz5Yc-rpTXdpmtL7iBdiQuRCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

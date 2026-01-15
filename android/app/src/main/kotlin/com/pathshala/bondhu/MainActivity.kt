@@ -1,4 +1,4 @@
-package com.example.pathshala_bondhu
+package com.pathshala.bondhu
 
 import io.flutter.embedding.android.FlutterActivity
 
