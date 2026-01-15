@@ -1,9 +1,52 @@
+/// API endpoint constants for PathShala Bondhu
 class ApiEndpoints {
-  // TODO: Replace with your actual API base URL
-  static const String baseUrl = 'https://your-api-domain.com/api';
+  // Private constructor to prevent instantiation
+  ApiEndpoints._();
 
-  // Example endpoints - customize as needed
-  static const String login = '/auth/login';
-  static const String register = '/auth/register';
-  static const String profile = '/user/profile';
+  // Base URL
+  static const String baseUrl = 'http://pathshalabondhu.top/api/v1';
+
+  // ========== Authentication Endpoints ==========
+  
+  /// Teacher login endpoint
+  /// POST: { "email": "string", "password": "string" }
+  static const String teacherLogin = '/teacher/login';
+
+  /// Parent login endpoint
+  /// POST: { "parent_id": "string", "password": "string" }
+  static const String parentLogin = '/parent/login';
+
+  /// Get parent profile
+  /// GET with Bearer token
+  static const String parentMe = '/parent/me';
+
+  // ========== Parent Endpoints ==========
+  
+  /// Get parent's students list
+  /// GET with Bearer token
+  static const String parentStudents = '/parent/students';
+
+  // ========== Category Endpoints ==========
+  
+  /// Get book list for all students
+  /// GET with Bearer token
+  static const String bookList = '/booklist';
+
+  /// Get class routines for all students
+  /// GET with Bearer token
+  static const String routines = '/routines';
+
+  /// Get exam routines for all students
+  /// GET with Bearer token
+  static const String examRoutines = '/exam-routines';
+
+  /// Get student attendance with filters
+  /// GET with Bearer token
+  /// Query params: month_name, year
+  static const String studentAttendance = '/student/attendance';
+
+  /// Get student fees with filters
+  /// POST with Bearer token
+  /// Body: { "year": "string" }
+  static const String studentFees = '/student/fees/monthly';
 }

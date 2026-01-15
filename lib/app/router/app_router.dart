@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/network/token_storage.dart';
+import '../../features/attendance/ui/attendance_screen.dart';
 import '../../features/auth/presentation/pages/login_screen.dart';
 import '../../features/auth/presentation/pages/onboarding_screen.dart';
 import '../../features/auth/presentation/pages/splash_screen.dart';
+import '../../features/books/ui/books_screen.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
+import '../../features/exams/ui/exam_routine_screen.dart';
+import '../../features/fees/ui/fees_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
+import '../../features/routines/ui/class_routine_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -48,8 +54,6 @@ class AppRouter {
         builder: (context, state) => const LoginScreen(),
       ),
 
-      // Signup Screen
-
       // Dashboard Screen
       GoRoute(
         path: dashboard,
@@ -57,15 +61,74 @@ class AppRouter {
         builder: (context, state) => const DashboardScreen(),
       ),
 
-      // Student Routes
-
       // Settings Screen
       GoRoute(
         path: settings,
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
       ),
+
+      // Books Screen
+      GoRoute(
+        path: '/books',
+        name: 'books',
+        builder: (context, state) => const BooksScreen(),
+      ),
+
+      // Class Routine Screen
+      GoRoute(
+        path: '/routines',
+        name: 'routines',
+        builder: (context, state) => const ClassRoutineScreen(),
+      ),
+
+      // Exam Routine Screen
+      GoRoute(
+        path: '/exam-routines',
+        name: 'exam-routines',
+        builder: (context, state) => const ExamRoutineScreen(),
+      ),
+
+      // Attendance Screen
+      GoRoute(
+        path: '/attendance',
+        name: 'attendance',
+        builder: (context, state) => const AttendanceScreen(),
+      ),
+
+      // Fees Screen
+      GoRoute(
+        path: '/fees',
+        name: 'fees',
+        builder: (context, state) => const FeesScreen(),
+      ),
     ],
+
+    // Redirect logic for authentication
+    redirect: (context, state) async {
+      final hasToken = await TokenStorage.hasToken();
+      final isGoingToLogin = state.matchedLocation == login;
+      final isGoingToSplash = state.matchedLocation == splash;
+      final isGoingToOnboarding = state.matchedLocation == onboarding;
+
+      // Allow splash and onboarding without auth check
+      if (isGoingToSplash || isGoingToOnboarding) {
+        return null;
+      }
+
+      // If no token and not going to login, redirect to login
+      if (!hasToken && !isGoingToLogin) {
+        return login;
+      }
+
+      // If has token and going to login, redirect to dashboard
+      if (hasToken && isGoingToLogin) {
+        return dashboard;
+      }
+
+      // No redirect needed
+      return null;
+    },
 
     // Error page
     errorBuilder: (context, state) => Scaffold(

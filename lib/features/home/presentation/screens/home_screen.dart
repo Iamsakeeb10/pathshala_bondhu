@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../features/students/provider/student_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/modern_premium_slider.dart';
+import '../../../../shared/widgets/student_selection_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +17,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch students if parent
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = context.read<AuthProvider>();
+      if (authProvider.isParent) {
+        context.read<StudentProvider>().fetchStudents();
+      }
+    });
+  }
+
+
   final List<String> _bannerImages = [
     'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800',
     'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800',
@@ -20,51 +38,131 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Map<String, dynamic>> _categories = [
     {
-      'icon': Icons.info_outline,
-      'label': 'Info Desk',
-      'color': Color(0xFFEFC45D),
+      'icon': Icons.book_outlined,
+      'label': 'Books',
+      'color': const Color(0xFFEFC45D),
+      'route': '/books',
     },
     {
       'icon': Icons.dashboard_outlined,
-      'label': 'Dashboard',
-      'color': Color(0xFFEFA35F),
+      'label': 'Class Routine',
+      'color': const Color(0xFFEFA35F),
+      'route': '/routines',
     },
     {
       'icon': Icons.school_outlined,
-      'label': 'Dashboard',
-      'color': Color(0xFFEE9C70),
+      'label': 'Exam Routine',
+      'color': const Color(0xFFEE9C70),
+      'route': '/exam-routines',
     },
     {
       'icon': Icons.calendar_today_outlined,
-      'label': 'Calendar',
-      'color': Color(0xFF22C55E),
+      'label': 'Attendance',
+      'color': const Color(0xFF22C55E),
+      'route': '/attendance',
     },
     {
-      'icon': Icons.assignment_outlined,
-      'label': 'Circular',
-      'color': Color(0xFF3B82F6),
+      'icon': Icons.payment_outlined,
+      'label': 'Fees',
+      'color': const Color(0xFF3B82F6),
+      'route': '/fees',
     },
     {
       'icon': Icons.description_outlined,
       'label': 'Notice',
-      'color': Color(0xFF8B5CF6),
+      'color': const Color(0xFF8B5CF6),
+      'route': null,
     },
     {
-      'icon': Icons.check_circle_outline,
-      'label': 'Attendance',
-      'color': Color(0xFFEC4899),
+      'icon': Icons.assignment_outlined,
+      'label': 'Circular',
+      'color': const Color(0xFFEC4899),
+      'route': null,
     },
     {
       'icon': Icons.analytics_outlined,
-      'label': 'Attendance',
-      'color': Color(0xFF06B6D4),
+      'label': 'Reports',
+      'color': const Color(0xFF06B6D4),
+      'route': null,
     },
     {
       'icon': Icons.people_outline,
-      'label': 'Employees',
-      'color': Color(0xFFEFC45D),
+      'label': 'Profile',
+      'color': const Color(0xFFEFC45D),
+      'route': null,
     },
   ];
+
+  /// Handle category tap
+  /// For parents: check student selection, show bottom sheet if needed
+  /// For teachers: navigate directly
+  void _handleCategoryTap(Map<String, dynamic> category) {
+    final route = category['route'] as String?;
+
+    // If route is not implemented yet
+    if (route == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${category['label']} coming soon!'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+
+    // Teachers can navigate directly
+    if (authProvider.isTeacher) {
+      context.push(route);
+      return;
+    }
+
+    // Parents need to handle student selection
+    if (authProvider.isParent) {
+      final studentProvider = context.read<StudentProvider>();
+
+      // If no students loaded yet
+      if (studentProvider.students.isEmpty && !studentProvider.isLoading) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No students found. Please contact support.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // If loading students
+      if (studentProvider.isLoading) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Loading student information...'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+        return;
+      }
+
+      // If single student, auto-select and navigate
+      if (studentProvider.hasSingleStudent) {
+        context.push(route);
+        return;
+      }
+
+      // If multiple students, show selection bottom sheet
+      if (studentProvider.hasMultipleStudents) {
+        StudentSelectionBottomSheet.show(
+          context,
+          students: studentProvider.students,
+          onStudentSelected: (student) {
+            studentProvider.selectStudent(student);
+            context.push(route);
+          },
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,15 +274,20 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Hi, Ronakbhai_P p Patil',
-                style: TextStyle(
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final userName = authProvider.currentUser?.name ?? 'Guest';
+                  return Text(
+                    'Hi, $userName',
+                    style: TextStyle(
                   fontSize: 22.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   height: 1.3,
-                  letterSpacing: 0.2,
-                ),
+                      letterSpacing: 0.2,
+                    ),
+                  );
+                },
               ),
               SizedBox(height: 6.h),
               Container(
@@ -367,9 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          print('Tapped on ${category['label']}');
-        },
+        onTap: () => _handleCategoryTap(category),
         borderRadius: BorderRadius.circular(18.r),
         child: Container(
           decoration: BoxDecoration(

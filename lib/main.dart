@@ -11,6 +11,13 @@ import 'app/theme/providers/theme_provider.dart';
 // 🔹 Network connectivity imports
 import 'core/services/connectivity_service.dart';
 import 'core/widgets/no_internet_overlay.dart';
+// 🔹 Feature providers
+import 'features/attendance/provider/attendance_provider.dart';
+import 'features/books/provider/books_provider.dart';
+import 'features/exams/provider/exam_routine_provider.dart';
+import 'features/fees/provider/fees_provider.dart';
+import 'features/routines/provider/routine_provider.dart';
+import 'features/students/provider/student_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +32,12 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider(prefs)),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => StudentProvider()),
+        ChangeNotifierProvider(create: (_) => BooksProvider()),
+        ChangeNotifierProvider(create: (_) => RoutineProvider()),
+        ChangeNotifierProvider(create: (_) => ExamRoutineProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceProvider()),
+        ChangeNotifierProvider(create: (_) => FeesProvider()),
       ],
       child: const MyApp(),
     ),

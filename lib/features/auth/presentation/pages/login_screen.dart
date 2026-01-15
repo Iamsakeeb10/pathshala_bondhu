@@ -69,23 +69,37 @@ class _LoginScreenState extends State<LoginScreen>
 
     final authProvider = context.read<AuthProvider>();
 
-    // Mock login - replace with actual authentication
-    final success = _selectedRole == UserRole.parent
-        ? await authProvider.login(
-            _parentIdController.text,
-            _passwordController.text,
-            _selectedRole,
-          )
-        : await authProvider.login(
-            _emailController.text,
-            _passwordController.text,
-            _selectedRole,
-          );
+    // Clear any previous errors
+    authProvider.clearError();
+
+    final success = await authProvider.login(
+      _selectedRole == UserRole.parent
+          ? _parentIdController.text
+          : _emailController.text,
+      _passwordController.text,
+      _selectedRole,
+    );
 
     if (!mounted) return;
 
     if (success) {
       context.go(AppRouter.dashboard);
+    } else {
+      // Show error message
+      if (authProvider.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authProvider.errorMessage!),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: 'Dismiss',
+              textColor: Colors.white,
+              onPressed: () {},
+            ),
+          ),
+        );
+      }
     }
   }
 

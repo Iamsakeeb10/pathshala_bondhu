@@ -1,9 +1,8 @@
-// ============================================================================
-// 6. lib/core/network/api_interceptor.dart
-// ============================================================================
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/router/root_navigator_key.dart';
 import 'token_storage.dart';
 
 class ApiInterceptor extends Interceptor {
@@ -51,21 +50,31 @@ class ApiInterceptor extends Interceptor {
 
     // Handle 401 Unauthorized - Token expired or invalid
     if (statusCode == 401) {
-      debugPrint('🔒 Unauthorized! Token might be expired.');
-      await TokenStorage.clearToken();
-
-      // TODO: Redirect to login page
-      // You can implement navigation logic here when needed
-      // Example:
-      // navigatorKey.currentContext?.pushReplacementNamed('/login');
+      debugPrint('🔒 Unauthorized! Force logout initiated.');
+      await _handleForceLogout();
     }
 
     // Handle 403 Forbidden
     if (statusCode == 403) {
       debugPrint('🚫 Forbidden! Access denied.');
-      // TODO: Handle forbidden access
+      await _handleForceLogout();
     }
 
     super.onError(err, handler);
+  }
+
+  /// Handle force logout on auth errors
+  Future<void> _handleForceLogout() async {
+    // Clear all stored data
+    await TokenStorage.clearAll();
+
+    // Navigate to login screen
+    // Using rootNavigatorKey from app_router.dart
+    final context = rootNavigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      // Import go_router for navigation
+      context.go('/login');
+      debugPrint('🔓 Redirected to login screen');
+    }
   }
 }
