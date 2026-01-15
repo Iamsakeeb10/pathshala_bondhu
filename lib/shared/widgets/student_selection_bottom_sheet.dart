@@ -40,16 +40,34 @@ class StudentSelectionBottomSheet extends StatelessWidget {
             ),
           ),
 
-          // Title
+          // Title with icon
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text(
-              'Select Student',
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.person_search,
+                  size: 36.sp,
+                  color: AppColors.primary,
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  'Select a Student',
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Choose which student\'s data to view',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
 

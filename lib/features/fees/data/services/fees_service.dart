@@ -9,11 +9,12 @@ class FeesService {
 
   FeesService() : _dioClient = DioClient();
 
+  /// Get fees - using GET with query parameter
   Future<FeesResponse> getFees({required String year}) async {
     try {
-      final response = await _dioClient.post(
+      final response = await _dioClient.get(
         ApiEndpoints.studentFees,
-        data: {'year': year},
+        queryParameters: {'year': year},
       );
 
       return FeesResponse.fromJson(response.data as Map<String, dynamic>);

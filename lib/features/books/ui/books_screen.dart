@@ -6,10 +6,11 @@ import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../students/provider/student_provider.dart';
 import '../data/models/books_models.dart';
 import '../provider/books_provider.dart';
 
-/// Books screen - displays book list  for students
+/// Books screen - displays book list for students
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
 
@@ -81,6 +82,17 @@ class _BooksScreenState extends State<BooksScreen> {
   }
 
   Widget _buildBookList(BookListResponse data) {
+    // Filter books by selected student if applicable
+    final studentProvider = context.watch<StudentProvider>();
+    final selectedStudent = studentProvider.selectedStudent;
+
+    List<ChildBookList> booksToShow = data.childrenBookLists;
+    if (selectedStudent != null && studentProvider.hasMultipleStudents) {
+      booksToShow = data.childrenBookLists
+          .where((b) => b.studentId == selectedStudent.studentId)
+          .toList();
+    }
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.w),
       child: Column(
@@ -114,21 +126,14 @@ class _BooksScreenState extends State<BooksScreen> {
                     color: Colors.white.withOpacity(0.9),
                   ),
                 ),
-                Text(
-                  'Total Students: ${data.totalStudents}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
               ],
             ),
           ),
 
           SizedBox(height: 20.h),
 
-          // Books by student
-          ...data.childrenBookLists.map((child) => _buildStudentBooks(child)),
+          // Books by student (filtered)
+          ...booksToShow.map((child) => _buildStudentBooks(child)),
         ],
       ),
     );
@@ -220,11 +225,7 @@ class _BooksScreenState extends State<BooksScreen> {
             color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8.r),
           ),
-          child: Icon(
-            Icons.book,
-            color: AppColors.primary,
-            size: 24.sp,
-          ),
+          child: Icon(Icons.book, color: AppColors.primary, size: 24.sp),
         ),
 
         SizedBox(width: 12.w),
