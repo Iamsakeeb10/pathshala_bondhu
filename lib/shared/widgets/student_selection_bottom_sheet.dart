@@ -104,10 +104,7 @@ class StudentSelectionBottomSheet extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(
-              color: AppColors.grey200,
-              width: 1.5,
-            ),
+            border: Border.all(color: AppColors.grey200, width: 1.5),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.04),
@@ -118,29 +115,23 @@ class StudentSelectionBottomSheet extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // Avatar
+              // Avatar with gradient
               Container(
-                width: 50.w,
-                height: 50.w,
+                width: 56.w,
+                height: 56.w,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primary.withOpacity(0.8),
-                      AppColors.primaryDark,
-                    ],
+                    colors: [AppColors.primary, AppColors.primaryDark],
                   ),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(14.r),
                 ),
                 child: Center(
-                  child: Text(
-                    student.userId.substring(0, 1).toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  child: Icon(
+                    Icons.person_rounded,
+                    size: 28.sp,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -152,40 +143,83 @@ class StudentSelectionBottomSheet extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Student ID: ${student.studentId}',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                    // Student ID as main identifier
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.badge_outlined,
+                          size: 16.sp,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 6.w),
+                        Text(
+                          'ID: ${student.studentId}',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+
+                    // Class and Roll info
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 5.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Text(
+                        '${student.classInfo.name} • Roll: ${student.rollNo}',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      '${student.classInfo.name} • Roll: ${student.rollNo}',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      'Session: ${student.academicSession.title}',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
-                      ),
+                    SizedBox(height: 6.h),
+
+                    // Session info
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 14.sp,
+                          color: AppColors.textSecondary,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          'Session: ${student.academicSession.title}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
 
               // Arrow icon
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16.sp,
-                color: AppColors.textSecondary,
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: AppColors.grey100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14.sp,
+                  color: AppColors.primary,
+                ),
               ),
             ],
           ),
