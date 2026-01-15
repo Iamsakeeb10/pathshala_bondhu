@@ -29,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
   final List<String> _bannerImages = [
     'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800',
     'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800',
@@ -93,13 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
-  /// Handle category tap
-  /// For parents: check student selection, show bottom sheet if needed
-  /// For teachers: navigate directly
   void _handleCategoryTap(Map<String, dynamic> category) {
     final route = category['route'] as String?;
 
-    // If route is not implemented yet
     if (route == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -112,17 +107,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final authProvider = context.read<AuthProvider>();
 
-    // Teachers can navigate directly
     if (authProvider.isTeacher) {
       context.push(route);
       return;
     }
 
-    // Parents need to handle student selection
     if (authProvider.isParent) {
       final studentProvider = context.read<StudentProvider>();
 
-      // If no students loaded yet
       if (studentProvider.students.isEmpty && !studentProvider.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -133,7 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
 
-      // If loading students
       if (studentProvider.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -144,13 +135,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
 
-      // If single student, auto-select and navigate
       if (studentProvider.hasSingleStudent) {
         context.push(route);
         return;
       }
 
-      // If multiple students, show selection bottom sheet
       if (studentProvider.hasMultipleStudents) {
         StudentSelectionBottomSheet.show(
           context,
@@ -166,16 +155,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final sliderHeight = 170.h;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTopSection(),
-            SizedBox(height: 24.h),
-            _buildSectionTitle(), // Add this
-            SizedBox(height: 16.h), // Add spacing between title and categories
+            // Header with floating slider
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                _buildTopSection(sliderHeight),
+                // Floating slider positioned half inside, half outside
+                Positioned(
+                  left: 24.w,
+                  right: 24.w,
+                  bottom: -(sliderHeight / 2),
+                  child: _buildSlider(sliderHeight),
+                ),
+              ],
+            ),
+            // Add spacing equal to half the slider height plus margin
+            SizedBox(height: (sliderHeight / 2) + 24.h),
+            _buildSectionTitle(),
+            SizedBox(height: 16.h),
             _buildCategoriesSection(),
             SizedBox(height: 24.h),
           ],
@@ -229,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTopSection() {
+  Widget _buildTopSection(double sliderHeight) {
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
@@ -251,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 28.h),
+        padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 6.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -259,7 +264,8 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 28.h),
             _buildGalleryHeader(),
             SizedBox(height: 16.h),
-            _buildSlider(),
+            // Empty space for the slider
+            SizedBox(height: sliderHeight / 2),
           ],
         ),
       ),
@@ -280,10 +286,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Text(
                     'Hi, $userName',
                     style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  height: 1.3,
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.3,
                       letterSpacing: 0.2,
                     ),
                   );
@@ -408,15 +414,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSlider() {
+  Widget _buildSlider(double sliderHeight) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -424,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(20.r),
         child: ModernPremiumSlider(
           bannerImages: _bannerImages,
-          height: 170.h,
+          height: sliderHeight,
           autoPlayInterval: const Duration(seconds: 5),
           borderRadius: 20.r,
           showControls: false,
@@ -442,17 +449,12 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Calculate item width (same as GridView)
-          final itemWidth =
-              (constraints.maxWidth - (2 * 14.w)) /
-              3; // 2 spacings between 3 items
-
-          // Calculate item height based on childAspectRatio
-          final itemHeight = itemWidth / 0.95; // childAspectRatio: 0.95
+          final itemWidth = (constraints.maxWidth - (2 * 14.w)) / 3;
+          final itemHeight = itemWidth / 0.95;
 
           return Wrap(
-            spacing: 14.w, // crossAxisSpacing
-            runSpacing: 14.h, // mainAxisSpacing
+            spacing: 14.w,
+            runSpacing: 14.h,
             children: _categories.map((category) {
               return SizedBox(
                 width: itemWidth,
