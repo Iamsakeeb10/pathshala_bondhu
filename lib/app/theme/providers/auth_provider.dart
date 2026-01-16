@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/network/token_storage.dart';
-import '../../../features/auth/data/models/parent_models.dart';
-import '../../../features/auth/data/models/teacher_models.dart';
 import '../../../features/auth/data/services/auth_service.dart';
 import '../../constants/user_role.dart';
 
@@ -72,7 +70,7 @@ class AuthProvider extends ChangeNotifier {
   /// Check authentication status on app launch
   Future<void> _checkAuthStatus() async {
     final hasToken = await TokenStorage.hasToken();
-    
+
     if (!hasToken) {
       // No token, user is not authenticated
       _currentUser = null;
@@ -87,12 +85,7 @@ class AuthProvider extends ChangeNotifier {
     final email = await TokenStorage.getUserEmail();
 
     if (role != null && id != null && name != null) {
-      _currentUser = User(
-        id: id,
-        name: name,
-        email: email,
-        role: role,
-      );
+      _currentUser = User(id: id, name: name, email: email, role: role);
       notifyListeners();
     } else {
       // Incomplete data, clear everything
@@ -200,11 +193,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Generic login method (for backward compatibility with login screen)
-  Future<bool> login(
-    String identifier,
-    String password,
-    UserRole role,
-  ) async {
+  Future<bool> login(String identifier, String password, UserRole role) async {
     if (role == UserRole.parent) {
       return loginAsParent(parentId: identifier, password: password);
     } else {
@@ -240,4 +229,3 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-

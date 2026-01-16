@@ -141,15 +141,39 @@ class _FeesScreenState extends State<FeesScreen> {
           .toList();
     }
 
+    // Filter months to show only up to current month if year is current year
+    final currentYear = DateTime.now().year;
+    final currentMonth = DateTime.now().month;
+    
+    // Only filter if it's the current year (or future years where we shouldn't show anything yet?)
+    // Requirement says "Future months fees dont show", assuming for current year.
+    // If year is past, show all. If year is future, show none.
+    
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.w),
       child: Column(
-        children: feesToShow.map((child) => _buildStudentFees(child)).toList(),
+        children: feesToShow.map((child) {
+          // Clone the object or just filter the list in the UI builder?
+          // Since models are final, we can't modify them easily without copyWith. 
+          // But we can just pass the filtered list to a modified _buildStudentFees or handle it there.
+          // Let's handle it by passing a filtered list to _buildStudentFees if possible, 
+          // or just modify _buildStudentFees to accept max month.
+          
+          List<MonthlyFee> monthlyBreakdown = child.monthlyBreakdown;
+          if (data.academicYear == currentYear) {
+            monthlyBreakdown = child.monthlyBreakdown.take(currentMonth).toList();
+          } else if (data.academicYear > currentYear) {
+             monthlyBreakdown = [];
+          }
+          
+          return _buildStudentFees(child, monthlyBreakdown);
+        }).toList(),
       ),
     );
   }
 
-  Widget _buildStudentFees(ChildFees child) {
+  Widget _buildStudentFees(ChildFees child, [List<MonthlyFee>? overrideMonthlyBreakdown]) {
+    final monthlyBreakdown = overrideMonthlyBreakdown ?? child.monthlyBreakdown;
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
@@ -231,9 +255,9 @@ class _FeesScreenState extends State<FeesScreen> {
               crossAxisSpacing: 10.w,
               mainAxisSpacing: 10.h,
             ),
-            itemCount: child.monthlyBreakdown.length,
+            itemCount: monthlyBreakdown.length,
             itemBuilder: (context, index) =>
-                _buildMonthCard(child.monthlyBreakdown[index]),
+                _buildMonthCard(monthlyBreakdown[index]),
           ),
         ],
       ),

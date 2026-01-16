@@ -12,6 +12,8 @@ import '../../features/exams/ui/exam_routine_screen.dart';
 import '../../features/fees/ui/fees_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
+import '../../features/routines/ui/class_routine_screen.dart';
+import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -101,6 +103,25 @@ class AppRouter {
         path: '/fees',
         name: 'fees',
         builder: (context, state) => const FeesScreen(),
+      ),
+
+      // Teacher Attendance Screen
+      GoRoute(
+        path: '/teacher-attendance',
+        name: 'teacher-attendance',
+        builder: (context, state) {
+          final classId = int.parse(state.uri.queryParameters['classId']!);
+          final sessionId = int.parse(state.uri.queryParameters['sessionId']!);
+          final className = state.uri.queryParameters['className']!;
+          final sessionName = state.uri.queryParameters['sessionName']!;
+          
+          return TeacherAttendanceScreen(
+            classId: classId,
+            sessionId: sessionId,
+            className: className,
+            sessionName: sessionName,
+          );
+        },
       ),
     ],
 

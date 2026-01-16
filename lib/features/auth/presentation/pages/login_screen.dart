@@ -324,7 +324,7 @@ class _LoginScreenState extends State<LoginScreen>
       hint: 'Enter your password',
       prefixIcon: Icon(Icons.lock_outline, size: 22.sp),
       obscureText: !_isPasswordVisible,
-      maxLength: 8,
+      maxLength: 10,
       suffixIcon: IconButton(
         icon: Icon(
           _isPasswordVisible
@@ -346,8 +346,8 @@ class _LoginScreenState extends State<LoginScreen>
         if (value.length < 6) {
           return 'Password must be at least 6 characters';
         }
-        if (value.length > 8) {
-          return 'Password must not exceed 8 characters';
+        if (value.length > 10) {
+          return 'Password must not exceed 10 characters';
         }
         return null;
       },

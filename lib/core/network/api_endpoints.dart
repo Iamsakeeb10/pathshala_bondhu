@@ -49,4 +49,21 @@ class ApiEndpoints {
   /// POST with Bearer token
   /// Body: { "year": "string" }
   static const String studentFees = '/student/fees/monthly';
+
+  // ========== Teacher Attendance Endpoints ==========
+  
+  /// Get academic sessions for teacher
+  /// GET
+  static const String teacherAcademicSessions = '/teacher/academic-sessions';
+
+  /// Get classes for teacher
+  /// GET
+  static const String teacherClasses = '/teacher/classes';
+
+  /// Get students for a class and session
+  /// POST: { "class_id": "1", "academic_session_id": "1" }
+  static const String teacherStudents = '/teacher/students';
+
+  /// Submit attendance OR Get History (POST)
+  static const String teacherAttendance = '/teacher/attendance';
 }

@@ -106,6 +106,7 @@ class StudentInfo {
   final String updatedAt;
   final ClassInfo classInfo;
   final AcademicSession academicSession;
+  final StudentUser? user;
 
   StudentInfo({
     required this.id,
@@ -121,6 +122,7 @@ class StudentInfo {
     required this.updatedAt,
     required this.classInfo,
     required this.academicSession,
+    this.user,
   });
 
   factory StudentInfo.fromJson(Map<String, dynamic> json) {
@@ -140,6 +142,35 @@ class StudentInfo {
       academicSession: AcademicSession.fromJson(
         json['academic_session'] as Map<String, dynamic>,
       ),
+      user: json['user'] != null
+          ? StudentUser.fromJson(json['user'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class StudentUser {
+  final int id;
+  final String schoolId;
+  final String name;
+  final String email;
+  final String? avatar;
+
+  StudentUser({
+    required this.id,
+    required this.schoolId,
+    required this.name,
+    required this.email,
+    this.avatar,
+  });
+
+  factory StudentUser.fromJson(Map<String, dynamic> json) {
+    return StudentUser(
+      id: json['id'] as int,
+      schoolId: json['school_id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      avatar: json['avatar'] as String?,
     );
   }
 }

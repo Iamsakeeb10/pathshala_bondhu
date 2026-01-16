@@ -3,16 +3,10 @@ class TeacherLoginRequest {
   final String email;
   final String password;
 
-  TeacherLoginRequest({
-    required this.email,
-    required this.password,
-  });
+  TeacherLoginRequest({required this.email, required this.password});
 
   Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'password': password,
-    };
+    return {'email': email, 'password': password};
   }
 }
 
@@ -21,10 +15,7 @@ class TeacherLoginResponse {
   final String token;
   final TeacherUserWithDetails user;
 
-  TeacherLoginResponse({
-    required this.token,
-    required this.user,
-  });
+  TeacherLoginResponse({required this.token, required this.user});
 
   factory TeacherLoginResponse.fromJson(Map<String, dynamic> json) {
     return TeacherLoginResponse(
@@ -44,7 +35,7 @@ class TeacherUserWithDetails {
   final String email;
   final String? avatar;
   final String? emailVerifiedAt;
-  final String passwordDisplay;
+  final String? passwordDisplay;
   final String createdAt;
   final String updatedAt;
   final TeacherDetails? teacher;
@@ -56,7 +47,7 @@ class TeacherUserWithDetails {
     required this.email,
     this.avatar,
     this.emailVerifiedAt,
-    required this.passwordDisplay,
+    this.passwordDisplay,
     required this.createdAt,
     required this.updatedAt,
     this.teacher,
@@ -65,12 +56,12 @@ class TeacherUserWithDetails {
   factory TeacherUserWithDetails.fromJson(Map<String, dynamic> json) {
     return TeacherUserWithDetails(
       id: json['id'] as int,
-      schoolId: json['school_id'] as String,
+      schoolId: json['school_id'].toString(),
       name: json['name'] as String,
       email: json['email'] as String,
       avatar: json['avatar'] as String?,
       emailVerifiedAt: json['email_verified_at'] as String?,
-      passwordDisplay: json['password_display'] as String,
+      passwordDisplay: json['password_display'] as String?,
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String,
       teacher: json['teacher'] != null
@@ -122,8 +113,8 @@ class TeacherDetails {
   factory TeacherDetails.fromJson(Map<String, dynamic> json) {
     return TeacherDetails(
       id: json['id'] as int,
-      schoolId: json['school_id'] as String,
-      userId: json['user_id'] as String,
+      schoolId: json['school_id'].toString(),
+      userId: json['user_id'].toString(),
       department: json['department'] as String,
       specialization: json['specialization'] as String,
       hireDate: json['hire_date'] as String,

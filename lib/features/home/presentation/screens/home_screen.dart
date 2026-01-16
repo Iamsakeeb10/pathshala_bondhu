@@ -8,6 +8,7 @@ import '../../../../features/students/provider/student_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/modern_premium_slider.dart';
 import '../../../../shared/widgets/student_selection_bottom_sheet.dart';
+import '../../../teacher_attendance/ui/widgets/class_selection_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -41,6 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
       'label': 'Books',
       'color': const Color(0xFFEFC45D),
       'route': '/books',
+    },
+    {
+      'icon': Icons.book, // Using book icon for Diary as placeholder
+      'label': 'Diary',
+      'color': const Color(0xFF8B5CF6),
+      'route': null,
     },
     {
       'icon': Icons.dashboard_outlined,
@@ -92,13 +99,33 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
+  // Filter categories based on role
+  List<Map<String, dynamic>> get _visibleCategories {
+    final authProvider = context.read<AuthProvider>();
+    if (authProvider.isTeacher) {
+      return _categories
+          .where(
+            (c) => [
+              'Attendance',
+              'Diary',
+              'Class Routine', // User said "Routine", assuming mapping to "Class Routine"
+            ].contains(c['label']),
+          )
+          .toList();
+    }
+    // For parents, show everything? Or should we hide Diary?
+    // User didn't specify for parents. Leaving as is (shows all).
+    return _categories;
+  }
+
   void _handleCategoryTap(Map<String, dynamic> category) {
     final route = category['route'] as String?;
+    final label = category['label'] as String;
 
     if (route == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${category['label']} coming soon!'),
+          content: Text('$label coming soon!'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -108,11 +135,44 @@ class _HomeScreenState extends State<HomeScreen> {
     final authProvider = context.read<AuthProvider>();
 
     if (authProvider.isTeacher) {
-      context.push(route);
+      if (label == 'Attendance') {
+        ClassSelectionBottomSheet.show(
+          context,
+          onConfirmed: (selectedClass, selectedSession) {
+            context.push(
+              '/teacher-attendance',
+              extra: {
+                'classId': selectedClass.id,
+                'sessionId': selectedSession.id,
+                'className': selectedClass.name,
+                'sessionName': selectedSession.title,
+              },
+            );
+            // Using query params might be cleaner for deep linking but extra is easier for objects/ints
+            // The GoRouter definition I planned uses query params.
+            // Let's stick to query params to match the plan and AppRouter update I will do.
+            // context.push(Uri(path: '/teacher-attendance', queryParameters: { ... }).toString());
+
+            final uri = Uri(
+              path: '/teacher-attendance',
+              queryParameters: {
+                'classId': selectedClass.id.toString(),
+                'sessionId': selectedSession.id.toString(),
+                'className': selectedClass.name,
+                'sessionName': selectedSession.title,
+              },
+            );
+            context.push(uri.toString());
+          },
+        );
+      } else {
+        context.push(route);
+      }
       return;
     }
 
     if (authProvider.isParent) {
+      // ... existing parent logic
       final studentProvider = context.read<StudentProvider>();
 
       if (studentProvider.students.isEmpty && !studentProvider.isLoading) {
@@ -455,7 +515,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return Wrap(
             spacing: 14.w,
             runSpacing: 14.h,
-            children: _categories.map((category) {
+            children: _visibleCategories.map((category) {
               return SizedBox(
                 width: itemWidth,
                 height: itemHeight,

@@ -153,7 +153,7 @@ class StudentSelectionBottomSheet extends StatelessWidget {
                         ),
                         SizedBox(width: 6.w),
                         Text(
-                          'ID: ${student.studentId}',
+                          student.user?.name ?? 'ID: ${student.studentId}',
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
@@ -162,6 +162,16 @@ class StudentSelectionBottomSheet extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (student.user?.name != null) ...[
+                      SizedBox(height: 4.h),
+                      Text(
+                        'ID: ${student.studentId}',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
                     SizedBox(height: 8.h),
 
                     // Class and Roll info
