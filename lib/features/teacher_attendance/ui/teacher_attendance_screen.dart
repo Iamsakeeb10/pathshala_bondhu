@@ -59,27 +59,79 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           children: [
             Text(
               'Attendance',
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
+            SizedBox(height: 2.h),
             Text(
               '${widget.className} • ${widget.sessionName}',
-              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400),
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3.h,
-          labelStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
-          unselectedLabelStyle: TextStyle(fontSize: 14.sp),
-          tabs: const [
-            Tab(text: 'Mark Attendance'),
-            Tab(text: 'History'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(56.h),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: AppColors.primary,
+              indicatorWeight: 3.h,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: AppColors.primary,
+              unselectedLabelColor: AppColors.grey500,
+              labelStyle: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+              tabs: [
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle_outline, size: 18.sp),
+                      SizedBox(width: 6.w),
+                      const Text('Mark Attendance'),
+                    ],
+                  ),
+                ),
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.history, size: 18.sp),
+                      SizedBox(width: 6.w),
+                      const Text('History'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(
