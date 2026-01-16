@@ -80,29 +80,35 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(56.h),
+          preferredSize: Size.fromHeight(60.h),
           child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            padding: EdgeInsets.all(4.w),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: AppColors.grey100,
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: TabBar(
               controller: _tabController,
-              indicatorColor: AppColors.primary,
-              indicatorWeight: 3.h,
+              indicator: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
               labelColor: AppColors.primary,
-              unselectedLabelColor: AppColors.grey500,
+              unselectedLabelColor: AppColors.grey600,
               labelStyle: TextStyle(
                 fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
               ),
               unselectedLabelStyle: TextStyle(
                 fontSize: 14.sp,
@@ -110,20 +116,22 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
               ),
               tabs: [
                 Tab(
+                  height: 44.h,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check_circle_outline, size: 18.sp),
+                      Icon(Icons.edit_note_rounded, size: 20.sp),
                       SizedBox(width: 6.w),
-                      const Text('Mark Attendance'),
+                      const Text('Mark'),
                     ],
                   ),
                 ),
                 Tab(
+                  height: 44.h,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.history, size: 18.sp),
+                      Icon(Icons.history_rounded, size: 20.sp),
                       SizedBox(width: 6.w),
                       const Text('History'),
                     ],
