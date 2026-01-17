@@ -12,8 +12,10 @@ import '../../features/exams/ui/exam_routine_screen.dart';
 import '../../features/fees/ui/fees_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
-import '../../features/routines/ui/class_routine_screen.dart';
 import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
+import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
+import '../../features/diary/presentation/screens/teacher_diary_list_screen.dart';
+import '../../features/diary/presentation/screens/create_diary_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -122,6 +124,27 @@ class AppRouter {
             sessionName: sessionName,
           );
         },
+      ),
+
+      // Teacher Routines
+      GoRoute(
+        path: '/teacher/routines',
+        name: 'teacher-routines',
+        builder: (context, state) => const TeacherRoutineScreen(),
+      ),
+
+      // Teacher Diaries
+      GoRoute(
+        path: '/teacher/diaries',
+        name: 'teacher-diaries',
+        builder: (context, state) => const TeacherDiaryListScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: 'create-diary',
+            builder: (context, state) => const CreateDiaryScreen(),
+          ),
+        ],
       ),
     ],
 

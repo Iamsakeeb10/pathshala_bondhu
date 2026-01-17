@@ -122,37 +122,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final route = category['route'] as String?;
     final label = category['label'] as String;
 
-    if (route == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$label coming soon!'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
     final authProvider = context.read<AuthProvider>();
 
+    // 1. Handle Teacher specific overrides first (allows 'Diary' which has null route in map)
     if (authProvider.isTeacher) {
       if (label == 'Attendance') {
         ClassSelectionBottomSheet.show(
           context,
           onConfirmed: (selectedClass, selectedSession) {
-            context.push(
-              '/teacher-attendance',
-              extra: {
-                'classId': selectedClass.id,
-                'sessionId': selectedSession.id,
-                'className': selectedClass.name,
-                'sessionName': selectedSession.title,
-              },
-            );
-            // Using query params might be cleaner for deep linking but extra is easier for objects/ints
-            // The GoRouter definition I planned uses query params.
-            // Let's stick to query params to match the plan and AppRouter update I will do.
-            // context.push(Uri(path: '/teacher-attendance', queryParameters: { ... }).toString());
-
             final uri = Uri(
               path: '/teacher-attendance',
               queryParameters: {
@@ -165,14 +142,35 @@ class _HomeScreenState extends State<HomeScreen> {
             context.push(uri.toString());
           },
         );
-      } else {
-        context.push(route);
+        return;
+      } else if (label == 'Class Routine') {
+        context.push('/teacher/routines');
+        return;
+      } else if (label == 'Diary') {
+        context.push('/teacher/diaries');
+        return;
       }
+    }
+
+    // 2. Check if route is null for other cases
+    if (route == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$label coming soon!'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
       return;
     }
 
+    // 3. Handle standard Teacher routes (fallthrough)
+    if (authProvider.isTeacher) {
+      context.push(route);
+      return;
+    }
+
+    // 4. Handle Parent logic
     if (authProvider.isParent) {
-      // ... existing parent logic
       final studentProvider = context.read<StudentProvider>();
 
       if (studentProvider.students.isEmpty && !studentProvider.isLoading) {

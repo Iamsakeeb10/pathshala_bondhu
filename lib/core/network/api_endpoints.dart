@@ -66,4 +66,12 @@ class ApiEndpoints {
 
   /// Submit attendance OR Get History (POST)
   static const String teacherAttendance = '/teacher/attendance';
+
+  /// Get routines for teacher
+  /// GET
+  static const String teacherRoutines = '/teacher/routines';
+
+  /// Get diaries (GET) or Create diary (POST)
+  /// GET/POST
+  static const String teacherDiaries = '/teacher/diaries';
 }

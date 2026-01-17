@@ -18,7 +18,10 @@ import 'features/exams/provider/exam_routine_provider.dart';
 import 'features/fees/provider/fees_provider.dart';
 import 'features/routines/provider/routine_provider.dart';
 import 'features/students/provider/student_provider.dart';
+import 'features/students/provider/student_provider.dart';
 import 'features/teacher_attendance/provider/teacher_attendance_provider.dart';
+import 'features/routines/provider/teacher_routine_provider.dart';
+import 'features/diary/provider/teacher_diary_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +43,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AttendanceProvider()),
         ChangeNotifierProvider(create: (_) => FeesProvider()),
         ChangeNotifierProvider(create: (_) => TeacherAttendanceProvider()),
+        ChangeNotifierProvider(create: (_) => TeacherRoutineProvider()),
+        ChangeNotifierProvider(create: (_) => TeacherDiaryProvider()),
       ],
       child: const MyApp(),
     ),
