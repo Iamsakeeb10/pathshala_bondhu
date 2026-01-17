@@ -16,12 +16,68 @@ class TeacherDiaryListScreen extends StatefulWidget {
 }
 
 class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TeacherDiaryProvider>().fetchDiaries();
+      context.read<TeacherDiaryProvider>().fetchDiaries(refresh: true);
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      context.read<TeacherDiaryProvider>().fetchDiaries();
+    }
+  }
+
+  Future<void> _refresh() async {
+    await context.read<TeacherDiaryProvider>().fetchDiaries(refresh: true);
+  }
+
+  void _confirmDelete(BuildContext context, int id) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Diary'),
+        content: const Text('Are you sure you want to delete this diary?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              try {
+                await context.read<TeacherDiaryProvider>().deleteDiary(id);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Diary deleted successfully')),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                }
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -58,34 +114,65 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
       ),
       body: Consumer<TeacherDiaryProvider>(
         builder: (context, provider, child) {
-          if (provider.isLoading) {
+          if (provider.isLoading && provider.diaries.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (provider.errorMessage != null) {
+          if (provider.errorMessage != null && provider.diaries.isEmpty) {
             return Center(
               child: Padding(
                 padding: EdgeInsets.all(24.w),
-                child: Text(
-                  provider.errorMessage!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.red, fontSize: 16.sp),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      provider.errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.red, fontSize: 16.sp),
+                    ),
+                    SizedBox(height: 16.h),
+                    ElevatedButton(
+                      onPressed: _refresh,
+                      child: const Text('Retry'),
+                    ),
+                  ],
                 ),
               ),
             );
           }
 
           if (provider.diaries.isEmpty) {
-            return _buildEmptyState();
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              child: Stack(
+                children: [
+                  ListView(), // Ensure pull to refresh works even if empty
+                  _buildEmptyState(),
+                ],
+              ),
+            );
           }
 
-          return ListView.separated(
-            padding: EdgeInsets.all(16.w),
-            itemCount: provider.diaries.length,
-            separatorBuilder: (context, index) => SizedBox(height: 12.h),
-            itemBuilder: (context, index) {
-              return _buildDiaryCard(provider.diaries[index]);
-            },
+          return RefreshIndicator(
+            onRefresh: _refresh,
+            child: ListView.separated(
+              controller: _scrollController,
+              padding: EdgeInsets.all(16.w),
+              itemCount:
+                  provider.diaries.length + (provider.isMoreLoading ? 1 : 0),
+              separatorBuilder: (context, index) => SizedBox(height: 12.h),
+              itemBuilder: (context, index) {
+                if (index == provider.diaries.length) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                return _buildDiaryCard(provider.diaries[index]);
+              },
+            ),
           );
         },
       ),
@@ -118,16 +205,6 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
   }
 
   Widget _buildDiaryCard(TeacherDiary diary) {
-    /*
-      Diary Card Design
-      Each diary card shows:
-      Title
-      Class name
-      Subject
-      Diary date
-      Status badge:
-      Published (Green), Draft (Orange)
-    */
     bool isPublished = diary.status.toLowerCase() == 'published';
 
     return Container(
@@ -146,8 +223,8 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            // View details (For now just a placeholder or show dialog)
-            // Implementation of View Details wasn't strictly detailed in Todos but good to have
+            // Navigate to Details
+            context.push('/teacher/diaries/${diary.id}');
           },
           borderRadius: BorderRadius.circular(12.r),
           child: Padding(
@@ -171,6 +248,8 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                       ),
                     ),
                     _buildStatusBadge(isPublished, diary.status),
+                    SizedBox(width: 8.w),
+                    _buildOptionsMenu(diary),
                   ],
                 ),
                 SizedBox(height: 8.h),
@@ -220,6 +299,16 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                         color: AppColors.grey500,
                       ),
                     ),
+                    const Spacer(),
+                    if (diary.academicSession != null)
+                      Text(
+                        diary.academicSession!.title,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: AppColors.grey400,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -227,6 +316,43 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildOptionsMenu(TeacherDiary diary) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'edit') {
+          context.push('/teacher/diaries/edit/${diary.id}', extra: diary);
+        } else if (value == 'delete') {
+          _confirmDelete(context, diary.id);
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        const PopupMenuItem<String>(
+          value: 'edit',
+          child: Row(
+            children: [
+              Icon(Icons.edit, size: 20),
+              SizedBox(width: 8),
+              Text('Edit'),
+            ],
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete, size: 20, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Delete', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ),
+      ],
+      icon: Icon(Icons.more_vert, size: 20.sp, color: AppColors.grey600),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
     );
   }
 
@@ -245,7 +371,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
         ),
       ),
       child: Text(
-        statusText.toUpperCase(), // Or capitalize
+        statusText.toUpperCase(),
         style: TextStyle(
           fontSize: 10.sp,
           fontWeight: FontWeight.bold,

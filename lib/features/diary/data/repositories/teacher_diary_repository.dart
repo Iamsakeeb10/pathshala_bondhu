@@ -10,27 +10,44 @@ class TeacherDiaryRepository {
   final DioClient _dioClient;
 
   TeacherDiaryRepository({DioClient? dioClient})
-    : _dioClient = dioClient ?? DioClient();
+      : _dioClient = dioClient ?? DioClient();
 
-  Future<List<TeacherDiary>> fetchDiaries() async {
+  Future<PaginatedDiaryResponse> fetchDiaries({int page = 1}) async {
     try {
-      final response = await _dioClient.get(ApiEndpoints.teacherDiaries);
+      final response = await _dioClient.get(
+        ApiEndpoints.teacherDiaries,
+        queryParameters: {'page': page},
+      );
 
       if (response.statusCode == 200) {
-        final data = response.data;
-        // Assuming the list key is 'diaries' or the root is a list/page.
-        // Based on routine response { "routines": [...] }, assume { "diaries": [...] }
-        // If not, we might need to adjust.
-        if (data['diaries'] != null) {
-          final List<dynamic> diariesJson = data['diaries'];
-          return diariesJson
-              .map((json) => TeacherDiary.fromJson(json))
-              .toList();
-        }
+        return PaginatedDiaryResponse.fromJson(response.data);
       }
-      return [];
+      throw Exception('Failed to load diaries');
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Failed to fetch diaries');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  Future<TeacherDiary> getDiary(int id) async {
+    try {
+      final response = await _dioClient.get('${ApiEndpoints.teacherDiaries}/$id');
+      if (response.statusCode == 200) {
+        // Assuming response structure: { "data": { ...diary_object... } } or just the object
+        // Standard REST often returns object directly or wrapped in data
+        // Based on list response wrapping in data, detailed response likely wraps in data too.
+        // If not, we might need a adjust.
+        // Let's assume response.data['data'] if wrapper exists, or response.data if direct.
+        // To be safe, let's look at the list response. It clearly uses "data" wrapper for list.
+        // Usually single item entry isn't wrapped or is wrapped in "data".
+        // I will act defensively.
+        final json = response.data['diary'] ?? response.data['data'] ?? response.data;
+        return TeacherDiary.fromJson(json);
+      }
+      throw Exception('Failed to fetch diary details');
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Failed to fetch diary');
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
     }
@@ -48,6 +65,37 @@ class TeacherDiaryRepository {
       }
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Failed to create diary');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  Future<void> updateDiary(int id, Map<String, dynamic> diaryData) async {
+    try {
+      final response = await _dioClient.put(
+        '${ApiEndpoints.teacherDiaries}/$id',
+        data: diaryData,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(response.data['message'] ?? 'Failed to update diary');
+      }
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Failed to update diary');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  Future<void> deleteDiary(int id) async {
+    try {
+      final response = await _dioClient.delete('${ApiEndpoints.teacherDiaries}/$id');
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception(response.data['message'] ?? 'Failed to delete diary');
+      }
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Failed to delete diary');
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
     }

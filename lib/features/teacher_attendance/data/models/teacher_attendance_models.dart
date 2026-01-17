@@ -178,3 +178,26 @@ class AttendanceHistoryRecord {
   }
 }
 
+
+class TeacherSubject {
+  final int id;
+  final String name;
+  final String? code;
+  final String? maxMarks;
+
+  TeacherSubject({
+    required this.id,
+    required this.name,
+    this.code,
+    this.maxMarks,
+  });
+
+  factory TeacherSubject.fromJson(Map<String, dynamic> json) {
+    return TeacherSubject(
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      name: json['name'] ?? '',
+      code: json['code'],
+      maxMarks: json['max_marks']?.toString(),
+    );
+  }
+}

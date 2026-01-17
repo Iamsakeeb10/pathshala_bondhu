@@ -10,7 +10,8 @@ import '../../data/models/teacher_diary_model.dart';
 import '../../provider/teacher_diary_provider.dart';
 
 class CreateDiaryScreen extends StatefulWidget {
-  const CreateDiaryScreen({super.key});
+  final TeacherDiary? diary;
+  const CreateDiaryScreen({super.key, this.diary});
 
   @override
   State<CreateDiaryScreen> createState() => _CreateDiaryScreenState();
@@ -37,24 +38,103 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
   DateTime? _selectedDiaryDate;
   DateTime? _selectedSubmissionDate;
 
+  bool _isEditing = false;
+
   @override
   void initState() {
     super.initState();
-    // Default dates
-    _selectedDiaryDate = DateTime.now();
-    _diaryDateController.text = DateFormat(
-      'yyyy-MM-dd',
-    ).format(_selectedDiaryDate!);
+    _isEditing = widget.diary != null;
 
-    // Default submission date same as diary date? Or empty?
-    _selectedSubmissionDate = DateTime.now();
-    _submissionDateController.text = DateFormat(
-      'yyyy-MM-dd',
-    ).format(_selectedSubmissionDate!);
+    if (_isEditing) {
+      _populateFields();
+    } else {
+      // Default dates
+      _selectedDiaryDate = DateTime.now();
+      _diaryDateController.text = DateFormat(
+        'yyyy-MM-dd',
+      ).format(_selectedDiaryDate!);
+
+      _selectedSubmissionDate = DateTime.now();
+      _submissionDateController.text = DateFormat(
+        'yyyy-MM-dd',
+      ).format(_selectedSubmissionDate!);
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<TeacherDiaryProvider>().fetchMetadata();
-      _autoSelectSession();
+      final provider = context.read<TeacherDiaryProvider>();
+      if (provider.classes.isEmpty ||
+          provider.sessions.isEmpty ||
+          provider.subjects.isEmpty) {
+        await provider.fetchMetadata();
+      }
+      if (!_isEditing) {
+        _autoSelectSession();
+      } else {
+        // If editing, ensure we set selected objects from list based on IDs
+        _matchSelections();
+      }
+
+      // Even if editing, we might need to match selections after fetch
+      if (_isEditing) {
+        _matchSelections();
+      }
+    });
+  }
+
+  void _populateFields() {
+    final diary = widget.diary!;
+    _titleController.text = diary.title;
+    _descriptionController.text = diary.description ?? '';
+    _status = diary.status;
+
+    if (diary.diaryDate != null) {
+      try {
+        _selectedDiaryDate = DateTime.parse(diary.diaryDate!);
+        _diaryDateController.text = DateFormat(
+          'yyyy-MM-dd',
+        ).format(_selectedDiaryDate!);
+      } catch (_) {}
+    }
+
+    if (diary.submissionDate != null) {
+      try {
+        _selectedSubmissionDate = DateTime.parse(diary.submissionDate!);
+        _submissionDateController.text = DateFormat(
+          'yyyy-MM-dd',
+        ).format(_selectedSubmissionDate!);
+      } catch (_) {}
+    }
+  }
+
+  void _matchSelections() {
+    if (!mounted || widget.diary == null) return;
+    final provider = context.read<TeacherDiaryProvider>();
+
+    setState(() {
+      if (widget.diary!.classId != null && provider.classes.isNotEmpty) {
+        try {
+          _selectedClass = provider.classes.firstWhere(
+            (c) => c.id == widget.diary!.classId,
+          );
+        } catch (_) {}
+      }
+
+      if (widget.diary!.academicSessionId != null &&
+          provider.sessions.isNotEmpty) {
+        try {
+          _selectedSession = provider.sessions.firstWhere(
+            (s) => s.id == widget.diary!.academicSessionId,
+          );
+        } catch (_) {}
+      }
+
+      if (widget.diary!.subjectId != null && provider.subjects.isNotEmpty) {
+        try {
+          _selectedSubject = provider.subjects.firstWhere(
+            (s) => s.id == widget.diary!.subjectId,
+          );
+        } catch (_) {}
+      }
     });
   }
 
@@ -145,15 +225,29 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
       };
 
       try {
-        await context.read<TeacherDiaryProvider>().createDiary(diaryData);
+        if (_isEditing) {
+          await context.read<TeacherDiaryProvider>().updateDiary(
+            widget.diary!.id,
+            diaryData,
+          );
+        } else {
+          await context.read<TeacherDiaryProvider>().createDiary(diaryData);
+        }
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Diary created successfully!'),
+            SnackBar(
+              content: Text(
+                _isEditing
+                    ? 'Diary updated successfully!'
+                    : 'Diary created successfully!',
+              ),
               backgroundColor: Colors.green,
             ),
           );
-          context.pop(); // Go back to list
+          // If editing, we might want to pop twice if we came from details logic or just once.
+          // Usually just pop once to go back to list or details.
+          context.pop();
         }
       } catch (e) {
         if (mounted) {
@@ -174,7 +268,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         title: Text(
-          'Create Diary',
+          _isEditing ? 'Edit Diary' : 'Create Diary',
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -287,9 +381,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                               ),
                             )
                           : Text(
-                              _status == 'published'
-                                  ? 'Publish Diary'
-                                  : 'Save as Draft',
+                              _isEditing ? 'Update Diary' : 'Publish Diary',
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,

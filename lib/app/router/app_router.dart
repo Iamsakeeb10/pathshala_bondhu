@@ -16,6 +16,8 @@ import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/diary/presentation/screens/teacher_diary_list_screen.dart';
 import '../../features/diary/presentation/screens/create_diary_screen.dart';
+import '../../features/diary/presentation/screens/teacher_diary_details_screen.dart';
+import '../../features/diary/data/models/teacher_diary_model.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/profile/presentation/pages/profile_details_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
@@ -170,6 +172,27 @@ class AppRouter {
             path: 'create',
             name: 'create-diary',
             builder: (context, state) => const CreateDiaryScreen(),
+          ),
+          GoRoute(
+             path: ':id',
+             name: 'teacher-diary-details',
+             builder: (context, state) {
+                final id = int.parse(state.pathParameters['id']!);
+                return TeacherDiaryDetailsScreen(diaryId: id);
+             },
+          ),
+          GoRoute(
+            path: 'edit/:id',
+            name: 'edit-diary',
+            builder: (context, state) {
+               // We can pass the diary object via extra if available, or just fetch by ID in screen (not implemented in create screen yet, but we'll rely on extra or refetch if we update create screen to support fetch)
+               // For now, CreateDiaryScreen expects `diary` object or nothing. 
+               // If we only have ID, we might need a wrapper or update CreateDiaryScreen to fetch by ID.
+               // But usually we go List -> Details -> Edit, so we have the object.
+               // Or List -> Edit directly.
+               final diary = state.extra as TeacherDiary?;
+               return CreateDiaryScreen(diary: diary);
+            },
           ),
         ],
       ),
