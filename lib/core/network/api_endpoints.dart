@@ -88,4 +88,7 @@ class ApiEndpoints {
   /// Get diaries (GET) or Create diary (POST)
   /// GET/POST
   static const String teacherDiaries = '/teacher/diaries';
+  /// Get student diaries with date filter
+  /// GET (with body): { "date": "YYYY-MM-DD" }
+  static const String studentDiaries = '/student/diaries';
 }

@@ -8,20 +8,20 @@ import '../../features/auth/presentation/pages/onboarding_screen.dart';
 import '../../features/auth/presentation/pages/splash_screen.dart';
 import '../../features/books/ui/books_screen.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
+import '../../features/diary/data/models/teacher_diary_model.dart';
+import '../../features/diary/presentation/screens/create_diary_screen.dart';
+import '../../features/diary/presentation/screens/parent_diary_screen.dart';
+import '../../features/diary/presentation/screens/teacher_diary_details_screen.dart';
+import '../../features/diary/presentation/screens/teacher_diary_list_screen.dart';
 import '../../features/exams/ui/exam_routine_screen.dart';
 import '../../features/fees/ui/fees_screen.dart';
+import '../../features/profile/presentation/pages/change_password_screen.dart';
+import '../../features/profile/presentation/pages/edit_profile_screen.dart';
+import '../../features/profile/presentation/pages/profile_details_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
+import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
 import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
-import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
-import '../../features/diary/presentation/screens/teacher_diary_list_screen.dart';
-import '../../features/diary/presentation/screens/create_diary_screen.dart';
-import '../../features/diary/presentation/screens/teacher_diary_details_screen.dart';
-import '../../features/diary/data/models/teacher_diary_model.dart';
-import '../../features/profile/presentation/pages/profile_screen.dart';
-import '../../features/profile/presentation/pages/profile_details_screen.dart';
-import '../../features/profile/presentation/pages/edit_profile_screen.dart';
-import '../../features/profile/presentation/pages/change_password_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -82,13 +82,12 @@ class AppRouter {
       // Profile Detail Routes (Nested under Dashboard -> Profile)
       // Since ProfileScreen is handled inside DashboardScreen tab 4, we don't need a top level route for /profile unless we want deep linking.
       // But we need routes for sub-pages pushed from ProfileScreen.
-      
       GoRoute(
         path: '/profile/details',
         name: 'profile-details',
         builder: (context, state) => const ProfileDetailsScreen(),
         routes: [
-           GoRoute(
+          GoRoute(
             path: 'edit',
             name: 'edit-profile',
             builder: (context, state) => const EditProfileScreen(),
@@ -98,7 +97,7 @@ class AppRouter {
             name: 'change-password',
             builder: (context, state) => const ChangePasswordScreen(),
           ),
-        ]
+        ],
       ),
 
       // Books Screen
@@ -145,7 +144,7 @@ class AppRouter {
           final sessionId = int.parse(state.uri.queryParameters['sessionId']!);
           final className = state.uri.queryParameters['className']!;
           final sessionName = state.uri.queryParameters['sessionName']!;
-          
+
           return TeacherAttendanceScreen(
             classId: classId,
             sessionId: sessionId,
@@ -174,29 +173,40 @@ class AppRouter {
             builder: (context, state) => const CreateDiaryScreen(),
           ),
           GoRoute(
-             path: ':id',
-             name: 'teacher-diary-details',
-             builder: (context, state) {
-                final id = int.parse(state.pathParameters['id']!);
-                return TeacherDiaryDetailsScreen(diaryId: id);
-             },
+            path: ':id',
+            name: 'teacher-diary-details',
+            builder: (context, state) {
+              final id = int.parse(state.pathParameters['id']!);
+              return TeacherDiaryDetailsScreen(diaryId: id);
+            },
           ),
           GoRoute(
             path: 'edit/:id',
             name: 'edit-diary',
             builder: (context, state) {
-               // We can pass the diary object via extra if available, or just fetch by ID in screen (not implemented in create screen yet, but we'll rely on extra or refetch if we update create screen to support fetch)
-               // For now, CreateDiaryScreen expects `diary` object or nothing. 
-               // If we only have ID, we might need a wrapper or update CreateDiaryScreen to fetch by ID.
-               // But usually we go List -> Details -> Edit, so we have the object.
-               // Or List -> Edit directly.
-               final diary = state.extra as TeacherDiary?;
-               return CreateDiaryScreen(diary: diary);
+              // We can pass the diary object via extra if available, or just fetch by ID in screen (not implemented in create screen yet, but we'll rely on extra or refetch if we update create screen to support fetch)
+              // For now, CreateDiaryScreen expects `diary` object or nothing.
+              // If we only have ID, we might need a wrapper or update CreateDiaryScreen to fetch by ID.
+              // But usually we go List -> Details -> Edit, so we have the object.
+              // Or List -> Edit directly.
+              final diary = state.extra as TeacherDiary?;
+              return CreateDiaryScreen(diary: diary);
             },
           ),
         ],
       ),
+
+      GoRoute(
+        path: '/parent/diaries',
+        name: 'parent-diaries',
+        builder: (context, state) {
+          final studentId = state.uri.queryParameters['studentId']!;
+          return ParentDiaryScreen(studentId: studentId);
+        },
+      ),
     ],
+
+    // Parent Diaries
 
     // Redirect logic for authentication
     redirect: (context, state) async {

@@ -152,7 +152,55 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    // 2. Check if route is null for other cases
+    // 2. Handle Parent logic
+    if (authProvider.isParent) {
+      // Handle Diary specifically
+      if (label == 'Diary') {
+         final studentProvider = context.read<StudentProvider>();
+         
+        if (studentProvider.students.isEmpty && !studentProvider.isLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No students found. Please contact support.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        if (studentProvider.isLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Loading student information...'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+          return;
+        }
+
+         if (studentProvider.hasSingleStudent) {
+             final student = studentProvider.students.first;
+             context.push(Uri(path: '/parent/diaries', queryParameters: {'studentId': student.studentId}).toString());
+             return;
+         }
+
+         if (studentProvider.hasMultipleStudents) {
+           StudentSelectionBottomSheet.show(
+              context,
+              students: studentProvider.students,
+              onStudentSelected: (student) {
+                studentProvider.selectStudent(student);
+                context.push(Uri(path: '/parent/diaries', queryParameters: {'studentId': student.studentId}).toString());
+              },
+            );
+            return;
+         }
+      }
+      
+      // Generic parent routing logic (if route is null, it will fall through)
+    }
+
+    // 3. Check if route is null for other cases
     if (route == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -163,13 +211,13 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    // 3. Handle standard Teacher routes (fallthrough)
+    // 4. Handle standard Teacher routes
     if (authProvider.isTeacher) {
       context.push(route);
       return;
     }
 
-    // 4. Handle Parent logic
+    // 5. Handle standard Parent routes (with student selection)
     if (authProvider.isParent) {
       final studentProvider = context.read<StudentProvider>();
 

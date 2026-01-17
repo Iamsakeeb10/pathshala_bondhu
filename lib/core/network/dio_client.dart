@@ -50,11 +50,13 @@ class DioClient {
   /// GET request
   Future<Response> get(
     String path, {
+    dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     return await dio.get(
       path,
+      data: data,
       queryParameters: queryParameters,
       options: options,
     );
