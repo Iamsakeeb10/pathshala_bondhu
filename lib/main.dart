@@ -22,6 +22,7 @@ import 'features/students/provider/student_provider.dart';
 import 'features/teacher_attendance/provider/teacher_attendance_provider.dart';
 import 'features/routines/provider/teacher_routine_provider.dart';
 import 'features/diary/provider/teacher_diary_provider.dart';
+import 'features/profile/providers/profile_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TeacherAttendanceProvider()),
         ChangeNotifierProvider(create: (_) => TeacherRoutineProvider()),
         ChangeNotifierProvider(create: (_) => TeacherDiaryProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
       child: const MyApp(),
     ),

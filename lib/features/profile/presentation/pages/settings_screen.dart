@@ -17,7 +17,6 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(langProvider.translate('settings'))),
       body: ListView(
-        padding: EdgeInsets.all(16.w),
         children: [
           Text(
             'Appearance',

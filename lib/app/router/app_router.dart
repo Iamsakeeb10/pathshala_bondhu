@@ -16,6 +16,10 @@ import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/diary/presentation/screens/teacher_diary_list_screen.dart';
 import '../../features/diary/presentation/screens/create_diary_screen.dart';
+import '../../features/profile/presentation/pages/profile_screen.dart';
+import '../../features/profile/presentation/pages/profile_details_screen.dart';
+import '../../features/profile/presentation/pages/edit_profile_screen.dart';
+import '../../features/profile/presentation/pages/change_password_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -70,6 +74,29 @@ class AppRouter {
         path: settings,
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+        // Settings routes reverted as profile is handled separately now
+      ),
+
+      // Profile Detail Routes (Nested under Dashboard -> Profile)
+      // Since ProfileScreen is handled inside DashboardScreen tab 4, we don't need a top level route for /profile unless we want deep linking.
+      // But we need routes for sub-pages pushed from ProfileScreen.
+      
+      GoRoute(
+        path: '/profile/details',
+        name: 'profile-details',
+        builder: (context, state) => const ProfileDetailsScreen(),
+        routes: [
+           GoRoute(
+            path: 'edit',
+            name: 'edit-profile',
+            builder: (context, state) => const EditProfileScreen(),
+          ),
+          GoRoute(
+            path: 'change-password',
+            name: 'change-password',
+            builder: (context, state) => const ChangePasswordScreen(),
+          ),
+        ]
       ),
 
       // Books Screen

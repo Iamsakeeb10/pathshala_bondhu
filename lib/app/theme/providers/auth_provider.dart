@@ -83,9 +83,16 @@ class AuthProvider extends ChangeNotifier {
     final id = await TokenStorage.getUserId();
     final name = await TokenStorage.getUserName();
     final email = await TokenStorage.getUserEmail();
+    final avatar = await TokenStorage.getUserAvatar();
 
     if (role != null && id != null && name != null) {
-      _currentUser = User(id: id, name: name, email: email, role: role);
+      _currentUser = User(
+        id: id,
+        name: name,
+        email: email,
+        role: role,
+        avatarUrl: avatar,
+      );
       notifyListeners();
     } else {
       // Incomplete data, clear everything
@@ -170,6 +177,7 @@ class AuthProvider extends ChangeNotifier {
         id: response.user.id.toString(),
         name: response.user.name,
         email: response.user.email,
+        avatar: response.user.avatar,
       );
 
       // Set current user
@@ -220,6 +228,30 @@ class AuthProvider extends ChangeNotifier {
     await TokenStorage.clearAll();
     _currentUser = null;
     _errorMessage = 'Session expired. Please login again.';
+    notifyListeners();
+  }
+
+  /// Update current user details (called after profile update)
+  Future<void> updateCurrentUser({
+    String? name,
+    String? email,
+    String? avatarUrl,
+  }) async {
+    if (_currentUser == null) return;
+
+    // Update in storage
+    if (name != null) await TokenStorage.saveUserName(name);
+    if (email != null) await TokenStorage.saveUserEmail(email);
+    if (avatarUrl != null) await TokenStorage.saveUserAvatar(avatarUrl);
+
+    // Update local state
+    _currentUser = User(
+      id: _currentUser!.id,
+      name: name ?? _currentUser!.name,
+      email: email ?? _currentUser!.email,
+      role: _currentUser!.role,
+      avatarUrl: avatarUrl ?? _currentUser!.avatarUrl,
+    );
     notifyListeners();
   }
 

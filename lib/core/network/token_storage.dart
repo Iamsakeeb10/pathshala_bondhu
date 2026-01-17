@@ -14,6 +14,7 @@ class TokenStorage {
   static const String _userIdKey = 'user_id';
   static const String _userNameKey = 'user_name';
   static const String _userEmailKey = 'user_email';
+  static const String _userAvatarKey = 'user_avatar';
 
   /// Save authentication token
   static Future<void> saveToken(String token) async {
@@ -87,6 +88,7 @@ class TokenStorage {
     required String id,
     required String name,
     String? email,
+    String? avatar,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -95,9 +97,42 @@ class TokenStorage {
       if (email != null) {
         await prefs.setString(_userEmailKey, email);
       }
+      if (avatar != null) {
+        await prefs.setString(_userAvatarKey, avatar);
+      }
       print('✅ User info saved');
     } catch (e) {
       print('❌ Error saving user info: $e');
+    }
+  }
+
+  /// Save user name
+  static Future<void> saveUserName(String name) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userNameKey, name);
+    } catch (e) {
+      print('❌ Error saving user name: $e');
+    }
+  }
+
+  /// Save user email
+  static Future<void> saveUserEmail(String email) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userEmailKey, email);
+    } catch (e) {
+      print('❌ Error saving user email: $e');
+    }
+  }
+
+  /// Save user avatar
+  static Future<void> saveUserAvatar(String avatar) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userAvatarKey, avatar);
+    } catch (e) {
+      print('❌ Error saving user avatar: $e');
     }
   }
 
@@ -134,6 +169,17 @@ class TokenStorage {
     }
   }
 
+  /// Get user avatar
+  static Future<String?> getUserAvatar() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_userAvatarKey);
+    } catch (e) {
+      print('❌ Error getting user avatar: $e');
+      return null;
+    }
+  }
+
   /// Clear all stored data (use on logout)
   static Future<void> clearAll() async {
     try {
@@ -143,6 +189,7 @@ class TokenStorage {
       await prefs.remove(_userIdKey);
       await prefs.remove(_userNameKey);
       await prefs.remove(_userEmailKey);
+      await prefs.remove(_userAvatarKey);
       print('✅ All user data cleared');
     } catch (e) {
       print('❌ Error clearing all data: $e');

@@ -20,6 +20,20 @@ class ApiEndpoints {
   /// GET with Bearer token
   static const String parentMe = '/parent/me';
 
+  /// Update parent profile
+  /// PUT with Bearer token
+  /// Body: { "father_name": "...", ... }
+  static const String parentProfileUpdate = '/parent/profile';
+
+  /// Get teacher profile
+  /// GET with Bearer token
+  static const String teacherMe = '/teacher/me';
+
+  /// Update teacher profile
+  /// PUT with Bearer token
+  /// Body: { "name": "...", ... }
+  static const String teacherProfileUpdate = '/teacher/profile';
+
   // ========== Parent Endpoints ==========
   
   /// Get parent's students list

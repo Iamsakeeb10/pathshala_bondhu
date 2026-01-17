@@ -79,6 +79,50 @@ class AuthService {
     }
   }
 
+  /// Get teacher profile
+  /// Requires authentication token (handled by interceptor)
+  Future<TeacherUserWithDetails> getTeacherProfile() async {
+    try {
+      final response = await _dioClient.get(ApiEndpoints.teacherMe);
+
+      final data = response.data as Map<String, dynamic>;
+      // API response structure: { "user": { ... } }
+      return TeacherUserWithDetails.fromJson(data['user'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw Exception('Unexpected error fetching teacher profile: $e');
+    }
+  }
+
+  /// Update parent profile
+  Future<void> updateParentProfile(Map<String, dynamic> data) async {
+    try {
+      await _dioClient.put(
+        ApiEndpoints.parentProfileUpdate,
+        data: data,
+      );
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw Exception('Unexpected error updating parent profile: $e');
+    }
+  }
+
+  /// Update teacher profile
+  Future<void> updateTeacherProfile(Map<String, dynamic> data) async {
+    try {
+      await _dioClient.put(
+        ApiEndpoints.teacherProfileUpdate,
+        data: data,
+      );
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    } catch (e) {
+      throw Exception('Unexpected error updating teacher profile: $e');
+    }
+  }
+
   /// Get parent's students list
   /// Requires authentication token (handled by interceptor)
   Future<GetStudentsResponse> getParentStudents() async {
