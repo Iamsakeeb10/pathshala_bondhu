@@ -22,6 +22,7 @@ import '../../features/profile/presentation/pages/settings_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
 import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
+import '../../features/notifications/screens/notification_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -203,6 +204,13 @@ class AppRouter {
           final studentId = state.uri.queryParameters['studentId']!;
           return ParentDiaryScreen(studentId: studentId);
         },
+      ),
+
+      // Notifications Screen
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) => const NotificationScreen(),
       ),
     ],
 

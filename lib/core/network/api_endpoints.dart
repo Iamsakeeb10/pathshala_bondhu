@@ -91,4 +91,33 @@ class ApiEndpoints {
   /// Get student diaries with date filter
   /// GET (with body): { "date": "YYYY-MM-DD" }
   static const String studentDiaries = '/student/diaries';
+
+  // ========== Notification Endpoints ==========
+  
+  /// Get all notifications (paginated)
+  /// GET with Bearer token
+  /// Query params: per_page, type
+  static const String notifications = '/notifications';
+
+  /// Get unread notifications only
+  /// GET with Bearer token
+  static const String notificationsUnread = '/notifications/unread';
+
+  /// Get unread count (for badge)
+  /// GET with Bearer token
+  static const String notificationsUnreadCount = '/notifications/unread/count';
+
+  /// Mark single notification as read
+  /// POST with Bearer token
+  /// Path param: {id}
+  static const String markNotificationRead = '/notifications/{id}/mark-read';
+
+  /// Mark all notifications as read
+  /// POST with Bearer token
+  static const String markAllNotificationsRead = '/notifications/mark-all-read';
+
+  /// Delete notification
+  /// DELETE with Bearer token
+  /// Path param: {id}
+  static const String deleteNotification = '/notifications/{id}';
 }

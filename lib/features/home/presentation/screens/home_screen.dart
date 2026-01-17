@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../core/services/notification_service.dart';
+import '../../../../features/notifications/providers/notification_provider.dart';
 import '../../../../features/students/provider/student_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/modern_premium_slider.dart';
@@ -21,12 +23,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch students if parent
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = context.read<AuthProvider>();
       if (authProvider.isParent) {
         context.read<StudentProvider>().fetchStudents();
       }
+      
+      // Fetch notification unread count
+      context.read<NotificationProvider>().fetchUnreadCount();
+      
+      // Request notification permission
+      NotificationService.requestPermission();
     });
   }
 
@@ -448,20 +455,81 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        Container(
-          padding: EdgeInsets.all(12.w),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+        // 🔔 Notification Bell Icon with Badge
+        Consumer<NotificationProvider>(
+          builder: (context, provider, child) {
+            return InkWell(
+              borderRadius: BorderRadius.circular(50.r),
+              onTap: () {
+                context.push('/notifications').then((_) {
+                  provider.fetchUnreadCount();
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      Icons.notifications_rounded,
+                      color: Colors.white,
+                      size: 24.sp,
+                    ),
+                    
+                    // 🔴 Unread badge
+                    if (provider.unreadCount > 0)
+                      Positioned(
+                        right: -6.w,
+                        top: -6.h,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: provider.unreadCount > 99 ? 4.w : 5.w,
+                            vertical: provider.unreadCount > 99 ? 2.h : 3.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.error,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1.2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.error.withOpacity(0.4),
+                                blurRadius: 4.r,
+                                offset: Offset(0, 2.h),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            provider.unreadCount > 99
+                                ? '99+'
+                                : '${provider.unreadCount}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: provider.unreadCount > 99 ? 8.sp : 9.sp,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ],
-          ),
-          child: Icon(Icons.bookmark_outline, color: Colors.white, size: 24.sp),
+            );
+          },
         ),
       ],
     );
