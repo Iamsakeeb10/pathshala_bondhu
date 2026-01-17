@@ -14,7 +14,8 @@ class TeacherDiaryDetailsScreen extends StatefulWidget {
   const TeacherDiaryDetailsScreen({super.key, required this.diaryId});
 
   @override
-  State<TeacherDiaryDetailsScreen> createState() => _TeacherDiaryDetailsScreenState();
+  State<TeacherDiaryDetailsScreen> createState() =>
+      _TeacherDiaryDetailsScreenState();
 }
 
 class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
@@ -34,7 +35,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
       _error = null;
     });
 
-    final diary = await context.read<TeacherDiaryProvider>().getDiary(widget.diaryId);
+    final diary = await context.read<TeacherDiaryProvider>().getDiary(
+      widget.diaryId,
+    );
 
     if (mounted) {
       if (diary != null) {
@@ -55,33 +58,70 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Diary'),
-        content: const Text('Are you sure you want to delete this diary?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Text(
+          'Delete Diary',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to delete this diary?',
+          style: TextStyle(fontSize: 14.sp),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
               try {
-                await context.read<TeacherDiaryProvider>().deleteDiary(_diary!.id);
+                await context.read<TeacherDiaryProvider>().deleteDiary(
+                  _diary!.id,
+                );
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Diary deleted successfully')),
+                    SnackBar(
+                      content: const Text('Diary deleted successfully'),
+                      backgroundColor: AppColors.success,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
                   );
                   context.pop(); // Go back to list
                 }
               } catch (e) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
+                    SnackBar(
+                      content: Text('Error: $e'),
+                      backgroundColor: AppColors.error,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
                   );
                 }
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(
+              'Delete',
+              style: TextStyle(
+                color: AppColors.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -93,32 +133,70 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: Text(
-          'Diary Details',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
+        title: const Text('Diary Details'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
         actions: [
           if (_diary != null)
-            IconButton(
-              icon: const Icon(Icons.edit, color: AppColors.primary),
-              onPressed: () {
-                context.push('/teacher/diaries/edit/${_diary!.id}', extra: _diary);
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'edit') {
+                  context.push(
+                    '/teacher/diaries/edit/${_diary!.id}',
+                    extra: _diary,
+                  );
+                } else if (value == 'delete') {
+                  _confirmDelete(context);
+                }
               },
-            ),
-          if (_diary != null)
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => _confirmDelete(context),
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.edit_outlined,
+                        size: 18.sp,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Edit',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_outline_rounded,
+                        size: 18.sp,
+                        color: AppColors.error,
+                      ),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Delete',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
             ),
         ],
       ),
@@ -128,146 +206,453 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_error != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             Text(_error!, style: TextStyle(color: Colors.red, fontSize: 16.sp)),
-             SizedBox(height: 16.h),
-             ElevatedButton(onPressed: _fetchDetails, child: const Text('Retry')),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              strokeWidth: 3,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'Loading diary details...',
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       );
     }
 
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(32.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.error_outline_rounded,
+                  size: 48.sp,
+                  color: AppColors.error,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'Error Loading Details',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              ElevatedButton.icon(
+                onPressed: _fetchDetails,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 12.h,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     if (_diary == null) {
-      return const Center(child: Text('Diary not found'));
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(32.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.all(24.w),
+                decoration: BoxDecoration(
+                  color: AppColors.grey200.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.search_off_rounded,
+                  size: 56.sp,
+                  color: AppColors.grey500,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              Text(
+                'Diary Not Found',
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                'The diary you are looking for\ncould not be found.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(24.w),
+      padding: EdgeInsets.all(16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(),
-          SizedBox(height: 24.h),
-          _buildSection('Description', _diary!.description ?? 'No description provided.'),
+          _buildHeaderCard(),
           SizedBox(height: 16.h),
-          _buildInfoGrid(),
+          _buildDescriptionCard(),
+          SizedBox(height: 16.h),
+          _buildInfoCard(),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeaderCard() {
     bool isPublished = _diary!.status.toLowerCase() == 'published';
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          _diary!.title,
-          style: TextStyle(
-            fontSize: 24.sp,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: isPublished ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(color: isPublished ? Colors.green : Colors.orange),
-              ),
-              child: Text(
-                _diary!.status.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.bold,
-                  color: isPublished ? Colors.green : Colors.orange,
-                ),
-              ),
-            ),
-            SizedBox(width: 12.w),
-             Icon(Icons.calendar_today, size: 16.sp, color: AppColors.grey500),
-             SizedBox(width: 4.w),
-             Text(
-               _formatDate(_diary!.diaryDate),
-               style: TextStyle(fontSize: 14.sp, color: AppColors.grey600),
-             ),
-          ],
-        ),
-      ],
-    );
-  }
 
-  Widget _buildSection(String title, String content) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          content,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: AppColors.grey700,
-            height: 1.5,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoGrid() {
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.grey200),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: AppColors.grey200.withOpacity(0.6),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Class', _diary!.diaryClass?.name ?? 'N/A'),
-          Divider(height: 24.h),
-          _buildInfoRow('Subject', _diary!.subject?.name ?? 'N/A'),
-          Divider(height: 24.h),
-          _buildInfoRow('Session', _diary!.academicSession?.title ?? 'N/A'),
-          Divider(height: 24.h),
-          _buildInfoRow('Submission Date', _formatDate(_diary!.submissionDate)),
+          Row(
+            children: [
+              _buildStatusBadge(isPublished, _diary!.status),
+              const Spacer(),
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 14.sp,
+                color: AppColors.textSecondary,
+              ),
+              SizedBox(width: 6.w),
+              Text(
+                _formatDate(_diary!.diaryDate),
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            _diary!.title,
+            style: TextStyle(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              letterSpacing: 0.1,
+              height: 1.3,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-           label,
-           style: TextStyle(fontSize: 14.sp, color: AppColors.grey600),
+  Widget _buildDescriptionCard() {
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: AppColors.grey200.withOpacity(0.6),
+          width: 1.2,
         ),
-        Text(
-          value,
-          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(
+                  Icons.description_outlined,
+                  size: 18.sp,
+                  color: AppColors.primary,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Text(
+                'Description',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Container(
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundLight,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Text(
+              _diary!.description ?? 'No description provided.',
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: AppColors.textSecondary,
+                height: 1.6,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard() {
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: AppColors.grey200.withOpacity(0.6),
+          width: 1.2,
         ),
-      ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  size: 18.sp,
+                  color: AppColors.primary,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Text(
+                'Details',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20.h),
+          _buildInfoRow(
+            icon: Icons.class_outlined,
+            label: 'Class',
+            value: _diary!.diaryClass?.name ?? 'N/A',
+            color: AppColors.primary,
+          ),
+          SizedBox(height: 16.h),
+          _buildInfoRow(
+            icon: Icons.book_outlined,
+            label: 'Subject',
+            value: _diary!.subject?.name ?? 'N/A',
+            color: AppColors.accent,
+          ),
+          SizedBox(height: 16.h),
+          _buildInfoRow(
+            icon: Icons.school_outlined,
+            label: 'Academic Session',
+            value: _diary!.academicSession?.title ?? 'N/A',
+            color: AppColors.secondary,
+          ),
+          SizedBox(height: 16.h),
+          _buildInfoRow(
+            icon: Icons.event_outlined,
+            label: 'Submission Date',
+            value: _formatDate(_diary!.submissionDate),
+            color: AppColors.info,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundLight,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(icon, size: 16.sp, color: color),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppColors.grey500,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(bool isPublished, String statusText) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isPublished
+              ? [
+                  AppColors.success.withOpacity(0.15),
+                  AppColors.success.withOpacity(0.08),
+                ]
+              : [
+                  AppColors.warning.withOpacity(0.15),
+                  AppColors.warning.withOpacity(0.08),
+                ],
+        ),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: isPublished
+              ? AppColors.success.withOpacity(0.3)
+              : AppColors.warning.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6.w,
+            height: 6.w,
+            decoration: BoxDecoration(
+              color: isPublished ? AppColors.success : AppColors.warning,
+              shape: BoxShape.circle,
+            ),
+          ),
+          SizedBox(width: 6.w),
+          Text(
+            statusText.toUpperCase(),
+            style: TextStyle(
+              fontSize: 11.sp,
+              fontWeight: FontWeight.bold,
+              color: isPublished ? AppColors.success : AppColors.warning,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
