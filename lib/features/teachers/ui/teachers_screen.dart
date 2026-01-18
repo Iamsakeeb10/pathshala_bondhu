@@ -7,11 +7,12 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../../../shared/widgets/person_card.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../data/models/teacher_model.dart';
 import '../provider/teachers_provider.dart';
 
 /// Screen displaying list of all teachers
-/// 
+///
 /// Shared between Parent and Teacher roles
 class TeachersScreen extends StatefulWidget {
   const TeachersScreen({super.key});
@@ -37,47 +38,49 @@ class _TeachersScreenState extends State<TeachersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Teachers'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
-      body: Consumer<TeachersProvider>(
-        builder: (context, provider, child) {
-          // Loading state
-          if (provider.isLoading && provider.teachers.isEmpty) {
-            return Padding(
-              padding: EdgeInsets.all(16.w),
-              child: LoadingShimmer.list(itemCount: 5, itemHeight: 100),
-            );
-          }
 
-          // Error state
-          if (provider.errorMessage != null && provider.teachers.isEmpty) {
-            return ErrorState(
-              message: provider.errorMessage!,
-              onRetry: provider.retry,
-            );
-          }
+      body: Column(
+        children: [
+          CustomAppBar(title: 'Teachers', showBackButton: false),
+          Expanded(
+            child: Consumer<TeachersProvider>(
+              builder: (context, provider, child) {
+                // Loading state
+                if (provider.isLoading && provider.teachers.isEmpty) {
+                  return Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: LoadingShimmer.list(itemCount: 5, itemHeight: 100),
+                  );
+                }
 
-          // Empty state
-          if (provider.isEmpty) {
-            return const EmptyState(
-              icon: Icons.school_outlined,
-              message: 'No teachers found',
-              subMessage: 'Teachers list is empty.',
-            );
-          }
+                // Error state
+                if (provider.errorMessage != null &&
+                    provider.teachers.isEmpty) {
+                  return ErrorState(
+                    message: provider.errorMessage!,
+                    onRetry: provider.retry,
+                  );
+                }
 
-          // Data state
-          return RefreshIndicator(
-            onRefresh: () => provider.fetchTeachers(refresh: true),
-            color: AppColors.primary,
-            child: _buildTeachersList(provider),
-          );
-        },
+                // Empty state
+                if (provider.isEmpty) {
+                  return const EmptyState(
+                    icon: Icons.school_outlined,
+                    message: 'No teachers found',
+                    subMessage: 'Teachers list is empty.',
+                  );
+                }
+
+                // Data state
+                return RefreshIndicator(
+                  onRefresh: () => provider.fetchTeachers(refresh: true),
+                  color: AppColors.primary,
+                  child: _buildTeachersList(provider),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -102,9 +105,7 @@ class _TeachersScreenState extends State<TeachersScreen> {
           if (index == provider.teachers.length) {
             return Padding(
               padding: EdgeInsets.all(16.w),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             );
           }
 
@@ -121,25 +122,31 @@ class _TeachersScreenState extends State<TeachersScreen> {
 
     if (teacher.teacher?.department != null &&
         teacher.teacher!.department!.isNotEmpty) {
-      chips.add(PersonCardChip(
-        icon: Icons.business_outlined,
-        label: teacher.teacher!.department!,
-      ));
+      chips.add(
+        PersonCardChip(
+          icon: Icons.business_outlined,
+          label: teacher.teacher!.department!,
+        ),
+      );
     }
 
     if (teacher.teacher?.specialization != null &&
         teacher.teacher!.specialization!.isNotEmpty) {
-      chips.add(PersonCardChip(
-        icon: Icons.star_outline,
-        label: teacher.teacher!.specialization!,
-      ));
+      chips.add(
+        PersonCardChip(
+          icon: Icons.star_outline,
+          label: teacher.teacher!.specialization!,
+        ),
+      );
     }
 
     if (teacher.school != null && teacher.school!.name.isNotEmpty) {
-      chips.add(PersonCardChip(
-        icon: Icons.school_outlined,
-        label: teacher.school!.name,
-      ));
+      chips.add(
+        PersonCardChip(
+          icon: Icons.school_outlined,
+          label: teacher.school!.name,
+        ),
+      );
     }
 
     return PersonCard(

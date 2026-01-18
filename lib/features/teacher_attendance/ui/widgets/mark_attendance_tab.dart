@@ -46,11 +46,17 @@ class MarkAttendanceTab extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                   Expanded(
+                  Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => provider.markAll('present'),
-                      icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-                      label: Text('All Present', style: TextStyle(color: Colors.green, fontSize: 13.sp)),
+                      icon: const Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.green,
+                      ),
+                      label: Text(
+                        'All Present',
+                        style: TextStyle(color: Colors.green, fontSize: 13.sp),
+                      ),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.green),
                       ),
@@ -60,8 +66,14 @@ class MarkAttendanceTab extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => provider.markAll('absent'),
-                      icon: const Icon(Icons.cancel_outlined, color: Colors.red),
-                      label: Text('All Absent', style: TextStyle(color: Colors.red, fontSize: 13.sp)),
+                      icon: const Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.red,
+                      ),
+                      label: Text(
+                        'All Absent',
+                        style: TextStyle(color: Colors.red, fontSize: 13.sp),
+                      ),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.red),
                       ),
@@ -80,7 +92,8 @@ class MarkAttendanceTab extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final student = provider.students[index];
                   // If status not set, default to present (or whatever initialize set)
-                  final status = provider.attendanceMap[student.id] ?? 'present';
+                  final status =
+                      provider.attendanceMap[student.id] ?? 'present';
                   final isPresent = status == 'present';
 
                   return Container(
@@ -89,7 +102,9 @@ class MarkAttendanceTab extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: isPresent ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                        color: isPresent
+                            ? Colors.green.withOpacity(0.3)
+                            : Colors.red.withOpacity(0.3),
                         width: 1,
                       ),
                     ),
@@ -99,18 +114,21 @@ class MarkAttendanceTab extends StatelessWidget {
                         CircleAvatar(
                           radius: 20.r,
                           backgroundColor: AppColors.primaryLight,
-                          backgroundImage: student.user.avatar != null 
-                              ? NetworkImage(student.user.avatar!) 
+                          backgroundImage: student.user.avatar != null
+                              ? NetworkImage(student.user.avatar!)
                               : null,
-                          child: student.user.avatar == null 
+                          child: student.user.avatar == null
                               ? Text(
                                   student.user.name.substring(0, 1),
-                                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                                ) 
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
                               : null,
                         ),
                         SizedBox(width: 12.w),
-                        
+
                         // Name & Roll
                         Expanded(
                           child: Column(
@@ -142,14 +160,16 @@ class MarkAttendanceTab extends StatelessWidget {
                               icon: Icons.check,
                               isActive: isPresent,
                               color: Colors.green,
-                              onTap: () => provider.markStudent(student.id, 'present'),
+                              onTap: () =>
+                                  provider.markStudent(student.id, 'present'),
                             ),
                             SizedBox(width: 8.w),
                             _AttendanceToggleButton(
                               icon: Icons.close,
                               isActive: !isPresent,
                               color: Colors.red,
-                              onTap: () => provider.markStudent(student.id, 'absent'),
+                              onTap: () =>
+                                  provider.markStudent(student.id, 'absent'),
                             ),
                           ],
                         ),
@@ -162,7 +182,12 @@ class MarkAttendanceTab extends StatelessWidget {
 
             // Submit Button Area
             Container(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.fromLTRB(
+                16.w,
+                16.w,
+                16.w,
+                MediaQuery.of(context).padding.bottom,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -176,23 +201,30 @@ class MarkAttendanceTab extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: provider.isSubmitting 
-                      ? null 
+                  onPressed: provider.isSubmitting
+                      ? null
                       : () async {
-                          final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                          final date = DateFormat(
+                            'yyyy-MM-dd',
+                          ).format(DateTime.now());
                           final success = await provider.submitAttendance(date);
                           if (success && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Attendance submitted successfully'),
+                                content: Text(
+                                  'Attendance submitted successfully',
+                                ),
                                 backgroundColor: Colors.green,
                               ),
                             );
-                            Navigator.pop(context); // Go back after success? Or stay? Plan didn't specify, likely stay or go back.
+                            Navigator.pop(
+                              context,
+                            ); // Go back after success? Or stay? Plan didn't specify, likely stay or go back.
                             // Requirement says "Submit & Navigate". Usually submit closes or shows success.
                             // Let's pop.
-                          } else if (context.mounted && provider.errorMessage != null) {
-                             ScaffoldMessenger.of(context).showSnackBar(
+                          } else if (context.mounted &&
+                              provider.errorMessage != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(provider.errorMessage!),
                                 backgroundColor: Colors.red,
@@ -211,11 +243,18 @@ class MarkAttendanceTab extends StatelessWidget {
                       ? SizedBox(
                           height: 20.h,
                           width: 20.h,
-                          child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : Text(
                           'Submit Attendance',
-                          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                 ),
               ),
@@ -249,9 +288,7 @@ class _AttendanceToggleButton extends StatelessWidget {
         padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
           color: isActive ? color : Colors.transparent,
-          border: Border.all(
-            color: isActive ? color : AppColors.grey300,
-          ),
+          border: Border.all(color: isActive ? color : AppColors.grey300),
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Icon(

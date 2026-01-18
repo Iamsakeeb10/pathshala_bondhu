@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../data/models/teacher_routine_model.dart';
 import '../../provider/teacher_routine_provider.dart';
 
@@ -92,23 +93,13 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('My Routine'),
-            Text(
-              'Academic Session: 2026',
-              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+
       body: Column(
         children: [
+          CustomAppBar(
+            title: 'My Routine',
+            showBackButton: true, // optional, show/hide back button
+          ),
           _buildDayTabs(),
           Expanded(child: _buildRoutineContent()),
         ],

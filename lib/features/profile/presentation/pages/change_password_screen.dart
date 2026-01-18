@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../providers/profile_provider.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -76,56 +77,66 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Change Password'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<ProfileProvider>(
-        builder: (context, provider, child) {
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSecurityInfo(),
-                  SizedBox(height: 32.h),
-                  _buildPasswordField(
-                    controller: _passwordController,
-                    label: 'New Password',
-                    icon: Icons.lock_outline,
-                    obscure: _obscurePassword,
-                    toggleObscure: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Change Password',
+            showBackButton: true, // enables back button
+            actions: [], // optional, empty for now
+            // optionally add gradientColors, height, or subtitle if you extend CustomAppBar
+          ),
+
+          Expanded(
+            child: Consumer<ProfileProvider>(
+              builder: (context, provider, child) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(16.w),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSecurityInfo(),
+                        SizedBox(height: 32.h),
+                        _buildPasswordField(
+                          controller: _passwordController,
+                          label: 'New Password',
+                          icon: Icons.lock_outline,
+                          obscure: _obscurePassword,
+                          toggleObscure: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
+                        ),
+                        SizedBox(height: 20.h),
+                        _buildPasswordField(
+                          controller: _confirmPasswordController,
+                          label: 'Confirm Password',
+                          icon: Icons.lock_reset_rounded,
+                          obscure: _obscureConfirm,
+                          toggleObscure: () => setState(
+                            () => _obscureConfirm = !_obscureConfirm,
+                          ),
+                          validator: (val) {
+                            if (val != _passwordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 24.h),
+                        _buildPasswordRequirements(),
+                        SizedBox(height: 32.h),
+                        _buildUpdateButton(provider),
+                        SizedBox(height: 24.h),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 20.h),
-                  _buildPasswordField(
-                    controller: _confirmPasswordController,
-                    label: 'Confirm Password',
-                    icon: Icons.lock_reset_rounded,
-                    obscure: _obscureConfirm,
-                    toggleObscure: () =>
-                        setState(() => _obscureConfirm = !_obscureConfirm),
-                    validator: (val) {
-                      if (val != _passwordController.text) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 24.h),
-                  _buildPasswordRequirements(),
-                  SizedBox(height: 32.h),
-                  _buildUpdateButton(provider),
-                  SizedBox(height: 24.h),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

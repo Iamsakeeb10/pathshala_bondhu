@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../../shared/widgets/custom_text_field.dart';
 import '../../../teacher_attendance/data/models/teacher_attendance_models.dart';
 import '../../data/models/teacher_diary_model.dart';
@@ -278,169 +279,175 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Diary' : 'Create Diary'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<TeacherDiaryProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading && provider.classes.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                    strokeWidth: 3,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Loading form data...',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildFormHeader(),
-                  SizedBox(height: 24.h),
-                  _buildFormCard(
-                    title: 'Basic Information',
-                    icon: Icons.info_outline_rounded,
-                    children: [
-                      _buildDropdown<TeacherClass>(
-                        label: 'Select Class',
-                        value: _selectedClass,
-                        items: provider.classes,
-                        hint: 'Choose Class',
-                        icon: Icons.class_outlined,
-                        onChanged: (val) =>
-                            setState(() => _selectedClass = val),
-                        itemLabel: (item) => item.name,
-                      ),
-                      SizedBox(height: 16.h),
-                      _buildDropdown<DiarySubject>(
-                        label: 'Subject',
-                        value: _selectedSubject,
-                        items: provider.subjects,
-                        hint: 'Choose Subject',
-                        icon: Icons.book_outlined,
-                        onChanged: (val) =>
-                            setState(() => _selectedSubject = val),
-                        itemLabel: (item) => item.name,
-                      ),
-                      SizedBox(height: 16.h),
-                      _buildDropdown<TeacherAcademicSession>(
-                        label: 'Academic Session',
-                        value: _selectedSession,
-                        items: provider.sessions,
-                        hint: 'Choose Session',
-                        icon: Icons.school_outlined,
-                        onChanged: (val) =>
-                            setState(() => _selectedSession = val),
-                        itemLabel: (item) => item.title,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFormCard(
-                    title: 'Dates',
-                    icon: Icons.calendar_today_outlined,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomTextField(
-                              label: 'Diary Date',
-                              hint: 'Select Date',
-                              controller: _diaryDateController,
-                              readOnly: true,
-                              onTap: () => _selectDate(context, true),
-                              suffixIcon: Icon(
-                                Icons.calendar_today,
-                                size: 20.sp,
-                                color: AppColors.primary,
-                              ),
-                            ),
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: _isEditing ? 'Edit Diary' : 'Create Diary',
+            showBackButton: true,
+          ),
+          Expanded(
+            child: Consumer<TeacherDiaryProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading && provider.classes.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primary,
                           ),
-                          SizedBox(width: 12.w),
-                          Expanded(
-                            child: CustomTextField(
-                              label: 'Submission Date',
-                              hint: 'Select Date',
-                              controller: _submissionDateController,
-                              readOnly: true,
-                              onTap: () => _selectDate(context, false),
-                              suffixIcon: Icon(
-                                Icons.event,
-                                size: 20.sp,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFormCard(
-                    title: 'Content',
-                    icon: Icons.description_outlined,
-                    children: [
-                      CustomTextField(
-                        label: 'Title',
-                        hint: 'Enter topic or chapter name',
-                        controller: _titleController,
-                        prefixIcon: Icon(
-                          Icons.title_rounded,
-                          color: AppColors.primary,
-                          size: 20.sp,
+                          strokeWidth: 3,
                         ),
-                        validator: (v) =>
-                            v?.isEmpty == true ? 'Title is required' : null,
-                      ),
-                      SizedBox(height: 16.h),
-                      CustomTextField(
-                        label: 'Description',
-                        hint: 'Enter detailed description',
-                        controller: _descriptionController,
-                        maxLines: 5,
-                        validator: (v) => v?.isEmpty == true
-                            ? 'Description is required'
-                            : null,
-                      ),
-                    ],
+                        SizedBox(height: 16.h),
+                        Text(
+                          'Loading form data...',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(16.w),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildFormHeader(),
+                        SizedBox(height: 24.h),
+                        _buildFormCard(
+                          title: 'Basic Information',
+                          icon: Icons.info_outline_rounded,
+                          children: [
+                            _buildDropdown<TeacherClass>(
+                              label: 'Select Class',
+                              value: _selectedClass,
+                              items: provider.classes,
+                              hint: 'Choose Class',
+                              icon: Icons.class_outlined,
+                              onChanged: (val) =>
+                                  setState(() => _selectedClass = val),
+                              itemLabel: (item) => item.name,
+                            ),
+                            SizedBox(height: 16.h),
+                            _buildDropdown<DiarySubject>(
+                              label: 'Subject',
+                              value: _selectedSubject,
+                              items: provider.subjects,
+                              hint: 'Choose Subject',
+                              icon: Icons.book_outlined,
+                              onChanged: (val) =>
+                                  setState(() => _selectedSubject = val),
+                              itemLabel: (item) => item.name,
+                            ),
+                            SizedBox(height: 16.h),
+                            _buildDropdown<TeacherAcademicSession>(
+                              label: 'Academic Session',
+                              value: _selectedSession,
+                              items: provider.sessions,
+                              hint: 'Choose Session',
+                              icon: Icons.school_outlined,
+                              onChanged: (val) =>
+                                  setState(() => _selectedSession = val),
+                              itemLabel: (item) => item.title,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        _buildFormCard(
+                          title: 'Dates',
+                          icon: Icons.calendar_today_outlined,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomTextField(
+                                    label: 'Diary Date',
+                                    hint: 'Select Date',
+                                    controller: _diaryDateController,
+                                    readOnly: true,
+                                    onTap: () => _selectDate(context, true),
+                                    suffixIcon: Icon(
+                                      Icons.calendar_today,
+                                      size: 20.sp,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 12.w),
+                                Expanded(
+                                  child: CustomTextField(
+                                    label: 'Submission Date',
+                                    hint: 'Select Date',
+                                    controller: _submissionDateController,
+                                    readOnly: true,
+                                    onTap: () => _selectDate(context, false),
+                                    suffixIcon: Icon(
+                                      Icons.event,
+                                      size: 20.sp,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        _buildFormCard(
+                          title: 'Content',
+                          icon: Icons.description_outlined,
+                          children: [
+                            CustomTextField(
+                              label: 'Title',
+                              hint: 'Enter topic or chapter name',
+                              controller: _titleController,
+                              prefixIcon: Icon(
+                                Icons.title_rounded,
+                                color: AppColors.primary,
+                                size: 20.sp,
+                              ),
+                              validator: (v) => v?.isEmpty == true
+                                  ? 'Title is required'
+                                  : null,
+                            ),
+                            SizedBox(height: 16.h),
+                            CustomTextField(
+                              label: 'Description',
+                              hint: 'Enter detailed description',
+                              controller: _descriptionController,
+                              maxLines: 5,
+                              validator: (v) => v?.isEmpty == true
+                                  ? 'Description is required'
+                                  : null,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        _buildFormCard(
+                          title: 'Status',
+                          icon: Icons.toggle_on_outlined,
+                          children: [_buildStatusSelector()],
+                        ),
+                        SizedBox(height: 32.h),
+                        _buildSubmitButton(provider),
+                        SizedBox(height: 24.h),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 16.h),
-                  _buildFormCard(
-                    title: 'Status',
-                    icon: Icons.toggle_on_outlined,
-                    children: [_buildStatusSelector()],
-                  ),
-                  SizedBox(height: 32.h),
-                  _buildSubmitButton(provider),
-                  SizedBox(height: 24.h),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

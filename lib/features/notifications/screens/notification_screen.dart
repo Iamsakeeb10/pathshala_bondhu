@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../shared/utils/app_colors.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../models/notification_model.dart';
 import '../providers/notification_provider.dart';
 import '../widgets/notification_shimmer.dart';
@@ -167,7 +168,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: AppColors.backgroundLight,
         body: Column(
           children: [
-            _buildAppBar(context),
+            CustomAppBar(
+              title: 'Notifications',
+              height: 60.h,
+              actions: [
+                Consumer<NotificationProvider>(
+                  builder: (context, provider, child) {
+                    if (provider.notifications.any((n) => !n.isRead)) {
+                      return MarkAllReadAction(onTap: _markAllAsRead);
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ],
+            ),
+
             Expanded(
               child: Consumer<NotificationProvider>(
                 builder: (context, provider, child) {
@@ -382,116 +397,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
       ),
     );
   }
-
-  Widget _buildAppBar(BuildContext context) {
-    final statusBarHeight = MediaQuery.of(context).padding.top;
-    
-    return Container(
-      padding: EdgeInsets.only(top: statusBarHeight, left: 16.w, right: 16.w),
-      height: 60.h + statusBarHeight,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary,
-            AppColors.primaryDark,
-            AppColors.accent,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.2),
-            offset: Offset(0, 2.h),
-            blurRadius: 20.r,
-            spreadRadius: 4.r,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Back button
-          InkWell(
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/dashboard');
-              }
-            },
-            borderRadius: BorderRadius.circular(12.r),
-            child: Container(
-              width: 36.w,
-              height: 36.w,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 18.sp,
-              ),
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Text(
-            'Notifications',
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const Spacer(),
-          Consumer<NotificationProvider>(
-            builder: (context, provider, child) {
-              if (provider.notifications.any((n) => !n.isRead)) {
-                return Tooltip(
-                  message: 'Mark all as read',
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(50.r),
-                    onTap: _markAllAsRead,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
-                        vertical: 6.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.done_all_rounded,
-                            color: Colors.white,
-                            size: 18.sp,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            'Mark all read',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-          SizedBox(width: 8.w),
-        ],
-      ),
-    );
-  }
 }
 
 class _NotificationCard extends StatelessWidget {
@@ -585,7 +490,9 @@ class _NotificationCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: notification.isRead ? AppColors.surfaceLight : color.withOpacity(0.03),
+        color: notification.isRead
+            ? AppColors.surfaceLight
+            : color.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: notification.isRead

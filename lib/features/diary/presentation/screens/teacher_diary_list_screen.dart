@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../data/models/teacher_diary_model.dart';
 import '../../provider/teacher_diary_provider.dart';
 
@@ -119,12 +120,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Class Diary'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           context.push('/teacher/diaries/create');
@@ -142,129 +138,144 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
           ),
         ),
       ),
-      body: Consumer<TeacherDiaryProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading && provider.diaries.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                    strokeWidth: 3,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Loading diaries...',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Class Diary',
+            showBackButton: true, // show back button if needed
+            actions: [], // optional actions here
+            // optionally add gradientColors, height, or subtitle
+          ),
 
-          if (provider.errorMessage != null && provider.diaries.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.error_outline_rounded,
-                        size: 48.sp,
-                        color: AppColors.error,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'Error Loading Diaries',
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      provider.errorMessage!,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    SizedBox(height: 24.h),
-                    ElevatedButton.icon(
-                      onPressed: _refresh,
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Retry'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24.w,
-                          vertical: 12.h,
+          Expanded(
+            child: Consumer<TeacherDiaryProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading && provider.diaries.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primary,
+                          ),
+                          strokeWidth: 3,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+                        SizedBox(height: 16.h),
+                        Text(
+                          'Loading diaries...',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }
+                  );
+                }
 
-          if (provider.diaries.isEmpty) {
-            return RefreshIndicator(
-              onRefresh: _refresh,
-              color: AppColors.primary,
-              child: Stack(children: [ListView(), _buildEmptyState()]),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            color: AppColors.primary,
-            child: ListView.separated(
-              controller: _scrollController,
-              padding: EdgeInsets.all(16.w),
-              itemCount:
-                  provider.diaries.length + (provider.isMoreLoading ? 1 : 0),
-              separatorBuilder: (context, index) => SizedBox(height: 12.h),
-              itemBuilder: (context, index) {
-                if (index == provider.diaries.length) {
+                if (provider.errorMessage != null && provider.diaries.isEmpty) {
                   return Center(
                     child: Padding(
-                      padding: EdgeInsets.all(16.h),
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
-                        ),
-                        strokeWidth: 2.5,
+                      padding: EdgeInsets.all(32.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(20.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.error_outline_rounded,
+                              size: 48.sp,
+                              color: AppColors.error,
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            'Error Loading Diaries',
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            provider.errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          SizedBox(height: 24.h),
+                          ElevatedButton.icon(
+                            onPressed: _refresh,
+                            icon: const Icon(Icons.refresh_rounded),
+                            label: const Text('Retry'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 24.w,
+                                vertical: 12.h,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
                 }
-                return _buildDiaryCard(provider.diaries[index]);
+
+                if (provider.diaries.isEmpty) {
+                  return RefreshIndicator(
+                    onRefresh: _refresh,
+                    color: AppColors.primary,
+                    child: Stack(children: [ListView(), _buildEmptyState()]),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: _refresh,
+                  color: AppColors.primary,
+                  child: ListView.separated(
+                    controller: _scrollController,
+                    padding: EdgeInsets.all(16.w),
+                    itemCount:
+                        provider.diaries.length +
+                        (provider.isMoreLoading ? 1 : 0),
+                    separatorBuilder: (context, index) =>
+                        SizedBox(height: 12.h),
+                    itemBuilder: (context, index) {
+                      if (index == provider.diaries.length) {
+                        return Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.h),
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primary,
+                              ),
+                              strokeWidth: 2.5,
+                            ),
+                          ),
+                        );
+                      }
+                      return _buildDiaryCard(provider.diaries[index]);
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

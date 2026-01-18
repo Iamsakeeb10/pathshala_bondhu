@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../auth/data/models/parent_models.dart';
 import '../../../auth/data/models/teacher_models.dart';
 import '../../providers/profile_provider.dart';
@@ -36,119 +37,124 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Personal Information'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_rounded, color: Colors.white),
-            onPressed: () => context.push('/profile/details/edit'),
-            tooltip: 'Edit Profile',
+
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Personal Information',
+            showBackButton: true, // show back button
+            actions: [
+              IconAction(
+                icon: Icons.edit_rounded,
+                onTap: () => context.push('/profile/details/edit'),
+                tooltip: 'Edit Profile',
+              ),
+            ],
+          ),
+          Expanded(
+            child: Consumer<ProfileProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primary,
+                          ),
+                          strokeWidth: 3,
+                        ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          'Loading profile...',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (provider.errorMessage != null) {
+                  return Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(20.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.error_outline_rounded,
+                              size: 48.sp,
+                              color: AppColors.error,
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            'Error Loading Profile',
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            provider.errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                final auth = context.read<AuthProvider>();
+
+                if (auth.isParent && provider.parentProfile != null) {
+                  return _buildParentProfile(provider.parentProfile!);
+                } else if (auth.isTeacher && provider.teacherProfile != null) {
+                  return _buildTeacherProfile(provider.teacherProfile!);
+                }
+
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.person_off_outlined,
+                        size: 64.sp,
+                        color: AppColors.grey400,
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        'No profile data found',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ],
-      ),
-      body: Consumer<ProfileProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                    strokeWidth: 3,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Loading profile...',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (provider.errorMessage != null) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.error_outline_rounded,
-                        size: 48.sp,
-                        color: AppColors.error,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'Error Loading Profile',
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      provider.errorMessage!,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          final auth = context.read<AuthProvider>();
-
-          if (auth.isParent && provider.parentProfile != null) {
-            return _buildParentProfile(provider.parentProfile!);
-          } else if (auth.isTeacher && provider.teacherProfile != null) {
-            return _buildTeacherProfile(provider.teacherProfile!);
-          }
-
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.person_off_outlined,
-                  size: 64.sp,
-                  color: AppColors.grey400,
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  'No profile data found',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }

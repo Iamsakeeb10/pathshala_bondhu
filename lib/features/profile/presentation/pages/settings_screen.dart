@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../../app/providers/language_provider.dart';
 import '../../../../app/theme/providers/theme_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -16,37 +17,44 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: Text(langProvider.translate('settings')),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionHeader('Appearance'),
-            SizedBox(height: 12.h),
-            _buildThemeCard(context, themeProvider, langProvider),
-            SizedBox(height: 24.h),
-            _buildSectionHeader(langProvider.translate('language')),
-            SizedBox(height: 12.h),
-            _buildLanguageCard(context, langProvider),
-            SizedBox(height: 24.h),
-            _buildSectionHeader('Notifications'),
-            SizedBox(height: 12.h),
-            _buildNotificationCard(context),
-            SizedBox(height: 24.h),
-            _buildSectionHeader('About'),
-            SizedBox(height: 12.h),
-            _buildAboutCard(context, langProvider),
-            SizedBox(height: 24.h),
-            _buildDeleteAccountCard(context),
-            SizedBox(height: 24.h),
-          ],
-        ),
+
+      body: Column(
+        children: [
+          // Fixed header
+          CustomAppBar(title: 'Settings', showBackButton: true, actions: []),
+
+          // Scrollable content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionHeader('Appearance'),
+                    SizedBox(height: 12.h),
+                    _buildThemeCard(context, themeProvider, langProvider),
+                    SizedBox(height: 24.h),
+                    _buildSectionHeader(langProvider.translate('language')),
+                    SizedBox(height: 12.h),
+                    _buildLanguageCard(context, langProvider),
+                    SizedBox(height: 24.h),
+                    _buildSectionHeader('Notifications'),
+                    SizedBox(height: 12.h),
+                    _buildNotificationCard(context),
+                    SizedBox(height: 24.h),
+                    _buildSectionHeader('About'),
+                    SizedBox(height: 12.h),
+                    _buildAboutCard(context, langProvider),
+                    SizedBox(height: 24.h),
+                    _buildDeleteAccountCard(context),
+                    SizedBox(height: 24.h),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

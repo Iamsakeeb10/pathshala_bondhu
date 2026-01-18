@@ -7,11 +7,12 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../../../shared/widgets/person_card.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../data/models/parent_model.dart';
 import '../provider/parents_provider.dart';
 
 /// Screen displaying list of parents with search functionality
-/// 
+///
 /// Only visible to Teacher role
 class ParentsScreen extends StatefulWidget {
   const ParentsScreen({super.key});
@@ -45,15 +46,11 @@ class _ParentsScreenState extends State<ParentsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Parents'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
+
       body: Column(
         children: [
+          CustomAppBar(title: 'Parents', showBackButton: false),
+
           // Search bar
           _buildSearchBar(),
 
@@ -93,8 +90,9 @@ class _ParentsScreenState extends State<ParentsScreen> {
                             provider.clearSearch();
                           }
                         : null,
-                    actionLabel:
-                        provider.searchQuery.isNotEmpty ? 'Clear Search' : null,
+                    actionLabel: provider.searchQuery.isNotEmpty
+                        ? 'Clear Search'
+                        : null,
                   );
                 }
 
@@ -135,10 +133,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
             },
             decoration: InputDecoration(
               hintText: 'Search parent by name or phone',
-              hintStyle: TextStyle(
-                color: AppColors.grey400,
-                fontSize: 14.sp,
-              ),
+              hintStyle: TextStyle(color: AppColors.grey400, fontSize: 14.sp),
               prefixIcon: provider.isSearching
                   ? Padding(
                       padding: EdgeInsets.all(12.w),
@@ -151,11 +146,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
                         ),
                       ),
                     )
-                  : Icon(
-                      Icons.search,
-                      color: AppColors.grey400,
-                      size: 22.sp,
-                    ),
+                  : Icon(Icons.search, color: AppColors.grey400, size: 22.sp),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       onPressed: () {
@@ -214,9 +205,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
           if (index == provider.parents.length) {
             return Padding(
               padding: EdgeInsets.all(16.w),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             );
           }
 
@@ -233,28 +222,28 @@ class _ParentsScreenState extends State<ParentsScreen> {
 
     // Phone number
     if (parent.parentPhone.isNotEmpty) {
-      chips.add(PersonCardChip(
-        icon: Icons.phone_outlined,
-        label: parent.parentPhone,
-      ));
+      chips.add(
+        PersonCardChip(icon: Icons.phone_outlined, label: parent.parentPhone),
+      );
     }
 
     // School name
     if (parent.school != null && parent.school!.name.isNotEmpty) {
-      chips.add(PersonCardChip(
-        icon: Icons.school_outlined,
-        label: parent.school!.name,
-      ));
+      chips.add(
+        PersonCardChip(icon: Icons.school_outlined, label: parent.school!.name),
+      );
     }
 
     // Address (truncated)
     if (parent.address != null && parent.address!.isNotEmpty) {
-      chips.add(PersonCardChip(
-        icon: Icons.location_on_outlined,
-        label: parent.address!.length > 25
-            ? '${parent.address!.substring(0, 25)}...'
-            : parent.address!,
-      ));
+      chips.add(
+        PersonCardChip(
+          icon: Icons.location_on_outlined,
+          label: parent.address!.length > 25
+              ? '${parent.address!.substring(0, 25)}...'
+              : parent.address!,
+        ),
+      );
     }
 
     // Build subtitle from mother name
