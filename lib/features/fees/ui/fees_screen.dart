@@ -6,6 +6,7 @@ import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../../students/provider/student_provider.dart';
 import '../data/models/fees_models.dart';
 import '../provider/fees_provider.dart';
@@ -30,21 +31,26 @@ class _FeesScreenState extends State<FeesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Fees'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<FeesProvider>(
-        builder: (context, provider, child) {
-          return Column(
-            children: [
-              _buildYearFilter(provider),
-              Expanded(child: _buildContent(provider)),
-            ],
-          );
-        },
+
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Fees',
+            showBackButton: true, // optional, default is true
+          ),
+          Expanded(
+            child: Consumer<FeesProvider>(
+              builder: (context, provider, child) {
+                return Column(
+                  children: [
+                    _buildYearFilter(provider),
+                    Expanded(child: _buildContent(provider)),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -144,35 +150,40 @@ class _FeesScreenState extends State<FeesScreen> {
     // Filter months to show only up to current month if year is current year
     final currentYear = DateTime.now().year;
     final currentMonth = DateTime.now().month;
-    
+
     // Only filter if it's the current year (or future years where we shouldn't show anything yet?)
     // Requirement says "Future months fees dont show", assuming for current year.
     // If year is past, show all. If year is future, show none.
-    
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.w),
       child: Column(
         children: feesToShow.map((child) {
           // Clone the object or just filter the list in the UI builder?
-          // Since models are final, we can't modify them easily without copyWith. 
+          // Since models are final, we can't modify them easily without copyWith.
           // But we can just pass the filtered list to a modified _buildStudentFees or handle it there.
-          // Let's handle it by passing a filtered list to _buildStudentFees if possible, 
+          // Let's handle it by passing a filtered list to _buildStudentFees if possible,
           // or just modify _buildStudentFees to accept max month.
-          
+
           List<MonthlyFee> monthlyBreakdown = child.monthlyBreakdown;
           if (data.academicYear == currentYear) {
-            monthlyBreakdown = child.monthlyBreakdown.take(currentMonth).toList();
+            monthlyBreakdown = child.monthlyBreakdown
+                .take(currentMonth)
+                .toList();
           } else if (data.academicYear > currentYear) {
-             monthlyBreakdown = [];
+            monthlyBreakdown = [];
           }
-          
+
           return _buildStudentFees(child, monthlyBreakdown);
         }).toList(),
       ),
     );
   }
 
-  Widget _buildStudentFees(ChildFees child, [List<MonthlyFee>? overrideMonthlyBreakdown]) {
+  Widget _buildStudentFees(
+    ChildFees child, [
+    List<MonthlyFee>? overrideMonthlyBreakdown,
+  ]) {
     final monthlyBreakdown = overrideMonthlyBreakdown ?? child.monthlyBreakdown;
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),

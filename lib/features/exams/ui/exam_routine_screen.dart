@@ -7,6 +7,7 @@ import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../../students/provider/student_provider.dart';
 import '../data/models/exam_routine_models.dart';
 import '../provider/exam_routine_provider.dart';
@@ -32,42 +33,47 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Exam Routine'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<ExamRoutineProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return Padding(
-              padding: EdgeInsets.all(16.w),
-              child: LoadingShimmer.list(itemCount: 5),
-            );
-          }
 
-          if (provider.errorMessage != null) {
-            return ErrorState(
-              message: provider.errorMessage!,
-              onRetry: provider.retry,
-            );
-          }
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Exam Routine',
+            showBackButton: true, // optional, default is true
+          ),
+          Expanded(
+            child: Consumer<ExamRoutineProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading) {
+                  return Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: LoadingShimmer.list(itemCount: 5),
+                  );
+                }
 
-          if (provider.isEmpty) {
-            return const EmptyState(
-              icon: Icons.event_note_outlined,
-              message: 'No exam routines found',
-              subMessage: 'There are no exams scheduled yet.',
-            );
-          }
+                if (provider.errorMessage != null) {
+                  return ErrorState(
+                    message: provider.errorMessage!,
+                    onRetry: provider.retry,
+                  );
+                }
 
-          if (provider.hasData) {
-            return _buildExamRoutineList(provider.data!);
-          }
+                if (provider.isEmpty) {
+                  return const EmptyState(
+                    icon: Icons.event_note_outlined,
+                    message: 'No exam routines found',
+                    subMessage: 'There are no exams scheduled yet.',
+                  );
+                }
 
-          return const SizedBox.shrink();
-        },
+                if (provider.hasData) {
+                  return _buildExamRoutineList(provider.data!);
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

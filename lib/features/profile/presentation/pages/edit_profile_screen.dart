@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../providers/profile_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -122,66 +123,71 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<ProfileProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                    strokeWidth: 3,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Saving changes...',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildInfoBox(),
-                  SizedBox(height: 24.h),
-                  if (auth.isParent) ...[
-                    _buildSectionHeader('Personal Information'),
-                    SizedBox(height: 12.h),
-                    ..._buildParentFields(),
-                  ],
-                  if (auth.isTeacher) ...[
-                    _buildSectionHeader('Personal Information'),
-                    SizedBox(height: 12.h),
-                    ..._buildTeacherFields(),
-                  ],
-                  SizedBox(height: 32.h),
-                  _buildSaveButton(),
-                  SizedBox(height: 24.h),
-                ],
-              ),
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Edit Profile',
+            showBackButton: true, // optional, default is true
+          ),
+          Expanded(
+            child: Consumer<ProfileProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primary,
+                          ),
+                          strokeWidth: 3,
+                        ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          'Saving changes...',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(16.w),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildInfoBox(),
+                        SizedBox(height: 24.h),
+                        if (auth.isParent) ...[
+                          _buildSectionHeader('Personal Information'),
+                          SizedBox(height: 12.h),
+                          ..._buildParentFields(),
+                        ],
+                        if (auth.isTeacher) ...[
+                          _buildSectionHeader('Personal Information'),
+                          SizedBox(height: 12.h),
+                          ..._buildTeacherFields(),
+                        ],
+                        SizedBox(height: 32.h),
+                        _buildSaveButton(),
+                        SizedBox(height: 24.h),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

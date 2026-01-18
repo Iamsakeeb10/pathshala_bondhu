@@ -28,10 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
       if (authProvider.isParent) {
         context.read<StudentProvider>().fetchStudents();
       }
-      
+
       // Fetch notification unread count
       context.read<NotificationProvider>().fetchUnreadCount();
-      
+
       // Request notification permission
       NotificationService.requestPermission();
     });
@@ -80,30 +80,30 @@ class _HomeScreenState extends State<HomeScreen> {
       'color': const Color(0xFF3B82F6),
       'route': '/fees',
     },
-    {
-      'icon': Icons.description_outlined,
-      'label': 'Notice',
-      'color': const Color(0xFF8B5CF6),
-      'route': null,
-    },
-    {
-      'icon': Icons.assignment_outlined,
-      'label': 'Circular',
-      'color': const Color(0xFFEC4899),
-      'route': null,
-    },
-    {
-      'icon': Icons.analytics_outlined,
-      'label': 'Reports',
-      'color': const Color(0xFF06B6D4),
-      'route': null,
-    },
-    {
-      'icon': Icons.people_outline,
-      'label': 'Profile',
-      'color': const Color(0xFFEFC45D),
-      'route': null,
-    },
+    // {
+    //   'icon': Icons.description_outlined,
+    //   'label': 'Notice',
+    //   'color': const Color(0xFF8B5CF6),
+    //   'route': null,
+    // },
+    // {
+    //   'icon': Icons.assignment_outlined,
+    //   'label': 'Circular',
+    //   'color': const Color(0xFFEC4899),
+    //   'route': null,
+    // },
+    // {
+    //   'icon': Icons.analytics_outlined,
+    //   'label': 'Reports',
+    //   'color': const Color(0xFF06B6D4),
+    //   'route': null,
+    // },
+    // {
+    //   'icon': Icons.people_outline,
+    //   'label': 'Profile',
+    //   'color': const Color(0xFFEFC45D),
+    //   'route': null,
+    // },
   ];
 
   // Filter categories based on role
@@ -163,8 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (authProvider.isParent) {
       // Handle Diary specifically
       if (label == 'Diary') {
-         final studentProvider = context.read<StudentProvider>();
-         
+        final studentProvider = context.read<StudentProvider>();
+
         if (studentProvider.students.isEmpty && !studentProvider.isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -185,25 +185,35 @@ class _HomeScreenState extends State<HomeScreen> {
           return;
         }
 
-         if (studentProvider.hasSingleStudent) {
-             final student = studentProvider.students.first;
-             context.push(Uri(path: '/parent/diaries', queryParameters: {'studentId': student.studentId}).toString());
-             return;
-         }
+        if (studentProvider.hasSingleStudent) {
+          final student = studentProvider.students.first;
+          context.push(
+            Uri(
+              path: '/parent/diaries',
+              queryParameters: {'studentId': student.studentId},
+            ).toString(),
+          );
+          return;
+        }
 
-         if (studentProvider.hasMultipleStudents) {
-           StudentSelectionBottomSheet.show(
-              context,
-              students: studentProvider.students,
-              onStudentSelected: (student) {
-                studentProvider.selectStudent(student);
-                context.push(Uri(path: '/parent/diaries', queryParameters: {'studentId': student.studentId}).toString());
-              },
-            );
-            return;
-         }
+        if (studentProvider.hasMultipleStudents) {
+          StudentSelectionBottomSheet.show(
+            context,
+            students: studentProvider.students,
+            onStudentSelected: (student) {
+              studentProvider.selectStudent(student);
+              context.push(
+                Uri(
+                  path: '/parent/diaries',
+                  queryParameters: {'studentId': student.studentId},
+                ).toString(),
+              );
+            },
+          );
+          return;
+        }
       }
-      
+
       // Generic parent routing logic (if route is null, it will fall through)
     }
 
@@ -486,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                       size: 24.sp,
                     ),
-                    
+
                     // 🔴 Unread badge
                     if (provider.unreadCount > 0)
                       Positioned(
@@ -500,10 +510,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.error,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1.2,
-                            ),
+                            border: Border.all(color: Colors.white, width: 1.2),
                             boxShadow: [
                               BoxShadow(
                                 color: AppColors.error.withOpacity(0.4),

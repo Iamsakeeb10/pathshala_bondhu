@@ -6,6 +6,7 @@ import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../../auth/data/models/parent_models.dart';
 import '../provider/student_provider.dart';
 
@@ -33,39 +34,43 @@ class _StudentsScreenState extends State<StudentsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('My Students'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
-      body: Consumer<StudentProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return Padding(
-              padding: EdgeInsets.all(16.w),
-              child: LoadingShimmer.list(itemCount: 3, itemHeight: 140),
-            );
-          }
 
-          if (provider.errorMessage != null) {
-            return ErrorState(
-              message: provider.errorMessage!,
-              onRetry: provider.fetchStudents,
-            );
-          }
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Students',
+            showBackButton: false, // optional, default is true
+          ),
+          Expanded(
+            child: Consumer<StudentProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading) {
+                  return Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: LoadingShimmer.list(itemCount: 3, itemHeight: 140),
+                  );
+                }
 
-          if (provider.hasNoStudents) {
-            return const EmptyState(
-              icon: Icons.people_outline,
-              message: 'No students found',
-              subMessage: 'No students are linked to your account.',
-            );
-          }
+                if (provider.errorMessage != null) {
+                  return ErrorState(
+                    message: provider.errorMessage!,
+                    onRetry: provider.fetchStudents,
+                  );
+                }
 
-          return _buildStudentList(provider.students, provider);
-        },
+                if (provider.hasNoStudents) {
+                  return const EmptyState(
+                    icon: Icons.people_outline,
+                    message: 'No students found',
+                    subMessage: 'No students are linked to your account.',
+                  );
+                }
+
+                return _buildStudentList(provider.students, provider);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

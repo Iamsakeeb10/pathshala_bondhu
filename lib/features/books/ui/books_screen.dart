@@ -6,6 +6,7 @@ import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../../students/provider/student_provider.dart';
 import '../data/models/books_models.dart';
 import '../provider/books_provider.dart';
@@ -32,44 +33,49 @@ class _BooksScreenState extends State<BooksScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Books'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<BooksProvider>(
-        builder: (context, provider, child) {
-          // Loading state
-          if (provider.isLoading) {
-            return _buildLoadingState();
-          }
 
-          // Error state
-          if (provider.errorMessage != null) {
-            return ErrorState(
-              message: provider.errorMessage!,
-              onRetry: provider.retry,
-            );
-          }
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Books',
+            showBackButton: true, // optional, default is true
+          ),
+          Expanded(
+            child: Consumer<BooksProvider>(
+              builder: (context, provider, child) {
+                // Loading state
+                if (provider.isLoading) {
+                  return _buildLoadingState();
+                }
 
-          // Empty state
-          if (provider.isEmpty) {
-            return const EmptyState(
-              icon: Icons.book_outlined,
-              message: 'No books found',
-              subMessage: 'There are no books assigned yet.',
-            );
-          }
+                // Error state
+                if (provider.errorMessage != null) {
+                  return ErrorState(
+                    message: provider.errorMessage!,
+                    onRetry: provider.retry,
+                  );
+                }
 
-          // Success state
-          if (provider.hasData) {
-            return _buildBookList(provider.data!);
-          }
+                // Empty state
+                if (provider.isEmpty) {
+                  return const EmptyState(
+                    icon: Icons.book_outlined,
+                    message: 'No books found',
+                    subMessage: 'There are no books assigned yet.',
+                  );
+                }
 
-          // Default empty
-          return const SizedBox.shrink();
-        },
+                // Success state
+                if (provider.hasData) {
+                  return _buildBookList(provider.data!);
+                }
+
+                // Default empty
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

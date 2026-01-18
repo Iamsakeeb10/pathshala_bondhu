@@ -6,6 +6,7 @@ import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../../students/provider/student_provider.dart';
 import '../data/models/routine_models.dart';
 import '../provider/routine_provider.dart';
@@ -31,39 +32,44 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Class Routine'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<RoutineProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return _buildLoadingState();
-          }
 
-          if (provider.errorMessage != null) {
-            return ErrorState(
-              message: provider.errorMessage!,
-              onRetry: provider.retry,
-            );
-          }
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Class Routine',
+            showBackButton: true, // optional, default is true
+          ),
+          Expanded(
+            child: Consumer<RoutineProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading) {
+                  return _buildLoadingState();
+                }
 
-          if (provider.isEmpty) {
-            return const EmptyState(
-              icon: Icons.calendar_today_outlined,
-              message: 'No routines found',
-              subMessage: 'There are no class routines assigned yet.',
-            );
-          }
+                if (provider.errorMessage != null) {
+                  return ErrorState(
+                    message: provider.errorMessage!,
+                    onRetry: provider.retry,
+                  );
+                }
 
-          if (provider.hasData) {
-            return _buildRoutineList(provider.data!);
-          }
+                if (provider.isEmpty) {
+                  return const EmptyState(
+                    icon: Icons.calendar_today_outlined,
+                    message: 'No routines found',
+                    subMessage: 'There are no class routines assigned yet.',
+                  );
+                }
 
-          return const SizedBox.shrink();
-        },
+                if (provider.hasData) {
+                  return _buildRoutineList(provider.data!);
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -7,6 +7,7 @@ import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../../students/provider/student_provider.dart';
 import '../data/models/attendance_models.dart';
 import '../provider/attendance_provider.dart';
@@ -31,21 +32,26 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Attendance'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Consumer<AttendanceProvider>(
-        builder: (context, provider, child) {
-          return Column(
-            children: [
-              _buildFilters(provider),
-              Expanded(child: _buildContent(provider)),
-            ],
-          );
-        },
+
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: 'Attendance',
+            showBackButton: true, // optional, default is true
+          ),
+          Expanded(
+            child: Consumer<AttendanceProvider>(
+              builder: (context, provider, child) {
+                return Column(
+                  children: [
+                    _buildFilters(provider),
+                    Expanded(child: _buildContent(provider)),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

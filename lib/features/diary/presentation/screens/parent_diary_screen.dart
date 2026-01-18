@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
-import '../../provider/parent_diary_provider.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../data/models/parent_diary_model.dart';
+import '../../provider/parent_diary_provider.dart';
 
 class ParentDiaryScreen extends StatefulWidget {
   final String studentId;
@@ -58,14 +58,13 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Class Diary'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+
       body: Column(
         children: [
+          CustomAppBar(
+            title: 'Class Diary',
+            showBackButton: true, // optional, default is true
+          ),
           _buildHeader(context),
           Expanded(
             child: Consumer<ParentDiaryProvider>(
@@ -79,7 +78,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                 }
 
                 final diaries = provider.currentStudentDiaries;
-                
+
                 if (diaries.isEmpty) {
                   return _buildEmptyState();
                 }
@@ -104,20 +103,31 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
     return Consumer<ParentDiaryProvider>(
       builder: (context, provider, child) {
         final studentInfo = provider.currentStudentInfo;
-        
+
         return Container(
           padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 24.h),
+
           decoration: BoxDecoration(
-            color: AppColors.primary,
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(24.r),
               bottomRight: Radius.circular(24.r),
             ),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary,
+                AppColors.primaryDark,
+                AppColors.accent,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+                color: AppColors.primary.withOpacity(0.2),
+
+                offset: Offset(0, 2.h),
+                blurRadius: 20.r,
+                spreadRadius: 4.r,
               ),
             ],
           ),
@@ -132,7 +142,11 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                       CircleAvatar(
                         radius: 20.r,
                         backgroundColor: Colors.white.withOpacity(0.2),
-                        child: Icon(Icons.person, color: Colors.white, size: 20.sp),
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 20.sp,
+                        ),
                       ),
                       SizedBox(width: 12.w),
                       Column(
@@ -149,7 +163,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                           SizedBox(height: 2.h),
                           Text(
                             '${studentInfo.classInfo} • ${studentInfo.academicSession}',
-                             style: TextStyle(
+                            style: TextStyle(
                               fontSize: 12.sp,
                               color: Colors.white.withOpacity(0.9),
                             ),
@@ -159,13 +173,16 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                     ],
                   ),
                 ),
-                
+
               // Date Selector
               InkWell(
                 onTap: () => _selectDate(context),
                 borderRadius: BorderRadius.circular(12.r),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 12.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12.r),
@@ -182,7 +199,9 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                           ),
                           SizedBox(width: 12.w),
                           Text(
-                            DateFormat('EEEE, d MMMM yyyy').format(provider.selectedDate),
+                            DateFormat(
+                              'EEEE, d MMMM yyyy',
+                            ).format(provider.selectedDate),
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
@@ -228,14 +247,21 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 5.h,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.book_outlined, size: 14.sp, color: AppColors.primary),
+                      Icon(
+                        Icons.book_outlined,
+                        size: 14.sp,
+                        color: AppColors.primary,
+                      ),
                       SizedBox(width: 6.w),
                       Text(
                         diary.subject,
@@ -283,16 +309,20 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
               SizedBox(height: 12.h),
               Row(
                 children: [
-                   Icon(Icons.event_available, size: 16.sp, color: AppColors.success),
-                   SizedBox(width: 8.w),
-                   Text(
-                     'Submission: ${_formatDate(diary.submissionDate)}',
-                     style: TextStyle(
-                       fontSize: 13.sp,
-                       fontWeight: FontWeight.w500,
-                       color: AppColors.textSecondary,
-                     ),
-                   ),
+                  Icon(
+                    Icons.event_available,
+                    size: 16.sp,
+                    color: AppColors.success,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Submission: ${_formatDate(diary.submissionDate)}',
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -312,7 +342,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
   }
 
   Widget _buildLoadingState() {
-     return Center(
+    return Center(
       child: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
       ),
@@ -348,10 +378,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
           SizedBox(height: 8.h),
           Text(
             'There are no diary entries for this date.',
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: AppColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -381,11 +408,11 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.textSecondary),
             ),
-             SizedBox(height: 24.h),
+            SizedBox(height: 24.h),
             ElevatedButton.icon(
               onPressed: () => provider.fetchDiaries(),
               icon: const Icon(Icons.refresh),
-               label: const Text('Retry'),
+              label: const Text('Retry'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
