@@ -26,6 +26,15 @@ class PersonCard extends StatelessWidget {
   /// Optional onTap callback
   final VoidCallback? onTap;
 
+  /// Optional action button icon (e.g., chat icon)
+  final IconData? actionIcon;
+
+  /// Optional action button callback
+  final VoidCallback? onActionTap;
+
+  /// Optional action button tooltip
+  final String? actionTooltip;
+
   const PersonCard({
     super.key,
     required this.title,
@@ -34,6 +43,9 @@ class PersonCard extends StatelessWidget {
     this.avatarUrl,
     this.accentColor = const Color(0xFFEFC45D),
     this.onTap,
+    this.actionIcon,
+    this.onActionTap,
+    this.actionTooltip,
   });
 
   @override
@@ -110,6 +122,35 @@ class PersonCard extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                // Action button (e.g., Chat)
+                if (actionIcon != null && onActionTap != null) ...[
+                  SizedBox(width: 8.w),
+                  Tooltip(
+                    message: actionTooltip ?? 'Action',
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: onActionTap,
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Container(
+                          padding: EdgeInsets.all(10.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Icon(
+                            actionIcon,
+                            size: 20.sp,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+
+                SizedBox(width: 8.w),
 
                 // Arrow indicator
                 Icon(

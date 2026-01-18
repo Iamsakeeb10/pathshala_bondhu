@@ -8,6 +8,7 @@ import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../../../shared/widgets/person_card.dart';
 import '../../../shared/widgets/custom_appbar.dart';
+import '../../chat/screens/chat_screen.dart';
 import '../data/models/teacher_model.dart';
 import '../provider/teachers_provider.dart';
 
@@ -153,10 +154,24 @@ class _TeachersScreenState extends State<TeachersScreen> {
       title: teacher.name,
       subtitle: teacher.teacher?.department,
       chips: chips,
-      avatarUrl: teacher.avatar, // Will need full URL handling if relative
+      avatarUrl: teacher.avatar,
       accentColor: AppColors.teacher,
+      // Chat action button
+      actionIcon: Icons.chat_bubble_outline_rounded,
+      actionTooltip: 'Chat with ${teacher.name}',
+      onActionTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatScreen(
+              otherUserId: teacher.id,
+              otherUserName: teacher.name,
+              otherUserImage: teacher.avatar,
+            ),
+          ),
+        );
+      },
       onTap: () {
-        // For now, just show a snackbar - can add detail screen later
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${teacher.name}'),
