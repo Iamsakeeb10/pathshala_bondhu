@@ -31,6 +31,10 @@ import 'features/routines/provider/teacher_routine_provider.dart';
 import 'features/students/provider/student_provider.dart';
 import 'features/teacher_attendance/provider/teacher_attendance_provider.dart';
 import 'features/teachers/provider/teachers_provider.dart';
+// 🔹 Chat feature providers
+import 'features/chat/providers/chat_provider.dart';
+import 'features/chat/providers/conversations_provider.dart';
+import 'features/chat/providers/chat_background_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -94,6 +98,10 @@ void main() async {
         // Teachers & Parents listing providers
         ChangeNotifierProvider(create: (_) => TeachersProvider()),
         ChangeNotifierProvider(create: (_) => ParentsProvider()),
+        // 🔹 Chat feature providers
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => ConversationsProvider()),
+        ChangeNotifierProvider(create: (_) => ChatBackgroundProvider()),
       ],
       child: const MyApp(),
     ),

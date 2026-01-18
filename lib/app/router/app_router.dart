@@ -23,6 +23,7 @@ import '../../features/routines/presentation/screens/teacher_routine_screen.dart
 import '../../features/routines/ui/class_routine_screen.dart';
 import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
 import '../../features/notifications/screens/notification_screen.dart';
+import '../../features/chat/screens/conversations_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -211,6 +212,13 @@ class AppRouter {
         path: '/notifications',
         name: 'notifications',
         builder: (context, state) => const NotificationScreen(),
+      ),
+
+      // Chat Conversations Screen
+      GoRoute(
+        path: '/conversations',
+        name: 'conversations',
+        builder: (context, state) => const ConversationsScreen(),
       ),
     ],
 

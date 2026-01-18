@@ -1,0 +1,166 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../core/network/token_storage.dart';
+import '../models/chat_user_model.dart';
+
+/// Service to fetch user information by user ID for chat screens
+class UserLookupService {
+  static const String baseUrl = 'https://whiteorbit.top/api/v1';
+  static const String _cacheKeyPrefix = 'user_cache_';
+  static const Duration _cacheDuration = Duration(days: 7);
+
+  // Memory cache
+  final Map<int, ChatUser> _memoryCache = {};
+
+  // Track ongoing requests to prevent duplicates
+  final Map<int, Future<ChatUser?>> _ongoingRequests = {};
+
+  /// Initialize service and load cache
+  Future<void> init() async {
+    // Preload frequent users if needed
+  }
+
+  /// Get user info by ID
+  Future<ChatUser?> getUserById(int userId, {bool forceRefresh = false}) async {
+    // 1. Check memory cache first
+    if (!forceRefresh && _memoryCache.containsKey(userId)) {
+      return _memoryCache[userId];
+    }
+
+    // 2. Check overlap (deduplication)
+    if (_ongoingRequests.containsKey(userId)) {
+      return _ongoingRequests[userId];
+    }
+
+    // 3. Check persistent cache
+    if (!forceRefresh) {
+      final cachedUser = await _getFromDisk(userId);
+      if (cachedUser != null) {
+        _memoryCache[userId] = cachedUser;
+        return cachedUser;
+      }
+    }
+
+    // 4. Fetch from API
+    final future = _fetchFromApi(userId);
+    _ongoingRequests[userId] = future;
+
+    try {
+      final user = await future;
+      if (user != null) {
+        _memoryCache[userId] = user;
+        await _saveToDisk(user);
+      }
+      return user;
+    } finally {
+      _ongoingRequests.remove(userId);
+    }
+  }
+
+  /// Fetch multiple users efficiently
+  Future<Map<int, ChatUser>> getUsersByIds(List<int> userIds) async {
+    final Map<int, ChatUser> results = {};
+    final List<int> idsToFetch = [];
+
+    // 1. Check Caches
+    for (final id in userIds) {
+      if (_memoryCache.containsKey(id)) {
+        results[id] = _memoryCache[id]!;
+      } else {
+        // Try disk cache
+        final cached = await _getFromDisk(id);
+        if (cached != null) {
+          _memoryCache[id] = cached;
+          results[id] = cached;
+        } else {
+          idsToFetch.add(id);
+        }
+      }
+    }
+
+    if (idsToFetch.isEmpty) return results;
+
+    // 2. Fetch missing (Parallel)
+    debugPrint('🔍 Fetching ${idsToFetch.length} missing users from API');
+
+    final futures = idsToFetch.map((id) => getUserById(id, forceRefresh: true));
+    final fetchedUsers = await Future.wait(futures);
+
+    for (final user in fetchedUsers) {
+      if (user != null) {
+        results[user.id] = user;
+      }
+    }
+
+    return results;
+  }
+
+  Future<ChatUser?> _fetchFromApi(int userId) async {
+    try {
+      final token = await TokenStorage.getToken();
+      if (token == null) return null;
+
+      debugPrint('🔍 API Call: Fetching user $userId');
+
+      final url = Uri.parse('$baseUrl/user/$userId');
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        if (data['success'] == true && data['data'] != null) {
+          final userData = data['data']['user'];
+          if (userData != null) {
+            final user = ChatUser.fromJson(userData);
+            debugPrint('✅ Fetched: ${user.name} ($userId)');
+            return user;
+          }
+        }
+      } else if (response.statusCode == 404) {
+        debugPrint('❌ User $userId not found (404)');
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching user $userId: $e');
+    }
+    return null;
+  }
+
+  Future<void> _saveToDisk(ChatUser user) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final key = '$_cacheKeyPrefix${user.id}';
+      final jsonStr = jsonEncode({
+        ...user.toJson(),
+        'cached_at': DateTime.now().toIso8601String(),
+      });
+      await prefs.setString(key, jsonStr);
+    } catch (_) {}
+  }
+
+  Future<ChatUser?> _getFromDisk(int userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final key = '$_cacheKeyPrefix$userId';
+      final jsonStr = prefs.getString(key);
+
+      if (jsonStr != null) {
+        final data = jsonDecode(jsonStr);
+        return ChatUser.fromJson(data);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  void clearCache() {
+    _memoryCache.clear();
+  }
+}

@@ -173,6 +173,12 @@ class _HomeScreenState extends State<HomeScreen> {
       'color': const Color(0xFF3B82F6),
       'route': '/fees',
     },
+    {
+      'icon': Icons.chat_bubble_outline_rounded,
+      'label': 'Messages',
+      'color': const Color(0xFF8B5CF6),
+      'route': '/conversations',
+    },
     // {
     //   'icon': Icons.description_outlined,
     //   'label': 'Notice',
