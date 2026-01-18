@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
       final authProvider = context.read<AuthProvider>();
       if (authProvider.isParent) {
         context.read<StudentProvider>().fetchStudents();
+        // Fetch extended profile for job title
+        authProvider.fetchExtendedProfile();
       }
 
       // Fetch notification unread count
@@ -35,6 +37,97 @@ class _HomeScreenState extends State<HomeScreen> {
       // Request notification permission
       NotificationService.requestPermission();
     });
+  }
+
+  /// Simple version with consistent greetings
+  String _getGreeting() {
+    final now = DateTime.now();
+    final hour = now.hour;
+    final day = now.weekday;
+
+    // Weekend check
+    final isWeekend = day == DateTime.saturday || day == DateTime.sunday;
+
+    // Early Morning (12 AM - 5 AM)
+    if (hour >= 0 && hour < 5) {
+      final messages = [
+        'Burning the midnight oil',
+        'Still awake',
+        'Working late',
+        'Night owl',
+      ];
+      return messages[now.second % messages.length];
+    }
+    // Dawn (5 AM - 7 AM)
+    else if (hour >= 5 && hour < 7) {
+      final messages = [
+        'Rise and shine',
+        'Early bird',
+        'Good morning',
+        'Beautiful morning',
+      ];
+      return messages[now.second % messages.length];
+    }
+    // Morning (7 AM - 12 PM)
+    else if (hour >= 7 && hour < 12) {
+      if (isWeekend) {
+        final messages = [
+          'Happy weekend',
+          'Good morning',
+          'Lovely morning',
+          'Great morning',
+        ];
+        return messages[now.second % messages.length];
+      } else {
+        final messages = [
+          'Good morning',
+          'Great morning',
+          'Wonderful morning',
+          'Beautiful morning',
+        ];
+        return messages[now.second % messages.length];
+      }
+    }
+    // Afternoon (12 PM - 5 PM)
+    else if (hour >= 12 && hour < 17) {
+      if (isWeekend) {
+        final messages = [
+          'Happy afternoon',
+          'Good afternoon',
+          'Lovely afternoon',
+          'Great afternoon',
+        ];
+        return messages[now.second % messages.length];
+      } else {
+        final messages = [
+          'Good afternoon',
+          'Great afternoon',
+          'Wonderful afternoon',
+          'Nice afternoon',
+        ];
+        return messages[now.second % messages.length];
+      }
+    }
+    // Evening (5 PM - 9 PM)
+    else if (hour >= 17 && hour < 21) {
+      final messages = [
+        'Good evening',
+        'Great evening',
+        'Lovely evening',
+        'Beautiful evening',
+      ];
+      return messages[now.second % messages.length];
+    }
+    // Night (9 PM - 12 AM)
+    else {
+      final messages = [
+        'Good evening',
+        'Working late',
+        'Night time',
+        'Late evening',
+      ];
+      return messages[now.second % messages.length];
+    }
   }
 
   final List<String> _bannerImages = [
@@ -398,43 +491,120 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Consumer<AuthProvider>(
-                builder: (context, authProvider, child) {
-                  final userName = authProvider.currentUser?.name ?? 'Guest';
-                  return Text(
-                    'Hi, $userName',
+          child: Consumer<AuthProvider>(
+            builder: (context, authProvider, child) {
+              final userName = authProvider.currentUser?.name ?? 'Guest';
+              final designation = authProvider.currentUser?.designation;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Greeting with wave emoji
+                  Row(
+                    children: [
+                      Text(
+                        _getGreeting(),
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.85),
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      SizedBox(width: 6.w),
+                      Text('👋', style: TextStyle(fontSize: 16.sp)),
+                    ],
+                  ),
+                  SizedBox(height: 6.h),
+
+                  // Name - Bold and prominent
+                  Text(
+                    userName,
                     style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.w800,
                       color: Colors.white,
-                      height: 1.3,
-                      letterSpacing: 0.2,
+                      height: 1.1,
+                      letterSpacing: 0.5,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.15),
+                          offset: Offset(0, 2.h),
+                          blurRadius: 8.r,
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
-              SizedBox(height: 6.h),
-              // Container(
-              //   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-              //   decoration: BoxDecoration(
-              //     color: Colors.white.withOpacity(0.15),
-              //     borderRadius: BorderRadius.circular(6.r),
-              //   ),
-              //   child: Text(
-              //     '2026-27',
-              //     style: TextStyle(
-              //       fontSize: 12.sp,
-              //       fontWeight: FontWeight.w600,
-              //       color: Colors.white.withOpacity(0.9),
-              //     ),
-              //   ),
-              // ),
-            ],
+                  ),
+
+                  // Designation Badge - Modern pill design
+                  if (designation != null && designation.isNotEmpty) ...[
+                    SizedBox(height: 12.h),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.25),
+                            Colors.white.withOpacity(0.15),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8.r,
+                            offset: Offset(0, 3.h),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(4.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.work_outline_rounded,
+                              size: 14.sp,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Flexible(
+                            child: Text(
+                              designation,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                letterSpacing: 0.2,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ),
+
         // 🔔 Notification Bell Icon with Badge
         Consumer<NotificationProvider>(
           builder: (context, provider, child) {

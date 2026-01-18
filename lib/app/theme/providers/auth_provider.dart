@@ -13,6 +13,7 @@ class User {
   final String? email;
   final UserRole role;
   final String? avatarUrl;
+  final String? designation; // Job title for parents, etc.
 
   User({
     required this.id,
@@ -20,6 +21,7 @@ class User {
     this.email,
     required this.role,
     this.avatarUrl,
+    this.designation,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class User {
         orElse: () => UserRole.parent,
       ),
       avatarUrl: json['avatarUrl'] as String?,
+      designation: json['designation'] as String?,
     );
   }
 
@@ -42,6 +45,7 @@ class User {
       'email': email,
       'role': role.name,
       'avatarUrl': avatarUrl,
+      'designation': designation,
     };
   }
 }
@@ -293,5 +297,38 @@ class AuthProvider extends ChangeNotifier {
   /// Returns null if token cannot be obtained (no permission, not initialized, etc.)
   Future<String?> _getFcmToken() async {
     return NotificationService.getDeviceToken();
+  }
+
+  /// Fetch extended profile information (e.g. parent job, teacher details)
+  /// 
+  /// Updates the current user with additional details from the API.
+  Future<void> fetchExtendedProfile() async {
+    if (_currentUser == null) return;
+
+    try {
+      if (isParent) {
+        final parentProfile = await _authService.getParentProfile();
+        
+        // Update current user with latest info including designation (father's job)
+        // Note: Using father_name as primary name as before
+        _currentUser = User(
+          id: _currentUser!.id,
+          name: parentProfile.fatherName,
+          email: _currentUser!.email,
+          role: _currentUser!.role,
+          avatarUrl: _currentUser!.avatarUrl,
+          designation: parentProfile.fatherJob,
+        );
+        notifyListeners();
+        
+        // Also update stored name if changed
+        await TokenStorage.saveUserName(parentProfile.fatherName);
+      }
+      // Can add teacher logic here later if needed
+      
+    } catch (e) {
+      debugPrint('⚠️ Failed to fetch extended profile: $e');
+      // Fail silently as this is just UI enhancement
+    }
   }
 }
