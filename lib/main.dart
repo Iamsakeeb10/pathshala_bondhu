@@ -24,11 +24,13 @@ import 'features/diary/provider/teacher_diary_provider.dart';
 import 'features/exams/provider/exam_routine_provider.dart';
 import 'features/fees/provider/fees_provider.dart';
 import 'features/notifications/providers/notification_provider.dart';
+import 'features/parents/provider/parents_provider.dart';
 import 'features/profile/providers/profile_provider.dart';
 import 'features/routines/provider/routine_provider.dart';
 import 'features/routines/provider/teacher_routine_provider.dart';
 import 'features/students/provider/student_provider.dart';
 import 'features/teacher_attendance/provider/teacher_attendance_provider.dart';
+import 'features/teachers/provider/teachers_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -89,6 +91,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ParentDiaryProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        // Teachers & Parents listing providers
+        ChangeNotifierProvider(create: (_) => TeachersProvider()),
+        ChangeNotifierProvider(create: (_) => ParentsProvider()),
       ],
       child: const MyApp(),
     ),

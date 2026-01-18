@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/network/token_storage.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../features/auth/data/services/auth_service.dart';
 import '../../constants/user_role.dart';
 
@@ -103,6 +104,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Parent login
+  /// 
+  /// Fetches FCM token and includes it in login request for push notification registration.
   Future<bool> loginAsParent({
     required String parentId,
     required String password,
@@ -112,10 +115,21 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Call API
+      // Get FCM token for push notifications
+      String? fcmToken;
+      try {
+        fcmToken = await _getFcmToken();
+        debugPrint('📱 FCM Token obtained: ${fcmToken?.substring(0, 20)}...');
+      } catch (e) {
+        debugPrint('⚠️ Failed to get FCM token: $e');
+        // Continue without FCM token - login should still work
+      }
+
+      // Call API with FCM token
       final response = await _authService.parentLogin(
         parentId: parentId,
         password: password,
+        deviceId: fcmToken,
       );
 
       // Save token
@@ -151,6 +165,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Teacher login
+  /// 
+  /// Fetches FCM token and includes it in login request for push notification registration.
   Future<bool> loginAsTeacher({
     required String email,
     required String password,
@@ -160,10 +176,21 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Call API
+      // Get FCM token for push notifications
+      String? fcmToken;
+      try {
+        fcmToken = await _getFcmToken();
+        debugPrint('📱 FCM Token obtained: ${fcmToken?.substring(0, 20)}...');
+      } catch (e) {
+        debugPrint('⚠️ Failed to get FCM token: $e');
+        // Continue without FCM token - login should still work
+      }
+
+      // Call API with FCM token
       final response = await _authService.teacherLogin(
         email: email,
         password: password,
+        deviceId: fcmToken,
       );
 
       // Save token
@@ -259,5 +286,12 @@ class AuthProvider extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// Get FCM device token for push notifications
+  /// 
+  /// Returns null if token cannot be obtained (no permission, not initialized, etc.)
+  Future<String?> _getFcmToken() async {
+    return NotificationService.getDeviceToken();
   }
 }

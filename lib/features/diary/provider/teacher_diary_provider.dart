@@ -153,4 +153,18 @@ class TeacherDiaryProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Reset provider state (call on logout)
+  void reset() {
+    _diaries = [];
+    _classes = [];
+    _sessions = [];
+    _subjects = [];
+    _isLoading = false;
+    _isMoreLoading = false;
+    _errorMessage = null;
+    _currentPage = 1;
+    _lastPage = 1;
+    notifyListeners();
+  }
 }

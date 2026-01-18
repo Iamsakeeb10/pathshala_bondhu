@@ -120,4 +120,16 @@ class ApiEndpoints {
   /// DELETE with Bearer token
   /// Path param: {id}
   static const String deleteNotification = '/notifications/{id}';
+
+  // ========== Teachers & Parents Endpoints ==========
+
+  /// Get teachers list (paginated)
+  /// GET with Bearer token
+  /// Query params: page, per_page
+  static const String teachers = '/teachers';
+
+  /// Get parents list (paginated, with optional search)
+  /// GET with Bearer token
+  /// Query params: page, per_page, search
+  static const String parents = '/parents';
 }

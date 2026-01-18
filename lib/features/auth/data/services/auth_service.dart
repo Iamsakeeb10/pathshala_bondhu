@@ -14,14 +14,18 @@ class AuthService {
 
   /// Parent login
   /// Returns ParentLoginResponse with token and parent info
+  /// 
+  /// [deviceId] - Optional FCM device token for push notifications
   Future<ParentLoginResponse> parentLogin({
     required String parentId,
     required String password,
+    String? deviceId,
   }) async {
     try {
       final request = ParentLoginRequest(
         parentId: parentId,
         password: password,
+        deviceId: deviceId,
       );
 
       final response = await _dioClient.post(
@@ -39,14 +43,18 @@ class AuthService {
 
   /// Teacher login
   /// Returns TeacherLoginResponse with token and teacher info
+  /// 
+  /// [deviceId] - Optional FCM device token for push notifications
   Future<TeacherLoginResponse> teacherLogin({
     required String email,
     required String password,
+    String? deviceId,
   }) async {
     try {
       final request = TeacherLoginRequest(
         email: email,
         password: password,
+        deviceId: deviceId,
       );
 
       final response = await _dioClient.post(

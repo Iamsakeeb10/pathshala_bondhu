@@ -37,4 +37,12 @@ class TeacherRoutineProvider extends ChangeNotifier {
     return _routines.where((routine) => routine.day.toLowerCase() == day.toLowerCase()).toList()
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
   }
+
+  /// Reset provider state (call on logout)
+  void reset() {
+    _routines = [];
+    _isLoading = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
 }

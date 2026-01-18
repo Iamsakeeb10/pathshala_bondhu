@@ -199,4 +199,21 @@ class TeacherAttendanceProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Reset provider state (call on logout)
+  void reset() {
+    _isLoading = false;
+    _errorMessage = null;
+    _classes = [];
+    _sessions = [];
+    _selectedClass = null;
+    _selectedSession = null;
+    _students = [];
+    _attendanceMap = {};
+    _isSubmitting = false;
+    _historyRecords = [];
+    _selectedHistoryDate = DateTime.now();
+    _isLoadingHistory = false;
+    notifyListeners();
+  }
 }

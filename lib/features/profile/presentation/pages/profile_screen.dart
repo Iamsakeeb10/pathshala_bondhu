@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../core/services/logout_service.dart';
 import '../../../../shared/utils/app_colors.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -50,10 +51,8 @@ class ProfileScreen extends StatelessWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      await context.read<AuthProvider>().logout();
-      if (context.mounted) {
-        context.go('/login');
-      }
+      // Use centralized LogoutService for complete cleanup
+      await LogoutService.logout(context);
     }
   }
 

@@ -2,17 +2,24 @@
 class ParentLoginRequest {
   final String parentId;
   final String password;
+  final String? deviceId;
 
   ParentLoginRequest({
     required this.parentId,
     required this.password,
+    this.deviceId,
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    final json = <String, dynamic>{
       'parent_id': parentId,
       'password': password,
     };
+    // Only include device_id if available
+    if (deviceId != null && deviceId!.isNotEmpty) {
+      json['device_id'] = deviceId;
+    }
+    return json;
   }
 }
 

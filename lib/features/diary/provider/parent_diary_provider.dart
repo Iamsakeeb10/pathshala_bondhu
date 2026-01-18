@@ -80,4 +80,14 @@ class ParentDiaryProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Reset provider state (call on logout)
+  void reset() {
+    _diaryResponse = null;
+    _isLoading = false;
+    _errorMessage = null;
+    _selectedDate = DateTime.now();
+    _selectedStudentId = null;
+    notifyListeners();
+  }
 }

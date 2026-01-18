@@ -2,11 +2,24 @@
 class TeacherLoginRequest {
   final String email;
   final String password;
+  final String? deviceId;
 
-  TeacherLoginRequest({required this.email, required this.password});
+  TeacherLoginRequest({
+    required this.email,
+    required this.password,
+    this.deviceId,
+  });
 
   Map<String, dynamic> toJson() {
-    return {'email': email, 'password': password};
+    final json = <String, dynamic>{
+      'email': email,
+      'password': password,
+    };
+    // Only include device_id if available
+    if (deviceId != null && deviceId!.isNotEmpty) {
+      json['device_id'] = deviceId;
+    }
+    return json;
   }
 }
 

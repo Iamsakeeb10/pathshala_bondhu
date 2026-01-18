@@ -94,4 +94,14 @@ class AttendanceProvider extends ChangeNotifier {
   Future<void> retry() async {
     await fetchAttendance();
   }
+
+  /// Reset provider state (call on logout)
+  void reset() {
+    _data = null;
+    _isLoading = false;
+    _errorMessage = null;
+    _selectedMonth = DateTime.now().month;
+    _selectedYear = DateTime.now().year;
+    notifyListeners();
+  }
 }

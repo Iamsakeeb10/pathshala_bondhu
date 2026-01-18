@@ -47,4 +47,13 @@ class FeesProvider extends ChangeNotifier {
   Future<void> retry() async {
     await fetchFees();
   }
+
+  /// Reset provider state (call on logout)
+  void reset() {
+    _data = null;
+    _isLoading = false;
+    _errorMessage = null;
+    _selectedYear = DateTime.now().year;
+    notifyListeners();
+  }
 }
