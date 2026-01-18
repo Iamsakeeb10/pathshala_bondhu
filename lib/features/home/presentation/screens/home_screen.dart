@@ -278,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sliderHeight = 170.h;
+    final sliderHeight = 150.h;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -384,8 +384,6 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildWelcomeSection(),
-            SizedBox(height: 28.h),
-            _buildGalleryHeader(),
             SizedBox(height: 16.h),
             // Empty space for the slider
             SizedBox(height: sliderHeight / 2),
@@ -419,49 +417,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               SizedBox(height: 6.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.badge_outlined,
-                      size: 14.sp,
-                      color: Colors.white.withOpacity(0.95),
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      'TEST0044',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white.withOpacity(0.95),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 6.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Text(
-                  '2026-27',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-              ),
+              // Container(
+              //   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+              //   decoration: BoxDecoration(
+              //     color: Colors.white.withOpacity(0.15),
+              //     borderRadius: BorderRadius.circular(6.r),
+              //   ),
+              //   child: Text(
+              //     '2026-27',
+              //     style: TextStyle(
+              //       fontSize: 12.sp,
+              //       fontWeight: FontWeight.w600,
+              //       color: Colors.white.withOpacity(0.9),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -537,59 +507,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGalleryHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          'Gallery',
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: 0.3,
-          ),
-        ),
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              // Navigate to full gallery
-            },
-            borderRadius: BorderRadius.circular(20.r),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'See All',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(width: 4.w),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 12.sp,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ],
     );
