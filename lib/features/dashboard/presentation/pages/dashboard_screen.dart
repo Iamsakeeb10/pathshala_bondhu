@@ -1,7 +1,10 @@
+import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../shared/utils/app_colors.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import '../../../parents/ui/parents_screen.dart';
 import '../../../profile/presentation/pages/profile_screen.dart';
@@ -9,7 +12,7 @@ import '../../../students/ui/students_screen.dart';
 import '../../../teachers/ui/teachers_screen.dart';
 
 /// Dashboard screen with role-based bottom navigation.
-/// 
+///
 /// Handles different navigation items based on user role:
 /// - Parent: Home | Students | Teachers | Profile
 /// - Teacher: Home | Teachers | Parents | Profile
@@ -29,7 +32,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Build pages and nav items based on role
     final List<Widget> pages = _buildPages(authProvider);
-    final List<BottomNavigationBarItem> navItems = _buildNavItems(authProvider);
+    final List<FlashyTabBarItem> navItems = _buildNavItems(authProvider);
 
     // CRITICAL: Clamp currentIndex to prevent assertion error on logout
     // When user logs out and pages list changes, ensure index is valid
@@ -45,17 +48,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       body: IndexedStack(index: clampedIndex, children: pages),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: clampedIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        type: BottomNavigationBarType.fixed,
+      bottomNavigationBar: FlashyTabBar(
+        selectedIndex: clampedIndex,
+        showElevation: true,
+        height: 65,
+        iconSize: 24,
+        backgroundColor: AppColors.surfaceLight,
+        animationDuration: const Duration(milliseconds: 250),
+        animationCurve: Curves.easeInOutCubic,
+        shadows: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+        onItemSelected: (index) => setState(() => _currentIndex = index),
         items: navItems,
       ),
     );
   }
 
   /// Build pages list based on user role
-  /// 
+  ///
   /// Parent: Home | Students | Teachers | Profile
   /// Teacher: Home | Teachers | Parents | Profile
   List<Widget> _buildPages(AuthProvider authProvider) {
@@ -67,7 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ProfileScreen(),
       ];
     }
-    
+
     // Parent role (or default)
     return const [
       HomeScreen(),
@@ -77,27 +92,100 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
   }
 
-  /// Build navigation items based on user role
-  List<BottomNavigationBarItem> _buildNavItems(AuthProvider authProvider) {
+  /// Build navigation items based on user role with professional styling
+  /// All tabs use the same active color for consistency
+  List<FlashyTabBarItem> _buildNavItems(AuthProvider authProvider) {
     if (authProvider.isTeacher) {
-      return const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Teachers'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.family_restroom),
-          label: 'Parents',
+      return [
+        FlashyTabBarItem(
+          icon: const Icon(Icons.home_rounded),
+          title: const Text(
+            'Home',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+          ),
+          activeColor: AppColors.primary,
+          inactiveColor: AppColors.textSecondary,
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        FlashyTabBarItem(
+          icon: const Icon(Icons.school_rounded),
+          title: const Text(
+            'Teachers',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+          ),
+          activeColor: AppColors.primary,
+          inactiveColor: AppColors.textSecondary,
+        ),
+        FlashyTabBarItem(
+          icon: const Icon(Icons.family_restroom_rounded),
+          title: const Text(
+            'Parents',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+          ),
+          activeColor: AppColors.primary,
+          inactiveColor: AppColors.textSecondary,
+        ),
+        FlashyTabBarItem(
+          icon: const Icon(Icons.person_rounded),
+          title: const Text(
+            'Profile',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+          ),
+          activeColor: AppColors.primary,
+          inactiveColor: AppColors.textSecondary,
+        ),
       ];
     }
 
     // Parent role (or default)
-    return const [
-      BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-      BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Students'),
-      BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Teachers'),
-      BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+    return [
+      FlashyTabBarItem(
+        icon: Icon(
+          Icons.home_rounded,
+          color: AppColors.dividerDark.withOpacity(0.7),
+        ),
+        title: Text(
+          'Home',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+        ),
+        activeColor: AppColors.primary,
+        inactiveColor: AppColors.textSecondary,
+      ),
+      FlashyTabBarItem(
+        icon: Icon(
+          Icons.people_rounded,
+          color: AppColors.dividerDark.withOpacity(0.7),
+        ),
+        title: Text(
+          'Students',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+        ),
+        activeColor: AppColors.primary,
+        inactiveColor: AppColors.textSecondary,
+      ),
+      FlashyTabBarItem(
+        icon: Icon(
+          Icons.school_rounded,
+          color: AppColors.dividerDark.withOpacity(0.7),
+        ),
+        title: Text(
+          'Teachers',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+        ),
+        activeColor: AppColors.primary,
+        inactiveColor: AppColors.textSecondary,
+      ),
+      FlashyTabBarItem(
+        icon: Icon(
+          Icons.person_rounded,
+          color: AppColors.dividerDark.withOpacity(0.7),
+        ),
+        title: Text(
+          'Profile',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+        ),
+        activeColor: AppColors.primary,
+        inactiveColor: AppColors.textSecondary,
+      ),
     ];
   }
 }
-
