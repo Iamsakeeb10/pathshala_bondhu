@@ -103,11 +103,11 @@ class ChatProvider extends ChangeNotifier {
       _setupCallbacks();
       _chatService!.connect();
 
-      // Fetch user activity
-      _fetchUserActivity(otherUserId);
-
       _isLoading = false;
       notifyListeners();
+
+      // Fetch user activity in background
+      _fetchUserActivity(otherUserId);
     } catch (e) {
       debugPrint('❌ Error initializing chat: $e');
       _error = 'Failed to initialize chat: $e';
@@ -158,8 +158,27 @@ class ChatProvider extends ChangeNotifier {
       // Check if this message is for current conversation
       if ((message.fromUserId == _otherUserId && message.toUserId == _currentUserId) ||
           (message.fromUserId == _currentUserId && message.toUserId == _otherUserId)) {
-        // Avoid duplicate
-        if (!_messages.any((m) => m.id == message.id)) {
+        
+        // Check if we have an optimistic (pending) message that matches this one
+        // We match by: id is null, isSent is false, message content matches
+        final pendingIndex = _messages.indexWhere((m) => 
+          m.id == null && 
+          !m.isSent && 
+          m.message == message.message &&
+          m.toUserId == message.toUserId
+        );
+
+        if (pendingIndex != -1) {
+          // Update the pending message with the real one from server
+          _messages[pendingIndex] = message;
+          _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+          notifyListeners();
+          
+          // Cache messages
+          _cacheMessages(_otherUserId!).ignore();
+        } 
+        // If not a pending match, check ID to avoid duplicates
+        else if (!_messages.any((m) => m.id == message.id)) {
           _messages.add(message);
           _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
           notifyListeners();
@@ -185,15 +204,20 @@ class ChatProvider extends ChangeNotifier {
         final existingIds = _messages.map((m) => m.id).toSet();
         final uniqueNew = newMessages.where((m) => !existingIds.contains(m.id)).toList();
 
-        if (uniqueNew.isEmpty) {
+        if (uniqueNew.isEmpty || newMessages.length < 30) {
           _hasMoreMessages = false;
-        } else {
+        } 
+        
+        if (uniqueNew.isNotEmpty) {
           _messages.insertAll(0, uniqueNew);
         }
         _isPaginating = false;
       } else {
         // Initial load: replace
         _messages = newMessages;
+        if (_messages.length < 30) {
+          _hasMoreMessages = false;
+        }
       }
 
       _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -356,6 +380,9 @@ class ChatProvider extends ChangeNotifier {
       } else {
         _hasMoreMessages = false;
       }
+    } else {
+      // If request failed (null result), stop pagination preventing infinite loader
+      _hasMoreMessages = false;
     }
 
     _isPaginating = false;

@@ -10,6 +10,7 @@ import '../../../../shared/widgets/person_card.dart';
 import '../../../shared/widgets/custom_appbar.dart';
 import '../data/models/parent_model.dart';
 import '../provider/parents_provider.dart';
+import '../../chat/screens/chat_screen.dart';
 
 /// Screen displaying list of parents with search functionality
 ///
@@ -257,6 +258,23 @@ class _ParentsScreenState extends State<ParentsScreen> {
       subtitle: subtitle,
       chips: chips,
       accentColor: AppColors.student, // Pink color for parents
+      // Chat action button
+      actionIcon: Icons.chat_bubble_outline_rounded,
+      actionTooltip: 'Chat with ${parent.fatherName}',
+      onActionTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatScreen(
+              otherUserId: parent.id,
+              otherUserName: parent.fatherName,
+              // Parent model doesn't have an avatar URL in the list model currently,
+              // passing null or we could try to look it up if available later.
+              otherUserImage: null, 
+            ),
+          ),
+        );
+      },
       onTap: () {
         // For now, just show a snackbar - can add detail screen later
         ScaffoldMessenger.of(context).showSnackBar(

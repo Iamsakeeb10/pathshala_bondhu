@@ -161,6 +161,6 @@ class _MessageBubbleState extends State<MessageBubble>
   }
 
   String _formatTime(DateTime dateTime) {
-    return DateFormat('h:mm a').format(dateTime);
+    return DateFormat('h:mm a').format(dateTime.toLocal());
   }
 }

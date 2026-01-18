@@ -6,6 +6,7 @@ import '../../../shared/utils/app_colors.dart';
 import '../models/chat_message_model.dart';
 import '../providers/chat_background_provider.dart';
 import '../providers/chat_provider.dart';
+import '../providers/conversations_provider.dart'; // Added
 import '../widgets/chat_shimmer.dart';
 import '../widgets/connection_status_bar.dart';
 import '../widgets/message_bubble.dart';
@@ -40,10 +41,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     // Initialize chat
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ChatProvider>().initialize(
-            otherUserId: widget.otherUserId,
-            otherUserName: widget.otherUserName,
-            otherUserImage: widget.otherUserImage,
-          );
+        otherUserId: widget.otherUserId,
+        otherUserName: widget.otherUserName,
+        otherUserImage: widget.otherUserImage,
+      );
     });
 
     // Setup scroll listener for pagination
@@ -104,7 +105,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
                     // Messages
                     Expanded(
-                      child: chatProvider.isLoading &&
+                      child:
+                          chatProvider.isLoading &&
                               chatProvider.messages.isEmpty
                           ? const ChatShimmer()
                           : _buildMessagesList(chatProvider),
@@ -122,6 +124,14 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       onSendMessage: (text) {
                         chatProvider.sendMessage(text);
                         _scrollToBottom();
+                        
+                        // Update Conversations List Realtime (Optimistic)
+                        context.read<ConversationsProvider>().updateLastMessage(
+                          otherUserId: widget.otherUserId,
+                          message: text,
+                          time: DateTime.now(),
+                          sentByMe: true,
+                        );
                       },
                       onTyping: (isTyping) {
                         chatProvider.sendTyping(isTyping);
@@ -231,10 +241,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           ),
           itemBuilder: (context, index) {
             return Center(
-              child: Text(
-                emoji,
-                style: TextStyle(fontSize: 24.sp),
-              ),
+              child: Text(emoji, style: TextStyle(fontSize: 24.sp)),
             );
           },
         ),
@@ -277,18 +284,21 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         final isMe = _isMyMessage(message, provider);
 
         // Grouping logic
-        final isFirstInGroup = reversedIndex == 0 ||
+        final isFirstInGroup =
+            reversedIndex == 0 ||
             _isMyMessage(messages[reversedIndex - 1], provider) != isMe ||
             _isNewTimeGroup(messages[reversedIndex - 1], message);
 
-        final isLastInGroup = reversedIndex == messages.length - 1 ||
+        final isLastInGroup =
+            reversedIndex == messages.length - 1 ||
             _isMyMessage(messages[reversedIndex + 1], provider) != isMe ||
             _isNewTimeGroup(message, messages[reversedIndex + 1]);
 
         return Column(
           children: [
             // Date separator
-            if (isFirstInGroup && _shouldShowDateSeparator(messages, reversedIndex))
+            if (isFirstInGroup &&
+                _shouldShowDateSeparator(messages, reversedIndex))
               _buildDateSeparator(message.createdAt),
 
             MessageBubble(
@@ -382,18 +392,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           SizedBox(height: 12.h),
           Text(
             'No messages yet',
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: AppColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 16.sp, color: AppColors.textSecondary),
           ),
           SizedBox(height: 4.h),
           Text(
             'Send a message to start chatting',
-            style: TextStyle(
-              fontSize: 13.sp,
-              color: AppColors.grey400,
-            ),
+            style: TextStyle(fontSize: 13.sp, color: AppColors.grey400),
           ),
         ],
       ),

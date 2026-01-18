@@ -21,7 +21,7 @@ class ActivityService {
 
       debugPrint('📊 Fetching activity for user $userId');
 
-      final url = Uri.parse('$baseUrl/api/activity/user/$userId');
+      final url = Uri.parse('$baseUrl/api/activity/user/$userId?source=$source');
       final response = await http.get(
         url,
         headers: {
@@ -66,7 +66,7 @@ class ActivityService {
 
       debugPrint('🔄 Updating activity for user $userId: isActive=$isActive');
 
-      final url = Uri.parse('$baseUrl/api/activity/user/$userId/active');
+      final url = Uri.parse('$baseUrl/api/activity/user/$userId/active?source=$source');
       final response = await http.put(
         url,
         headers: {
@@ -164,7 +164,7 @@ class ActivityService {
 
       debugPrint('👁️ Marking messages as seen from user $otherUserId');
 
-      final url = Uri.parse('$baseUrl/api/activity/messages/seen');
+      final url = Uri.parse('$baseUrl/api/activity/messages/seen?source=$source');
       final response = await http.post(
         url,
         headers: {

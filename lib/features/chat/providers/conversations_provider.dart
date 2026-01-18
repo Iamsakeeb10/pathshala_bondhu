@@ -197,8 +197,8 @@ class ConversationsProvider extends ChangeNotifier {
 
       _conversations = await _conversationsService.getConversations(_currentUserId!);
 
-      // Fetch user details for all conversations
-      await _fetchConversationUsers();
+      // Fetch user details for all conversations (non-blocking)
+      _fetchConversationUsers();
 
       _isLoading = false;
       notifyListeners();
