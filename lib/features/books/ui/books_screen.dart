@@ -11,7 +11,7 @@ import '../../students/provider/student_provider.dart';
 import '../data/models/books_models.dart';
 import '../provider/books_provider.dart';
 
-/// Books screen - displays book list for students
+/// Books screen - displays book list for students in Bangladesh style
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
 
@@ -23,7 +23,6 @@ class _BooksScreenState extends State<BooksScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch books on screen load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<BooksProvider>().fetchBookList();
     });
@@ -33,22 +32,16 @@ class _BooksScreenState extends State<BooksScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
       body: Column(
         children: [
-          CustomAppBar(
-            title: 'Books',
-            showBackButton: true, // optional, default is true
-          ),
+          CustomAppBar(title: 'Books', showBackButton: true),
           Expanded(
             child: Consumer<BooksProvider>(
               builder: (context, provider, child) {
-                // Loading state
                 if (provider.isLoading) {
                   return _buildLoadingState();
                 }
 
-                // Error state
                 if (provider.errorMessage != null) {
                   return ErrorState(
                     message: provider.errorMessage!,
@@ -56,7 +49,6 @@ class _BooksScreenState extends State<BooksScreen> {
                   );
                 }
 
-                // Empty state
                 if (provider.isEmpty) {
                   return const EmptyState(
                     icon: Icons.book_outlined,
@@ -65,12 +57,10 @@ class _BooksScreenState extends State<BooksScreen> {
                   );
                 }
 
-                // Success state
                 if (provider.hasData) {
                   return _buildBookList(provider.data!);
                 }
 
-                // Default empty
                 return const SizedBox.shrink();
               },
             ),
@@ -88,7 +78,6 @@ class _BooksScreenState extends State<BooksScreen> {
   }
 
   Widget _buildBookList(BookListResponse data) {
-    // Filter books by selected student if applicable
     final studentProvider = context.watch<StudentProvider>();
     final selectedStudent = studentProvider.selectedStudent;
 
@@ -104,85 +93,96 @@ class _BooksScreenState extends State<BooksScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header info
-          Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.primary, AppColors.primaryDark],
-              ),
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.schoolName,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  'Parent: ${data.parentName}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
+          // Header - School Info
+          _buildSchoolHeader(data),
           SizedBox(height: 20.h),
 
-          // Books by student (filtered)
-          ...booksToShow.map((child) => _buildStudentBooks(child)),
+          // Books by student
+          ...booksToShow.map((child) => _buildStudentBookList(child)),
         ],
       ),
     );
   }
 
-  Widget _buildStudentBooks(ChildBookList child) {
+  Widget _buildSchoolHeader(BookListResponse data) {
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.school, size: 40.sp, color: AppColors.primary),
+          SizedBox(height: 8.h),
+          Text(
+            data.schoolName,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color:
+                  Theme.of(context).textTheme.titleLarge?.color ??
+                  AppColors.textPrimary,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            'Parent: ${data.parentName}',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color:
+                  Theme.of(context).textTheme.bodyMedium?.color ??
+                  AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentBookList(ChildBookList child) {
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? AppColors.borderDark
-              : Colors.transparent,
-          width: 1.2,
+          color: AppColors.primary.withOpacity(0.2),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05,
-            ),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Student header
+          // Student Header
           Container(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: AppColors.primaryLight.withOpacity(0.1),
+              color: AppColors.primary,
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16.r),
-                topRight: Radius.circular(16.r),
+                topLeft: Radius.circular(12.r),
+                topRight: Radius.circular(12.r),
               ),
             ),
             child: Row(
               children: [
-                Icon(Icons.person, color: AppColors.primary, size: 20.sp),
+                Icon(Icons.person, color: Colors.white, size: 20.sp),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Column(
@@ -193,14 +193,14 @@ class _BooksScreenState extends State<BooksScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                       ),
                       Text(
-                        '${child.classInfo} • ID: ${child.studentId}',
+                        '${child.classInfo} • Roll: ${child.studentId}',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                          color: Colors.white.withOpacity(0.9),
                         ),
                       ),
                     ],
@@ -210,111 +210,215 @@ class _BooksScreenState extends State<BooksScreen> {
             ),
           ),
 
-          // Book list
+          // Table Header
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight.withOpacity(0.15),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppColors.primary.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 40.w,
+                  child: Text(
+                    'ক্রমিক',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    'বইয়ের নাম ও বিবরণ',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Book Items
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.zero,
             itemCount: child.books.length,
-            separatorBuilder: (_, __) => Divider(height: 24.h),
+            separatorBuilder: (_, __) => Divider(
+              height: 1,
+              thickness: 1,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withOpacity(0.1)
+                  : Colors.grey.shade200,
+            ),
             itemBuilder: (context, index) {
               final book = child.books[index];
-              return _buildBookCard(book);
+              return _buildBookRow(book, index + 1);
             },
+          ),
+
+          // Footer note
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight.withOpacity(0.08),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(12.r),
+                bottomRight: Radius.circular(12.r),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, size: 16.sp, color: AppColors.primary),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    'Total Books: ${child.books.length}',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBookCard(BookInfo book) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Book icon
-        Container(
-          width: 44.w,
-          height: 44.w,
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8.r),
+  Widget _buildBookRow(BookInfo book, int serialNo) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Serial Number
+          SizedBox(
+            width: 40.w,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6.r),
+              ),
+              child: Text(
+                '${serialNo}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
           ),
-          child: Icon(Icons.book, color: AppColors.primary, size: 24.sp),
-        ),
 
-        SizedBox(width: 12.w),
+          SizedBox(width: 12.w),
 
-        // Book details
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      book.bookName,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                  if (book.mandatory)
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(4.r),
-                      ),
+          // Book Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Book Name with Badge
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
                       child: Text(
-                        'Required',
+                        book.bookName,
                         style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red.shade700,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w700,
+                          color:
+                              Theme.of(context).textTheme.titleMedium?.color ??
+                              AppColors.textPrimary,
+                          height: 1.3,
                         ),
                       ),
                     ),
-                ],
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                'Subject: ${book.subject}',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                    if (book.mandatory)
+                      Container(
+                        margin: EdgeInsets.only(left: 8.w),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 3.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade600,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                        child: Text(
+                          'আবশ্যক',
+                          style: TextStyle(
+                            fontSize: 9.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              ),
-              Text(
-                'Author: ${book.author}',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
-                ),
-              ),
-              Text(
-                'Publisher: ${book.publisher}',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
-                ),
-              ),
-              Text(
-                'Edition: ${book.edition}',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
-                ),
-              ),
-            ],
+
+                SizedBox(height: 6.h),
+
+                // Subject
+                _buildDetailRow('বিষয়', book.subject),
+                _buildDetailRow('লেখক', book.author),
+                _buildDetailRow('প্রকাশক', book.publisher),
+                _buildDetailRow('সংস্করণ', book.edition),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 3.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 60.w,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

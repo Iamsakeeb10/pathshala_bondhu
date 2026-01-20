@@ -11,7 +11,7 @@ import '../../students/provider/student_provider.dart';
 import '../data/models/routine_models.dart';
 import '../provider/routine_provider.dart';
 
-/// Class Routine screen
+/// Class Routine screen - Bangladesh style
 class ClassRoutineScreen extends StatefulWidget {
   const ClassRoutineScreen({super.key});
 
@@ -32,13 +32,9 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
       body: Column(
         children: [
-          CustomAppBar(
-            title: 'Class Routine',
-            showBackButton: true, // optional, default is true
-          ),
+          CustomAppBar(title: 'Class Routine', showBackButton: true),
           Expanded(
             child: Consumer<RoutineProvider>(
               builder: (context, provider, child) {
@@ -85,7 +81,6 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
     final studentProvider = context.watch<StudentProvider>();
     final selectedStudent = studentProvider.selectedStudent;
 
-    // Filter routines for selected student if applicable
     List<ChildRoutine> routinesToShow = data.childrenRoutines;
     if (selectedStudent != null && studentProvider.hasMultipleStudents) {
       routinesToShow = data.childrenRoutines
@@ -98,7 +93,7 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(data),
+          _buildSchoolHeader(data),
           SizedBox(height: 20.h),
           ...routinesToShow.map((child) => _buildStudentRoutine(child)),
         ],
@@ -106,24 +101,34 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
     );
   }
 
-  Widget _buildHeader(RoutineResponse data) {
+  Widget _buildSchoolHeader(RoutineResponse data) {
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-        ),
-        borderRadius: BorderRadius.circular(16.r),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Icon(Icons.school, size: 40.sp, color: AppColors.primary),
+          SizedBox(height: 8.h),
           Text(
             data.schoolName,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color:
+                  Theme.of(context).textTheme.titleLarge?.color ??
+                  AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 4.h),
@@ -131,7 +136,25 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
             'Parent: ${data.parentName}',
             style: TextStyle(
               fontSize: 14.sp,
-              color: Colors.white.withOpacity(0.9),
+              color:
+                  Theme.of(context).textTheme.bodyMedium?.color ??
+                  AppColors.textSecondary,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6.r),
+            ),
+            child: Text(
+              'ক্লাস রুটিন',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ],
@@ -155,24 +178,30 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
       'Saturday',
     ];
 
+    final banglaWeekdays = {
+      'Sunday': 'রবিবার',
+      'Monday': 'সোমবার',
+      'Tuesday': 'মঙ্গলবার',
+      'Wednesday': 'বুধবার',
+      'Thursday': 'বৃহস্পতিবার',
+      'Friday': 'শুক্রবার',
+      'Saturday': 'শনিবার',
+    };
+
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? AppColors.borderDark
-              : Colors.transparent,
-          width: 1.2,
+          color: AppColors.primary.withOpacity(0.2),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05,
-            ),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -181,17 +210,17 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
         children: [
           // Student header
           Container(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: AppColors.primaryLight.withOpacity(0.1),
+              color: AppColors.primary,
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16.r),
-                topRight: Radius.circular(16.r),
+                topLeft: Radius.circular(12.r),
+                topRight: Radius.circular(12.r),
               ),
             ),
             child: Row(
               children: [
-                Icon(Icons.person, color: AppColors.primary, size: 20.sp),
+                Icon(Icons.person, color: Colors.white, size: 20.sp),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Column(
@@ -202,14 +231,14 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                       ),
                       Text(
-                        '${child.classInfo} • ID: ${child.studentId}',
+                        '${child.classInfo} • Roll: ${child.studentId}',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                          color: Colors.white.withOpacity(0.9),
                         ),
                       ),
                     ],
@@ -227,7 +256,11 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
                 final dayRoutines = routinesByDay[day] ?? [];
                 if (dayRoutines.isEmpty) return const SizedBox.shrink();
 
-                return _buildDaySection(day, dayRoutines);
+                return _buildDaySection(
+                  day,
+                  banglaWeekdays[day] ?? day,
+                  dayRoutines,
+                );
               }).toList(),
             ),
           ),
@@ -236,91 +269,242 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
     );
   }
 
-  Widget _buildDaySection(String day, List<RoutineEntry> routines) {
+  Widget _buildDaySection(
+    String englishDay,
+    String banglaDay,
+    List<RoutineEntry> routines,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Day header
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(8.r),
           ),
-          child: Text(
-            day,
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
+          child: Row(
+            children: [
+              Icon(Icons.calendar_today, color: Colors.white, size: 16.sp),
+              SizedBox(width: 8.w),
+              Text(
+                banglaDay,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 4.w),
+              Text(
+                '($englishDay)',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: Colors.white.withOpacity(0.9),
+                ),
+              ),
+            ],
           ),
         ),
-        SizedBox(height: 8.h),
-        ...routines.map((routine) => _buildRoutineCard(routine)),
+
         SizedBox(height: 12.h),
+
+        // Table header
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            color: AppColors.primaryLight.withOpacity(0.15),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8.r),
+              topRight: Radius.circular(8.r),
+            ),
+            border: Border.all(
+              color: AppColors.primary.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 70.w,
+                child: Text(
+                  'সময়',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  'বিষয় ও শিক্ষক',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Routine rows
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: AppColors.primary.withOpacity(0.3),
+              width: 1,
+            ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(8.r),
+              bottomRight: Radius.circular(8.r),
+            ),
+          ),
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            itemCount: routines.length,
+            separatorBuilder: (_, __) => Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.primary.withOpacity(0.2),
+            ),
+            itemBuilder: (context, index) {
+              return _buildRoutineRow(routines[index]);
+            },
+          ),
+        ),
+
+        SizedBox(height: 16.h),
       ],
     );
   }
 
-  Widget _buildRoutineCard(RoutineEntry routine) {
+  Widget _buildRoutineRow(RoutineEntry routine) {
     return Container(
-      margin: EdgeInsets.only(bottom: 8.h),
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.surfaceDark
-            : AppColors.grey50,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? AppColors.borderDark
-              : AppColors.grey200,
-        ),
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Icon(Icons.schedule, color: AppColors.primary, size: 20.sp),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
+          // Time column
+          SizedBox(
+            width: 70.w,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  routine.subject,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                  child: Text(
+                    routine.startTime,
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  '${routine.startTime} - ${routine.endTime}',
+                  'to',
                   style: TextStyle(
-                    fontSize: 13.sp,
-                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                    fontSize: 9.sp,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-                Text(
-                  'Teacher: ${routine.teacherName}',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                SizedBox(height: 2.h),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4.r),
                   ),
-                ),
-                if (routine.roomNumber != '---')
-                  Text(
-                    'Room: ${routine.roomNumber}',
+                  child: Text(
+                    routine.endTime,
                     style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(width: 12.w),
+
+          // Subject and details column
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Subject name
+                Text(
+                  routine.subject,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w700,
+                    color:
+                        Theme.of(context).textTheme.titleMedium?.color ??
+                        AppColors.textPrimary,
+                    height: 1.3,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+
+                // Teacher
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person_outline,
+                      size: 14.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        routine.teacherName,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Room number
+                if (routine.roomNumber != '---')
+                  Padding(
+                    padding: EdgeInsets.only(top: 3.h),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.meeting_room_outlined,
+                          size: 14.sp,
+                          color: AppColors.textSecondary,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          'Room ${routine.roomNumber}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
               ],

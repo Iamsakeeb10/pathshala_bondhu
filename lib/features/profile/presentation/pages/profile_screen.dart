@@ -268,53 +268,53 @@ class ProfileScreen extends StatelessWidget {
                     subtitle: localizations.translate('app_preferences'),
                     onTap: () => context.push('/settings'),
                   ),
-                  SizedBox(height: 12.h),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.notifications_outlined,
-                    title: localizations.translate('notifications'),
-                    subtitle: localizations.translate(
-                      'manage_notification_settings',
-                    ),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(localizations.translate('coming_soon')),
-                        ),
-                      );
-                    },
-                  ),
+                  // SizedBox(height: 12.h),
+                  // _buildMenuItem(
+                  //   context,
+                  //   icon: Icons.notifications_outlined,
+                  //   title: localizations.translate('notifications'),
+                  //   subtitle: localizations.translate(
+                  //     'manage_notification_settings',
+                  //   ),
+                  //   onTap: () {
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       SnackBar(
+                  //         content: Text(localizations.translate('coming_soon')),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   SizedBox(height: 24.h),
                   _buildSectionHeader(localizations.translate('support')),
+                  // SizedBox(height: 12.h),
+                  // _buildMenuItem(
+                  //   context,
+                  //   icon: Icons.help_outline,
+                  //   title: localizations.translate('help_support'),
+                  //   subtitle: localizations.translate('get_help_account'),
+                  //   onTap: () {
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       SnackBar(
+                  //         content: Text(localizations.translate('coming_soon')),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
+                  // SizedBox(height: 12.h),
+                  // _buildMenuItem(
+                  //   context,
+                  //   icon: Icons.info_outline,
+                  //   title: localizations.translate('about'),
+                  //   subtitle: localizations.translate('app_version_info'),
+                  //   onTap: () {
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       SnackBar(
+                  //         content: Text(localizations.translate('coming_soon')),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   SizedBox(height: 12.h),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.help_outline,
-                    title: localizations.translate('help_support'),
-                    subtitle: localizations.translate('get_help_account'),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(localizations.translate('coming_soon')),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.info_outline,
-                    title: localizations.translate('about'),
-                    subtitle: localizations.translate('app_version_info'),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(localizations.translate('coming_soon')),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 24.h),
                   _buildMenuItem(
                     context,
                     icon: Icons.logout_rounded,
