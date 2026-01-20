@@ -139,10 +139,11 @@ class _SplashScreenState extends State<SplashScreen>
                     ],
                   ),
                   child: Center(
-                    child: Icon(
-                      Icons.school_rounded,
-                      size: 70.sp,
-                      color: AppColors.primary,
+                    child: Image.asset(
+                      'assets/images/logo_tiny.png',
+                      width: 120.sp,
+                      height: 120.sp,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -154,10 +155,7 @@ class _SplashScreenState extends State<SplashScreen>
               AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
-                  return Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: child,
-                  );
+                  return Opacity(opacity: _fadeAnimation.value, child: child);
                 },
                 child: Column(
                   children: [
@@ -233,10 +231,7 @@ class _SplashScreenState extends State<SplashScreen>
               AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
-                  return Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: child,
-                  );
+                  return Opacity(opacity: _fadeAnimation.value, child: child);
                 },
                 child: Column(
                   children: [

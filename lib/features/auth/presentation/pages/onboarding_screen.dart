@@ -39,10 +39,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primary.withOpacity(0.1),
-              Colors.white,
-            ],
+            colors: [AppColors.primary.withOpacity(0.1), Colors.white],
           ),
         ),
         child: SafeArea(
@@ -58,7 +55,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 180.w,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryDark],
+                      colors: [
+                        AppColors.primary.withOpacity(0.7),
+                        AppColors.primaryDark.withOpacity(0.5),
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(40.r),
                     boxShadow: [
@@ -70,10 +70,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ],
                   ),
                   child: Center(
-                    child: Icon(
-                      Icons.school_rounded,
-                      size: 90.sp,
-                      color: Colors.white,
+                    child: Image.asset(
+                      'assets/images/logo_tiny.png',
+                      width: 150.sp,
+                      height: 150.sp,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -85,9 +86,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   localizations.translate('welcome_to_pathshala_bondhu'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    fontSize: 30.sp, // slightly larger for emphasis
+                    fontWeight:
+                        FontWeight.w800, // bolder weight for modern look
+                    color: const Color.fromARGB(
+                      255,
+                      201,
+                      113,
+                      65,
+                    ), // new color: dark variant of primary
+                    height: 1.3, // tighter line height
+                    letterSpacing: 0.5, // subtle spacing for readability
                   ),
                 ),
 
@@ -123,10 +132,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   spacing: 12.w,
                   runSpacing: 12.h,
                   children: [
-                    _buildFeatureChip(Icons.book, localizations.translate('books')),
-                    _buildFeatureChip(Icons.schedule, localizations.translate('class_routine')),
-                    _buildFeatureChip(Icons.check_circle, localizations.translate('attendance')),
-                    _buildFeatureChip(Icons.payment, localizations.translate('fees')),
+                    _buildFeatureChip(
+                      Icons.book,
+                      localizations.translate('books'),
+                    ),
+                    _buildFeatureChip(
+                      Icons.schedule,
+                      localizations.translate('class_routine'),
+                    ),
+                    _buildFeatureChip(
+                      Icons.check_circle,
+                      localizations.translate('attendance'),
+                    ),
+                    _buildFeatureChip(
+                      Icons.payment,
+                      localizations.translate('fees'),
+                    ),
                   ],
                 ),
 
