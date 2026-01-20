@@ -321,7 +321,7 @@ class ProfileScreen extends StatelessWidget {
                       '${localizations.translate('version')} 1.0.0',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: AppColors.grey500,
+                        color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -336,15 +336,17 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4.w, bottom: 4.h),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textSecondary,
-          letterSpacing: 0.5,
+    return Builder(
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(left: 4.w, bottom: 4.h),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
     );
@@ -452,7 +454,7 @@ class ProfileScreen extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16.sp,
-                color: AppColors.grey400,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
               ),
             ],
           ),

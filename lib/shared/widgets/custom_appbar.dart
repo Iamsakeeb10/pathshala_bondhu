@@ -106,16 +106,16 @@ class CustomAppBar extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withOpacity(0.4)
-                : (gradientColors?.first ?? AppColors.primary).withOpacity(0.2),
-            offset: Offset(0, 2.h),
-            blurRadius: 20.r,
-            spreadRadius: 4.r,
-          ),
-        ],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: (gradientColors?.first ?? AppColors.primary).withOpacity(0.2),
+                  offset: Offset(0, 2.h),
+                  blurRadius: 20.r,
+                  spreadRadius: 4.r,
+                ),
+              ],
       ),
       child: Row(
         children: [

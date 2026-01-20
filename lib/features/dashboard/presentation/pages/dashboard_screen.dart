@@ -54,17 +54,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
         height: 65,
         iconSize: 24,
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF283447)
+            ? const Color.fromARGB(
+                255,
+                28,
+                35,
+                45,
+              ) // dark theme bg color, complements AppColors.backgroundDark
             : Theme.of(context).cardColor,
         animationDuration: const Duration(milliseconds: 250),
         animationCurve: Curves.easeInOutCubic,
-        shadows: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        shadows: Theme.of(context).brightness == Brightness.dark
+            ? [] // remove shadows in dark mode
+            : [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, -2),
+                ),
+              ],
         onItemSelected: (index) => setState(() => _currentIndex = index),
         items: navItems,
       ),

@@ -66,29 +66,31 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4.w, bottom: 4.h),
-      child: Row(
-        children: [
-          Container(
-            width: 4.w,
-            height: 20.h,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(2.r),
+    return Builder(
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(left: 4.w, bottom: 4.h),
+        child: Row(
+          children: [
+            Container(
+              width: 4.w,
+              height: 20.h,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
             ),
-          ),
-          SizedBox(width: 8.w),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              letterSpacing: 0.3,
+            SizedBox(width: 8.w),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                letterSpacing: 0.3,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -284,19 +286,21 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         SizedBox(width: 14.w),
                         Expanded(
-                          child: Text(
-                            LanguageProvider.getLanguageName(
-                              locale.languageCode,
-                            ),
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? AppColors.textPrimary
-                                  : AppColors.textSecondary,
-                              letterSpacing: 0.1,
+                          child: Builder(
+                            builder: (context) => Text(
+                              LanguageProvider.getLanguageName(
+                                locale.languageCode,
+                              ),
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? (Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary)
+                                    : (Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary),
+                                letterSpacing: 0.1,
+                              ),
                             ),
                           ),
                         ),
@@ -392,69 +396,71 @@ class SettingsScreen extends StatelessWidget {
     bool isFirst = false,
     bool isLast = false,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {},
-        borderRadius: isFirst
-            ? BorderRadius.vertical(top: Radius.circular(16.r))
-            : isLast
-            ? BorderRadius.vertical(bottom: Radius.circular(16.r))
-            : BorderRadius.zero,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-          child: Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primary.withOpacity(0.15),
-                      AppColors.primary.withOpacity(0.08),
+    return Builder(
+      builder: (context) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {},
+          borderRadius: isFirst
+              ? BorderRadius.vertical(top: Radius.circular(16.r))
+              : isLast
+              ? BorderRadius.vertical(bottom: Radius.circular(16.r))
+              : BorderRadius.zero,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary.withOpacity(0.15),
+                        AppColors.primary.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(icon, color: AppColors.primary, size: 20.sp),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                      SizedBox(height: 3.h),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 20.sp),
-              ),
-              SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
-                    SizedBox(height: 3.h),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: AppColors.grey500,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
+                Transform.scale(
+                  scale: 0.9,
+                  child: Switch(
+                    value: value,
+                    onChanged: (val) {},
+                    activeColor: AppColors.primary,
+                  ),
                 ),
-              ),
-              Transform.scale(
-                scale: 0.9,
-                child: Switch(
-                  value: value,
-                  onChanged: (val) {},
-                  activeColor: AppColors.primary,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -573,7 +579,7 @@ class SettingsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                         letterSpacing: 0.1,
                       ),
                     ),
