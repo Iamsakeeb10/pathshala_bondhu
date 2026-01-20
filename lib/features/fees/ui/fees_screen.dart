@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
@@ -29,13 +30,14 @@ class _FeesScreenState extends State<FeesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
           CustomAppBar(
-            title: 'Fees',
+            title: localizations.translate('fees'),
             showBackButton: true, // optional, default is true
           ),
           Expanded(
@@ -43,8 +45,8 @@ class _FeesScreenState extends State<FeesScreen> {
               builder: (context, provider, child) {
                 return Column(
                   children: [
-                    _buildYearFilter(provider),
-                    Expanded(child: _buildContent(provider)),
+                    _buildYearFilter(provider, context),
+                    Expanded(child: _buildContent(provider, context)),
                   ],
                 );
               },
@@ -55,7 +57,8 @@ class _FeesScreenState extends State<FeesScreen> {
     );
   }
 
-  Widget _buildYearFilter(FeesProvider provider) {
+  Widget _buildYearFilter(FeesProvider provider, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -71,7 +74,7 @@ class _FeesScreenState extends State<FeesScreen> {
       child: Row(
         children: [
           Text(
-            'Academic Year:',
+            '${localizations.translate('academic_year')}:',
             style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
           ),
           SizedBox(width: 12.w),
@@ -106,7 +109,8 @@ class _FeesScreenState extends State<FeesScreen> {
     );
   }
 
-  Widget _buildContent(FeesProvider provider) {
+  Widget _buildContent(FeesProvider provider, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     if (provider.isLoading) {
       return Padding(
         padding: EdgeInsets.all(16.w),
@@ -122,21 +126,22 @@ class _FeesScreenState extends State<FeesScreen> {
     }
 
     if (provider.isEmpty) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.payment,
-        message: 'No fee records',
-        subMessage: 'No fee records for selected year.',
+        message: localizations.translate('no_fee_records'),
+        subMessage: localizations.translate('no_fee_records_year'),
       );
     }
 
     if (provider.hasData) {
-      return _buildFeesList(provider.data!);
+      return _buildFeesList(provider.data!, context);
     }
 
     return const SizedBox.shrink();
   }
 
-  Widget _buildFeesList(FeesResponse data) {
+  Widget _buildFeesList(FeesResponse data, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     final studentProvider = context.watch<StudentProvider>();
     final selectedStudent = studentProvider.selectedStudent;
 
@@ -174,7 +179,7 @@ class _FeesScreenState extends State<FeesScreen> {
             monthlyBreakdown = [];
           }
 
-          return _buildStudentFees(child, monthlyBreakdown);
+          return _buildStudentFees(child, monthlyBreakdown, context);
         }).toList(),
       ),
     );
@@ -183,7 +188,9 @@ class _FeesScreenState extends State<FeesScreen> {
   Widget _buildStudentFees(
     ChildFees child, [
     List<MonthlyFee>? overrideMonthlyBreakdown,
+    BuildContext? context,
   ]) {
+    final localizations = context != null ? AppLocalizations.of(context)! : null;
     final monthlyBreakdown = overrideMonthlyBreakdown ?? child.monthlyBreakdown;
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
@@ -268,14 +275,15 @@ class _FeesScreenState extends State<FeesScreen> {
             ),
             itemCount: monthlyBreakdown.length,
             itemBuilder: (context, index) =>
-                _buildMonthCard(monthlyBreakdown[index]),
+                _buildMonthCard(monthlyBreakdown[index], context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMonthCard(MonthlyFee fee) {
+  Widget _buildMonthCard(MonthlyFee fee, BuildContext? context) {
+    final localizations = context != null ? AppLocalizations.of(context)! : null;
     final isPaid = fee.isPaid;
     final color = isPaid ? Colors.green : Colors.red;
 
@@ -302,7 +310,9 @@ class _FeesScreenState extends State<FeesScreen> {
             ),
           ),
           Text(
-            isPaid ? 'Paid' : 'Unpaid',
+            isPaid 
+                ? (localizations?.translate('paid') ?? 'Paid')
+                : (localizations?.translate('unpaid') ?? 'Unpaid'),
             style: TextStyle(fontSize: 10.sp, color: color),
           ),
         ],

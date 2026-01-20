@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../app/router/app_router.dart';
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_button.dart';
 
@@ -29,6 +30,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -80,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                 // Welcome text
                 Text(
-                  'পাঠশালা বন্ধুতে স্বাগতম',
+                  localizations.translate('welcome_to_pathshala_bondhu'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28.sp,
@@ -92,7 +94,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 SizedBox(height: 12.h),
 
                 Text(
-                  'Welcome to Pathshala Bondhu',
+                  localizations.translate('your_school_companion'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18.sp,
@@ -104,7 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 SizedBox(height: 24.h),
 
                 Text(
-                  'আপনার সন্তানের শিক্ষা জীবনের সেরা সঙ্গী। বই, রুটিন, পরীক্ষা, উপস্থিতি এবং ফি সব এক জায়গায়।',
+                  localizations.translate('welcome_description'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15.sp,
@@ -121,10 +123,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   spacing: 12.w,
                   runSpacing: 12.h,
                   children: [
-                    _buildFeatureChip(Icons.book, 'Books'),
-                    _buildFeatureChip(Icons.schedule, 'Routine'),
-                    _buildFeatureChip(Icons.check_circle, 'Attendance'),
-                    _buildFeatureChip(Icons.payment, 'Fees'),
+                    _buildFeatureChip(Icons.book, localizations.translate('books')),
+                    _buildFeatureChip(Icons.schedule, localizations.translate('class_routine')),
+                    _buildFeatureChip(Icons.check_circle, localizations.translate('attendance')),
+                    _buildFeatureChip(Icons.payment, localizations.translate('fees')),
                   ],
                 ),
 
@@ -132,7 +134,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                 // Get Started button
                 CustomButton(
-                  text: 'Get Started',
+                  text: localizations.translate('get_started'),
                   onPressed: _completeOnboarding,
                 ),
 

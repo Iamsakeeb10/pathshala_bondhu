@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageProvider extends ChangeNotifier {
+  static const String _languageKey = 'selected_language';
   Locale _currentLocale = const Locale('en');
 
   Locale get currentLocale => _currentLocale;
@@ -21,55 +23,42 @@ class LanguageProvider extends ChangeNotifier {
     }
   }
 
-  final Map<String, Map<String, String>> _localizedValues = {
-    'en': {
-      'signup': 'Sign Up',
-      'email': 'Email',
-      'password': 'Password',
-      'confirm_password': 'Confirm Password',
-      'already_have_account': 'Already have an account?',
-      'login': 'Login',
-      'full_name': 'Full Name',
-      'profile': 'Profile',
-      'notifications': 'Notifications',
-      'settings': 'Settings',
-      'about': 'About',
-      'logout': 'Logout',
-      'cancel': 'Cancel',
-      'dark_mode': 'Dark Mode',
-      'language': 'Language',
-      'privacy_policy': 'Privacy Policy',
-      'terms_conditions': 'Terms & Conditions',
-    },
-    'bn': {
-      'signup': 'নিবন্ধন করুন',
-      'email': 'ইমেইল',
-      'password': 'পাসওয়ার্ড',
-      'confirm_password': 'পাসওয়ার্ড নিশ্চিত করুন',
-      'already_have_account': 'ইতিমধ্যে একটি অ্যাকাউন্ট আছে?',
-      'login': 'লগইন',
-      'full_name': 'পুরো নাম',
-      'profile': 'প্রোফাইল',
-      'notifications': 'নোটিফিকেশন',
-      'settings': 'সেটিংস',
-      'about': 'সম্পর্কে',
-      'logout': 'লগআউট',
-      'cancel': 'বাতিল',
-      'dark_mode': 'ডার্ক মোড',
-      'language': 'ভাষা',
-      'privacy_policy': 'গোপনীয়তা নীতি',
-      'terms_conditions': 'শর্তাবলী',
-    },
-  };
+  /// Initialize language from SharedPreferences
+  Future<void> initialize() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedLanguage = prefs.getString(_languageKey) ?? 'en';
+    _currentLocale = Locale(savedLanguage);
+    notifyListeners();
+  }
 
-  void changeLanguage(Locale locale) {
+  /// Change language and persist to SharedPreferences
+  Future<void> changeLanguage(Locale locale) async {
     if (_currentLocale != locale) {
       _currentLocale = locale;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_languageKey, locale.languageCode);
       notifyListeners();
     }
   }
 
+  /// Set language by code string
+  Future<void> setLanguage(String code) async {
+    final locale = Locale(code);
+    await changeLanguage(locale);
+  }
+
+  /// Toggle between supported languages
+  Future<void> toggleLanguage() async {
+    final currentIndex = supportedLocales.indexWhere(
+      (locale) => locale.languageCode == _currentLocale.languageCode,
+    );
+    final nextIndex = (currentIndex + 1) % supportedLocales.length;
+    await changeLanguage(supportedLocales[nextIndex]);
+  }
+
   String translate(String key) {
-    return _localizedValues[_currentLocale.languageCode]?[key] ?? key;
+    // This method is kept for backward compatibility
+    // But translations should use AppLocalizations.of(context).translate(key)
+    return key;
   }
 }

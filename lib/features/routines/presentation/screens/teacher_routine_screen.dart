@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
 import '../../data/models/teacher_routine_model.dart';
@@ -18,28 +19,40 @@ class TeacherRoutineScreen extends StatefulWidget {
 class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _days = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Saturday',
-  ];
+  
+  List<String> _getDays(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return [
+      localizations.translate('sunday'),
+      localizations.translate('monday'),
+      localizations.translate('tuesday'),
+      localizations.translate('wednesday'),
+      localizations.translate('thursday'),
+      localizations.translate('saturday'),
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _days.length, vsync: this);
-    _setInitialDay();
+    // Initialize with default length, will be updated in build
+    _tabController = TabController(length: 6, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TeacherRoutineProvider>().fetchRoutines();
     });
   }
 
-  void _setInitialDay() {
+  void _setInitialDay(List<String> days) {
     final today = DateFormat('EEEE').format(DateTime.now());
-    final index = _days.indexOf(today);
+    final dayMap = {
+      'Sunday': days[0],
+      'Monday': days[1],
+      'Tuesday': days[2],
+      'Wednesday': days[3],
+      'Thursday': days[4],
+      'Saturday': days[5],
+    };
+    final index = days.indexWhere((d) => d == dayMap[today]);
     if (index != -1) {
       _tabController.index = index;
     } else if (today == 'Friday') {
@@ -91,23 +104,35 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final days = _getDays(context);
+    
+    // Update tab controller if needed
+    if (_tabController.length != days.length) {
+      _tabController.dispose();
+      _tabController = TabController(length: days.length, vsync: this);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _setInitialDay(days);
+      });
+    }
+    
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
           CustomAppBar(
-            title: 'My Routine',
+            title: localizations.translate('my_routine'),
             showBackButton: true, // optional, show/hide back button
           ),
-          _buildDayTabs(),
-          Expanded(child: _buildRoutineContent()),
+          _buildDayTabs(context, days),
+          Expanded(child: _buildRoutineContent(context, days)),
         ],
       ),
     );
   }
 
-  Widget _buildDayTabs() {
+  Widget _buildDayTabs(BuildContext context, List<String> days) {
     return Container(
       margin: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 12.h),
       height: 48.h,
@@ -154,8 +179,17 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
         padding: EdgeInsets.symmetric(horizontal: 4.w),
         tabAlignment: TabAlignment.start,
         dividerColor: Colors.transparent,
-        tabs: _days.map((day) {
-          final isToday = DateFormat('EEEE').format(DateTime.now()) == day;
+        tabs: days.map((day) {
+          final today = DateFormat('EEEE').format(DateTime.now());
+          final dayMap = {
+            'Sunday': days[0],
+            'Monday': days[1],
+            'Tuesday': days[2],
+            'Wednesday': days[3],
+            'Thursday': days[4],
+            'Saturday': days[5],
+          };
+          final isToday = day == dayMap[today];
           return Tab(
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -180,7 +214,8 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
     );
   }
 
-  Widget _buildRoutineContent() {
+  Widget _buildRoutineContent(BuildContext context, List<String> days) {
+    final localizations = AppLocalizations.of(context)!;
     return Consumer<TeacherRoutineProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
@@ -194,7 +229,7 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'Loading routine...',
+                  localizations.translate('loading_routine'),
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.textSecondary,
@@ -227,7 +262,7 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
                   ),
                   SizedBox(height: 16.h),
                   Text(
-                    'Oops! Something went wrong',
+                    localizations.translate('oops_something_went_wrong'),
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
@@ -251,16 +286,26 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
 
         return TabBarView(
           controller: _tabController,
-          children: _days.map((day) {
-            final routines = provider.getRoutinesForDay(day);
+          children: days.map((day) {
+            // Map translated day back to English for provider
+            final dayMap = {
+              localizations.translate('sunday'): 'Sunday',
+              localizations.translate('monday'): 'Monday',
+              localizations.translate('tuesday'): 'Tuesday',
+              localizations.translate('wednesday'): 'Wednesday',
+              localizations.translate('thursday'): 'Thursday',
+              localizations.translate('saturday'): 'Saturday',
+            };
+            final englishDay = dayMap[day] ?? day;
+            final routines = provider.getRoutinesForDay(englishDay);
             if (routines.isEmpty) {
-              return _buildEmptyState(day);
+              return _buildEmptyState(day, context);
             }
             return ListView.builder(
               padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
               itemCount: routines.length,
               itemBuilder: (context, index) {
-                return _buildRoutineCard(routines[index], index);
+                return _buildRoutineCard(routines[index], index, context);
               },
             );
           }).toList(),
@@ -269,8 +314,18 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
     );
   }
 
-  Widget _buildEmptyState(String day) {
-    final isToday = DateFormat('EEEE').format(DateTime.now()) == day;
+  Widget _buildEmptyState(String day, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final today = DateFormat('EEEE').format(DateTime.now());
+    final dayMap = {
+      'Sunday': localizations.translate('sunday'),
+      'Monday': localizations.translate('monday'),
+      'Tuesday': localizations.translate('tuesday'),
+      'Wednesday': localizations.translate('wednesday'),
+      'Thursday': localizations.translate('thursday'),
+      'Saturday': localizations.translate('saturday'),
+    };
+    final isToday = day == dayMap[today];
 
     return Center(
       child: Padding(
@@ -292,7 +347,9 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
             ),
             SizedBox(height: 24.h),
             Text(
-              isToday ? 'No classes today' : 'No classes scheduled',
+              isToday 
+                  ? localizations.translate('no_classes_today')
+                  : localizations.translate('no_classes_scheduled'),
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
@@ -301,7 +358,9 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
             ),
             SizedBox(height: 8.h),
             Text(
-              isToday ? 'Enjoy your free day!' : 'for $day',
+              isToday 
+                  ? localizations.translate('enjoy_free_day')
+                  : '${localizations.translate('for_day')} $day',
               style: TextStyle(
                 fontSize: 15.sp,
                 color: AppColors.textSecondary,
@@ -314,7 +373,8 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
     );
   }
 
-  Widget _buildRoutineCard(TeacherRoutine routine, int index) {
+  Widget _buildRoutineCard(TeacherRoutine routine, int index, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     final isOngoing = _isCurrentClass(routine);
 
     return Container(
@@ -434,7 +494,7 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
                                         ),
                                         SizedBox(width: 4.w),
                                         Text(
-                                          'Ongoing',
+                                          localizations.translate('ongoing'),
                                           style: TextStyle(
                                             fontSize: 11.sp,
                                             fontWeight: FontWeight.w700,

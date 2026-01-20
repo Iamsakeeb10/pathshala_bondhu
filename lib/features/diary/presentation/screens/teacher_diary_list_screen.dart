@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
 import '../../data/models/teacher_diary_model.dart';
@@ -46,6 +47,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
   }
 
   void _confirmDelete(BuildContext context, int id) {
+    final localizations = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -53,18 +55,18 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
           borderRadius: BorderRadius.circular(16.r),
         ),
         title: Text(
-          'Delete Diary',
+          localizations.translate('delete_diary'),
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         content: Text(
-          'Are you sure you want to delete this diary?',
+          localizations.translate('are_you_sure_delete_diary'),
           style: TextStyle(fontSize: 14.sp),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Cancel',
+              localizations.translate('cancel'),
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -79,7 +81,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text('Diary deleted successfully'),
+                      content: Text(localizations.translate('diary_deleted_successfully')),
                       backgroundColor: AppColors.success,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
@@ -92,7 +94,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Error: $e'),
+                      content: Text('${localizations.translate('error')}: $e'),
                       backgroundColor: AppColors.error,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
@@ -104,7 +106,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
               }
             },
             child: Text(
-              'Delete',
+              localizations.translate('delete'),
               style: TextStyle(
                 color: AppColors.error,
                 fontWeight: FontWeight.w600,
@@ -119,33 +121,41 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.push('/teacher/diaries/create');
+      floatingActionButton: Builder(
+        builder: (context) {
+          final localizations = AppLocalizations.of(context)!;
+          return FloatingActionButton.extended(
+            onPressed: () {
+              context.push('/teacher/diaries/create');
+            },
+            backgroundColor: AppColors.primary,
+            elevation: 4,
+            icon: const Icon(Icons.add_rounded, color: Colors.white),
+            label: Text(
+              localizations.translate('add_diary'),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15.sp,
+                letterSpacing: 0.3,
+              ),
+            ),
+          );
         },
-        backgroundColor: AppColors.primary,
-        elevation: 4,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: Text(
-          'Add Diary',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 15.sp,
-            letterSpacing: 0.3,
-          ),
-        ),
       ),
-      body: Column(
-        children: [
-          CustomAppBar(
-            title: 'Class Diary',
-            showBackButton: true, // show back button if needed
-            actions: [], // optional actions here
-            // optionally add gradientColors, height, or subtitle
-          ),
+      body: Builder(
+        builder: (context) {
+          final localizations = AppLocalizations.of(context)!;
+          return Column(
+            children: [
+              CustomAppBar(
+                title: localizations.translate('class_diary'),
+                showBackButton: true, // show back button if needed
+                actions: [], // optional actions here
+                // optionally add gradientColors, height, or subtitle
+              ),
 
           Expanded(
             child: Consumer<TeacherDiaryProvider>(
@@ -163,7 +173,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                         ),
                         SizedBox(height: 16.h),
                         Text(
-                          'Loading diaries...',
+                          localizations.translate('loading_diaries'),
                           style: TextStyle(
                             fontSize: 14.sp,
                             color: AppColors.textSecondary,
@@ -196,7 +206,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                           ),
                           SizedBox(height: 16.h),
                           Text(
-                            'Error Loading Diaries',
+                            localizations.translate('error_loading_diaries'),
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
@@ -216,7 +226,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                           ElevatedButton.icon(
                             onPressed: _refresh,
                             icon: const Icon(Icons.refresh_rounded),
-                            label: const Text('Retry'),
+                            label: Text(localizations.translate('retry')),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
@@ -276,11 +286,14 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
             ),
           ),
         ],
+      );
+        },
       ),
     );
   }
 
   Widget _buildEmptyState() {
+    final localizations = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: EdgeInsets.all(32.w),
@@ -301,7 +314,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
             ),
             SizedBox(height: 24.h),
             Text(
-              'No Diaries Yet',
+              localizations.translate('no_diaries_yet'),
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
@@ -310,7 +323,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
             ),
             SizedBox(height: 8.h),
             Text(
-              'Start creating class diaries by tapping\nthe "Add Diary" button below.',
+              localizations.translate('start_creating_diaries'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
@@ -402,7 +415,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                                 ),
                                 SizedBox(width: 4.w),
                                 Text(
-                                  diary.diaryClass?.name ?? 'Unknown',
+                                  diary.diaryClass?.name ?? AppLocalizations.of(context)!.translate('unknown'),
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w600,
@@ -434,7 +447,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                       SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
-                          diary.subject?.name ?? 'Unknown Subject',
+                          diary.subject?.name ?? '${AppLocalizations.of(context)!.translate('unknown')} ${AppLocalizations.of(context)!.translate('subject')}',
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w600,
@@ -522,34 +535,34 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                   color: AppColors.primary,
                 ),
                 SizedBox(width: 12.w),
-                Text(
-                  'Edit',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuItem<String>(
-            value: 'delete',
-            child: Row(
-              children: [
-                Icon(
-                  Icons.delete_outline_rounded,
-                  size: 18.sp,
-                  color: AppColors.error,
-                ),
-                SizedBox(width: 12.w),
-                Text(
-                  'Delete',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.error,
-                  ),
-                ),
+                                Text(
+                                  AppLocalizations.of(context)!.translate('edit'),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete_outline_rounded,
+                                  size: 18.sp,
+                                  color: AppColors.error,
+                                ),
+                                SizedBox(width: 12.w),
+                                Text(
+                                  AppLocalizations.of(context)!.translate('delete'),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.error,
+                                  ),
+                                ),
               ],
             ),
           ),

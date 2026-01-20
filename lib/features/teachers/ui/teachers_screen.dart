@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
@@ -37,12 +38,13 @@ class _TeachersScreenState extends State<TeachersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
-          CustomAppBar(title: 'Teachers', showBackButton: false),
+          CustomAppBar(title: localizations.translate('teachers'), showBackButton: false),
           Expanded(
             child: Consumer<TeachersProvider>(
               builder: (context, provider, child) {
@@ -65,10 +67,10 @@ class _TeachersScreenState extends State<TeachersScreen> {
 
                 // Empty state
                 if (provider.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.school_outlined,
-                    message: 'No teachers found',
-                    subMessage: 'Teachers list is empty.',
+                    message: localizations.translate('no_teachers_found'),
+                    subMessage: localizations.translate('teachers_list_empty'),
                   );
                 }
 

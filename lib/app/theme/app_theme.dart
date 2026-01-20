@@ -163,6 +163,21 @@ class AppTheme {
 
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.backgroundDark,
+      
+      // Dark gradient background decoration
+      extensions: <ThemeExtension<dynamic>>[
+        _DarkGradientTheme(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF1F2937), // backgroundDark
+              const Color(0xFF111827), // darker shade
+              const Color(0xFF0F172A), // darkest shade
+            ],
+          ),
+        ),
+      ],
 
       // App bar
       appBarTheme: AppBarTheme(
@@ -231,6 +246,81 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(foregroundColor: AppColors.primaryLight),
       ),
+
+      // Text theme for dark mode
+      textTheme: TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 32.sp,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textDark,
+        ),
+        displayMedium: TextStyle(
+          fontSize: 28.sp,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textDark,
+        ),
+        displaySmall: TextStyle(
+          fontSize: 24.sp,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textDark,
+        ),
+        headlineLarge: TextStyle(
+          fontSize: 22.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textDark,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 20.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textDark,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textDark,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textDark,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textDarkSecondary,
+        ),
+        titleSmall: TextStyle(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textDarkSecondary,
+        ),
+        bodyLarge: TextStyle(fontSize: 16.sp, color: AppColors.textDark),
+        bodyMedium: TextStyle(fontSize: 14.sp, color: AppColors.textDarkSecondary),
+        bodySmall: TextStyle(fontSize: 12.sp, color: AppColors.textDarkSecondary),
+      ),
     );
+  }
+}
+
+/// Extension for dark theme gradient
+class _DarkGradientTheme extends ThemeExtension<_DarkGradientTheme> {
+  final LinearGradient gradient;
+
+  const _DarkGradientTheme({required this.gradient});
+
+  @override
+  ThemeExtension<_DarkGradientTheme> copyWith({LinearGradient? gradient}) {
+    return _DarkGradientTheme(gradient: gradient ?? this.gradient);
+  }
+
+  @override
+  ThemeExtension<_DarkGradientTheme> lerp(
+    ThemeExtension<_DarkGradientTheme>? other,
+    double t,
+  ) {
+    if (other is! _DarkGradientTheme) {
+      return this;
+    }
+    return _DarkGradientTheme(gradient: gradient);
   }
 }

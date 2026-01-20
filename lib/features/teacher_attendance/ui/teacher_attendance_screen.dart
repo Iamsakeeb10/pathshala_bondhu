@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../provider/teacher_attendance_provider.dart';
 import 'widgets/attendance_history_tab.dart';
@@ -52,13 +53,14 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
           CustomAppBarWithTabs(
-            title: 'Attendance',
+            title: localizations.translate('attendance'),
             subtitle: '${widget.className} • ${widget.sessionName}',
             tabController: _tabController,
             tabs: [
@@ -69,7 +71,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                   children: [
                     Icon(Icons.edit_note_rounded, size: 20.sp),
                     SizedBox(width: 6.w),
-                    const Text('Mark'),
+                    Text(localizations.translate('mark')),
                   ],
                 ),
               ),
@@ -80,7 +82,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
                   children: [
                     Icon(Icons.history_rounded, size: 20.sp),
                     SizedBox(width: 6.w),
-                    const Text('History'),
+                    Text(localizations.translate('history')),
                   ],
                 ),
               ),

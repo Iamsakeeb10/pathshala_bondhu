@@ -8,6 +8,7 @@ import '../../../../core/services/notification_service.dart';
 import '../../../../features/notifications/providers/notification_provider.dart';
 import '../../../../features/students/provider/student_provider.dart';
 import '../../../../features/chat/providers/conversations_provider.dart';
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/modern_premium_slider.dart';
 import '../../../../shared/widgets/student_selection_bottom_sheet.dart';
@@ -137,86 +138,68 @@ class _HomeScreenState extends State<HomeScreen> {
     'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800',
   ];
 
-  final List<Map<String, dynamic>> _categories = [
-    {
-      'icon': Icons.book_outlined,
-      'label': 'Books',
-      'color': const Color(0xFFEFC45D),
-      'route': '/books',
-    },
-    {
-      'icon': Icons.book, // Using book icon for Diary as placeholder
-      'label': 'Diary',
-      'color': const Color(0xFF8B5CF6),
-      'route': null,
-    },
-    {
-      'icon': Icons.dashboard_outlined,
-      'label': 'Class Routine',
-      'color': const Color(0xFFEFA35F),
-      'route': '/routines',
-    },
-    {
-      'icon': Icons.school_outlined,
-      'label': 'Exam Routine',
-      'color': const Color(0xFFEE9C70),
-      'route': '/exam-routines',
-    },
-    {
-      'icon': Icons.calendar_today_outlined,
-      'label': 'Attendance',
-      'color': const Color(0xFF22C55E),
-      'route': '/attendance',
-    },
-    {
-      'icon': Icons.payment_outlined,
-      'label': 'Fees',
-      'color': const Color(0xFF3B82F6),
-      'route': '/fees',
-    },
-    // {
-    //   'icon': Icons.description_outlined,
-    //   'label': 'Notice',
-    //   'color': const Color(0xFF8B5CF6),
-    //   'route': null,
-    // },
-    // {
-    //   'icon': Icons.assignment_outlined,
-    //   'label': 'Circular',
-    //   'color': const Color(0xFFEC4899),
-    //   'route': null,
-    // },
-    // {
-    //   'icon': Icons.analytics_outlined,
-    //   'label': 'Reports',
-    //   'color': const Color(0xFF06B6D4),
-    //   'route': null,
-    // },
-    // {
-    //   'icon': Icons.people_outline,
-    //   'label': 'Profile',
-    //   'color': const Color(0xFFEFC45D),
-    //   'route': null,
-    // },
-  ];
+  List<Map<String, dynamic>> _getCategories(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return [
+      {
+        'icon': Icons.book_outlined,
+        'label': localizations.translate('books'),
+        'color': const Color(0xFFEFC45D),
+        'route': '/books',
+      },
+      {
+        'icon': Icons.book, // Using book icon for Diary as placeholder
+        'label': localizations.translate('diary'),
+        'color': const Color(0xFF8B5CF6),
+        'route': null,
+      },
+      {
+        'icon': Icons.dashboard_outlined,
+        'label': localizations.translate('class_routine'),
+        'color': const Color(0xFFEFA35F),
+        'route': '/routines',
+      },
+      {
+        'icon': Icons.school_outlined,
+        'label': localizations.translate('exam_routine'),
+        'color': const Color(0xFFEE9C70),
+        'route': '/exam-routines',
+      },
+      {
+        'icon': Icons.calendar_today_outlined,
+        'label': localizations.translate('attendance'),
+        'color': const Color(0xFF22C55E),
+        'route': '/attendance',
+      },
+      {
+        'icon': Icons.payment_outlined,
+        'label': localizations.translate('fees'),
+        'color': const Color(0xFF3B82F6),
+        'route': '/fees',
+      },
+    ];
+  }
 
   // Filter categories based on role
-  List<Map<String, dynamic>> get _visibleCategories {
+  List<Map<String, dynamic>> _visibleCategories(BuildContext context) {
     final authProvider = context.read<AuthProvider>();
+    final localizations = AppLocalizations.of(context)!;
+    final categories = _getCategories(context);
+    
     if (authProvider.isTeacher) {
-      return _categories
+      return categories
           .where(
             (c) => [
-              'Attendance',
-              'Diary',
-              'Class Routine', // User said "Routine", assuming mapping to "Class Routine"
+              localizations.translate('attendance'),
+              localizations.translate('diary'),
+              localizations.translate('class_routine'),
             ].contains(c['label']),
           )
           .toList();
     }
     // For parents, show everything? Or should we hide Diary?
     // User didn't specify for parents. Leaving as is (shows all).
-    return _categories;
+    return categories;
   }
 
   void _handleCategoryTap(Map<String, dynamic> category) {
@@ -225,9 +208,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final authProvider = context.read<AuthProvider>();
 
+    final localizations = AppLocalizations.of(context)!;
     // 1. Handle Teacher specific overrides first (allows 'Diary' which has null route in map)
     if (authProvider.isTeacher) {
-      if (label == 'Attendance') {
+      if (label == localizations.translate('attendance')) {
         ClassSelectionBottomSheet.show(
           context,
           onConfirmed: (selectedClass, selectedSession) {
@@ -244,10 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         );
         return;
-      } else if (label == 'Class Routine') {
+      } else if (label == localizations.translate('class_routine')) {
         context.push('/teacher/routines');
         return;
-      } else if (label == 'Diary') {
+      } else if (label == localizations.translate('diary')) {
         context.push('/teacher/diaries');
         return;
       }
@@ -256,13 +240,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // 2. Handle Parent logic
     if (authProvider.isParent) {
       // Handle Diary specifically
-      if (label == 'Diary') {
+      if (label == localizations.translate('diary')) {
         final studentProvider = context.read<StudentProvider>();
 
         if (studentProvider.students.isEmpty && !studentProvider.isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('No students found. Please contact support.'),
+            SnackBar(
+              content: Text(localizations.translate('no_students_found')),
               backgroundColor: Colors.red,
             ),
           );
@@ -271,9 +255,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (studentProvider.isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Loading student information...'),
-              duration: Duration(seconds: 1),
+            SnackBar(
+              content: Text(localizations.translate('loading_student_information')),
+              duration: const Duration(seconds: 1),
             ),
           );
           return;
@@ -315,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (route == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$label coming soon!'),
+          content: Text('${localizations.translate('coming_soon')}'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -334,8 +318,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (studentProvider.students.isEmpty && !studentProvider.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No students found. Please contact support.'),
+          SnackBar(
+            content: Text(localizations.translate('no_students_found')),
             backgroundColor: Colors.red,
           ),
         );
@@ -344,9 +328,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (studentProvider.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Loading student information...'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(localizations.translate('loading_student_information')),
+            duration: const Duration(seconds: 1),
           ),
         );
         return;
@@ -375,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final sliderHeight = 150.h;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,9 +380,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             // Add spacing equal to half the slider height plus margin
             SizedBox(height: (sliderHeight / 2) + 24.h),
-            _buildSectionTitle(),
+            _buildSectionTitle(context),
             SizedBox(height: 16.h),
-            _buildCategoriesSection(),
+            _buildCategoriesSection(context),
             SizedBox(height: 24.h),
           ],
         ),
@@ -406,7 +390,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSectionTitle() {
+  Widget _buildSectionTitle(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
@@ -424,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(width: 8.w),
               Text(
-                'Quick Access',
+                localizations.translate('quick_access'),
                 style: TextStyle(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
@@ -438,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: EdgeInsets.only(left: 12.w),
             child: Text(
-              'Explore all features',
+              localizations.translate('explore_all_features'),
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w400,
@@ -787,7 +772,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoriesSection() {
+  Widget _buildCategoriesSection(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: LayoutBuilder(
@@ -798,7 +783,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return Wrap(
             spacing: 14.w,
             runSpacing: 14.h,
-            children: _visibleCategories.map((category) {
+            children: _visibleCategories(context).map((category) {
               return SizedBox(
                 width: itemWidth,
                 height: itemHeight,

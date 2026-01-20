@@ -5,12 +5,14 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../core/services/logout_service.dart';
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   Future<void> _handleLogout(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -18,18 +20,18 @@ class ProfileScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
         ),
         title: Text(
-          'Logout',
+          localizations.translate('logout'),
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         content: Text(
-          'Are you sure you want to logout?',
+          localizations.translate('are_you_sure_logout'),
           style: TextStyle(fontSize: 14.sp),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Cancel',
+              localizations.translate('cancel'),
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -39,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              'Logout',
+              localizations.translate('logout'),
               style: TextStyle(
                 color: AppColors.error,
                 fontWeight: FontWeight.w600,
@@ -60,9 +62,10 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final user = auth.currentUser;
+    final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -213,60 +216,60 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionHeader('Account'),
+                  _buildSectionHeader(localizations.translate('account')),
                   SizedBox(height: 12.h),
                   _buildMenuItem(
                     context,
                     icon: Icons.person_outline,
-                    title: 'Personal Information',
-                    subtitle: 'View and edit profile details',
+                    title: localizations.translate('personal_information'),
+                    subtitle: localizations.translate('view_edit_profile'),
                     onTap: () => context.push('/profile/details'),
                   ),
                   SizedBox(height: 12.h),
                   _buildMenuItem(
                     context,
                     icon: Icons.lock_outline,
-                    title: 'Change Password',
-                    subtitle: 'Update your password',
+                    title: localizations.translate('change_password'),
+                    subtitle: localizations.translate('update_password'),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coming soon!')),
+                        SnackBar(content: Text(localizations.translate('coming_soon'))),
                       );
                     },
                   ),
                   SizedBox(height: 24.h),
-                  _buildSectionHeader('Preferences'),
+                  _buildSectionHeader(localizations.translate('preferences')),
                   SizedBox(height: 12.h),
                   _buildMenuItem(
                     context,
                     icon: Icons.settings_outlined,
-                    title: 'Settings',
-                    subtitle: 'App preferences and configurations',
+                    title: localizations.translate('settings'),
+                    subtitle: localizations.translate('app_preferences'),
                     onTap: () => context.push('/settings'),
                   ),
                   SizedBox(height: 12.h),
                   _buildMenuItem(
                     context,
                     icon: Icons.notifications_outlined,
-                    title: 'Notifications',
-                    subtitle: 'Manage notification settings',
+                    title: localizations.translate('notifications'),
+                    subtitle: localizations.translate('manage_notification_settings'),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coming soon!')),
+                        SnackBar(content: Text(localizations.translate('coming_soon'))),
                       );
                     },
                   ),
                   SizedBox(height: 24.h),
-                  _buildSectionHeader('Support'),
+                  _buildSectionHeader(localizations.translate('support')),
                   SizedBox(height: 12.h),
                   _buildMenuItem(
                     context,
                     icon: Icons.help_outline,
-                    title: 'Help & Support',
-                    subtitle: 'Get help with your account',
+                    title: localizations.translate('help_support'),
+                    subtitle: localizations.translate('get_help_account'),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coming soon!')),
+                        SnackBar(content: Text(localizations.translate('coming_soon'))),
                       );
                     },
                   ),
@@ -274,11 +277,11 @@ class ProfileScreen extends StatelessWidget {
                   _buildMenuItem(
                     context,
                     icon: Icons.info_outline,
-                    title: 'About',
-                    subtitle: 'App version and information',
+                    title: localizations.translate('about'),
+                    subtitle: localizations.translate('app_version_info'),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Coming soon!')),
+                        SnackBar(content: Text(localizations.translate('coming_soon'))),
                       );
                     },
                   ),
@@ -286,8 +289,8 @@ class ProfileScreen extends StatelessWidget {
                   _buildMenuItem(
                     context,
                     icon: Icons.logout_rounded,
-                    title: 'Logout',
-                    subtitle: 'Sign out of your account',
+                    title: localizations.translate('logout'),
+                    subtitle: localizations.translate('sign_out_account'),
                     isDestructive: true,
                     onTap: () => _handleLogout(context),
                   ),
@@ -295,7 +298,7 @@ class ProfileScreen extends StatelessWidget {
                   // App Version
                   Center(
                     child: Text(
-                      'Version 1.0.0',
+                      '${localizations.translate('version')} 1.0.0',
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: AppColors.grey500,
@@ -343,12 +346,14 @@ class ProfileScreen extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
               color: isDestructive
                   ? AppColors.error.withOpacity(0.2)
-                  : AppColors.grey200.withOpacity(0.6),
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey200.withOpacity(0.6)),
               width: 1.2,
             ),
             boxShadow: [
@@ -406,7 +411,7 @@ class ProfileScreen extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: isDestructive
                             ? AppColors.error
-                            : AppColors.textPrimary,
+                            : (Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary),
                         letterSpacing: 0.1,
                       ),
                     ),
@@ -416,7 +421,7 @@ class ProfileScreen extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: AppColors.grey500,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

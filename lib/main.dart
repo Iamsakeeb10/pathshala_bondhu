@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import 'app/router/root_navigator_key.dart';
 import 'app/theme/app_theme.dart';
 import 'app/theme/providers/auth_provider.dart';
 import 'app/theme/providers/theme_provider.dart';
+import 'shared/localization/app_localizations.dart';
 // 🔹 Network connectivity imports
 import 'core/services/connectivity_service.dart';
 import 'core/services/notification_service.dart';
@@ -77,12 +79,20 @@ void main() async {
     },
   );
 
+  // Initialize theme and language providers with saved preferences
+  final themeProvider = ThemeProvider();
+  final languageProvider = LanguageProvider();
+  
+  // Load saved preferences
+  await themeProvider.initialize();
+  await languageProvider.initialize();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider(prefs)),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider.value(value: AuthProvider(prefs)),
+        ChangeNotifierProvider.value(value: themeProvider),
+        ChangeNotifierProvider.value(value: languageProvider),
         ChangeNotifierProvider(create: (_) => StudentProvider()),
         ChangeNotifierProvider(create: (_) => BooksProvider()),
         ChangeNotifierProvider(create: (_) => RoutineProvider()),
@@ -130,6 +140,14 @@ class MyApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
 
           locale: languageProvider.currentLocale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          
           routerConfig: AppRouter.router,
 
           // ✅ GLOBAL no-internet overlay

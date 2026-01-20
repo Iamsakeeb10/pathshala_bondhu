@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../app/constants/user_role.dart';
 import '../../../../app/router/app_router.dart';
 import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_button.dart';
 import '../../../../shared/widgets/custom_text_field.dart';
@@ -106,6 +107,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SizedBox.expand(
@@ -130,15 +132,15 @@ class _LoginScreenState extends State<LoginScreen>
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 20.h),
-                    _buildHeader(),
+                    _buildHeader(localizations),
                     SizedBox(height: 40.h),
-                    _buildRoleSelector(),
+                    _buildRoleSelector(localizations),
                     SizedBox(height: 32.h),
-                    _buildLoginForm(),
+                    _buildLoginForm(localizations),
                     SizedBox(height: 24.h),
-                    _buildLoginButton(authProvider),
+                    _buildLoginButton(authProvider, localizations),
                     SizedBox(height: 16.h),
-                    _buildForgotPassword(),
+                    _buildForgotPassword(localizations),
                   ],
                 ),
               ),
@@ -149,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations localizations) {
     return Column(
       children: [
         Container(
@@ -170,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         SizedBox(height: 24.h),
         Text(
-          'Welcome Back',
+          localizations.translate('welcome_back'),
           style: TextStyle(
             fontSize: 28.sp,
             fontWeight: FontWeight.bold,
@@ -179,14 +181,14 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         SizedBox(height: 8.h),
         Text(
-          'Sign in to continue',
+          localizations.translate('sign_in_to_continue'),
           style: TextStyle(fontSize: 16.sp, color: AppColors.textSecondary),
         ),
       ],
     );
   }
 
-  Widget _buildRoleSelector() {
+  Widget _buildRoleSelector(AppLocalizations localizations) {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
@@ -198,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen>
           Expanded(
             child: _buildRoleOption(
               role: UserRole.parent,
-              label: 'Parent',
+              label: localizations.translate('parents'),
               icon: Icons.family_restroom_rounded,
             ),
           ),
@@ -206,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen>
           Expanded(
             child: _buildRoleOption(
               role: UserRole.teacher,
-              label: 'Teacher',
+              label: localizations.translate('teachers'),
               icon: Icons.person_rounded,
             ),
           ),
@@ -262,27 +264,27 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(AppLocalizations localizations) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Column(
         children: [
           if (_selectedRole == UserRole.parent)
-            _buildParentFields()
+            _buildParentFields(localizations)
           else
-            _buildTeacherFields(),
+            _buildTeacherFields(localizations),
           SizedBox(height: 16.h),
-          _buildPasswordField(),
+          _buildPasswordField(localizations),
         ],
       ),
     );
   }
 
-  Widget _buildParentFields() {
+  Widget _buildParentFields(AppLocalizations localizations) {
     return CustomTextField(
       controller: _parentIdController,
-      label: 'Parent ID',
-      hint: 'Enter your parent ID',
+      label: localizations.translate('parent_id'),
+      hint: localizations.translate('enter_parent_id'),
       prefixIcon: Icon(Icons.badge_outlined, size: 22.sp),
       keyboardType: TextInputType.text,
       validator: (value) {
@@ -297,11 +299,11 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildTeacherFields() {
+  Widget _buildTeacherFields(AppLocalizations localizations) {
     return CustomTextField(
       controller: _emailController,
-      label: 'Email',
-      hint: 'Enter your email address',
+      label: localizations.translate('email'),
+      hint: localizations.translate('enter_email'),
       prefixIcon: Icon(Icons.email_outlined, size: 22.sp),
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
@@ -317,11 +319,11 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(AppLocalizations localizations) {
     return CustomTextField(
       controller: _passwordController,
-      label: 'Password',
-      hint: 'Enter your password',
+      label: localizations.translate('password'),
+      hint: localizations.translate('enter_password'),
       prefixIcon: Icon(Icons.lock_outline, size: 22.sp),
       obscureText: !_isPasswordVisible,
       maxLength: 10,
@@ -354,7 +356,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildLoginButton(AuthProvider authProvider) {
+  Widget _buildLoginButton(AuthProvider authProvider, AppLocalizations localizations) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -370,7 +372,7 @@ class _LoginScreenState extends State<LoginScreen>
         ],
       ),
       child: CustomButton(
-        text: 'Sign In',
+        text: localizations.translate('sign_in'),
         onPressed: _handleLogin,
         isLoading: authProvider.isLoading,
         backgroundColor: Colors.transparent,
@@ -379,7 +381,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildForgotPassword() {
+  Widget _buildForgotPassword(AppLocalizations localizations) {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton(
@@ -387,7 +389,7 @@ class _LoginScreenState extends State<LoginScreen>
           // Handle forgot password
         },
         child: Text(
-          'Forgot Password?',
+          localizations.translate('forgot_password'),
           style: TextStyle(
             fontSize: 14.sp,
             color: AppColors.primaryDark,

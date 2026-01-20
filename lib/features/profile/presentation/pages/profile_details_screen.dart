@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../auth/data/models/parent_models.dart';
@@ -36,20 +37,25 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
-          CustomAppBar(
-            title: 'Personal Information',
-            showBackButton: true, // show back button
-            actions: [
-              IconAction(
-                icon: Icons.edit_rounded,
-                onTap: () => context.push('/profile/details/edit'),
-                tooltip: 'Edit Profile',
-              ),
-            ],
+          Builder(
+            builder: (context) {
+              final localizations = AppLocalizations.of(context)!;
+              return CustomAppBar(
+                title: localizations.translate('personal_information'),
+                showBackButton: true, // show back button
+                actions: [
+                  IconAction(
+                    icon: Icons.edit_rounded,
+                    onTap: () => context.push('/profile/details/edit'),
+                    tooltip: localizations.translate('edit'),
+                  ),
+                ],
+              );
+            },
           ),
           Expanded(
             child: Consumer<ProfileProvider>(
@@ -67,7 +73,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                         ),
                         SizedBox(height: 16.h),
                         Text(
-                          'Loading profile...',
+                          AppLocalizations.of(context)!.translate('loading_profile'),
                           style: TextStyle(
                             fontSize: 14.sp,
                             color: AppColors.textSecondary,
@@ -100,7 +106,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                           ),
                           SizedBox(height: 16.h),
                           Text(
-                            'Error Loading Profile',
+                            AppLocalizations.of(context)!.translate('error_loading_profile'),
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
@@ -141,7 +147,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                       ),
                       SizedBox(height: 16.h),
                       Text(
-                        'No profile data found',
+                        AppLocalizations.of(context)!.translate('no_profile_data_found'),
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: AppColors.textSecondary,
@@ -165,49 +171,59 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildAvatarSection(user.fatherName, null),
-          SizedBox(height: 32.h),
-          _buildSectionTitle('Personal Information'),
-          SizedBox(height: 12.h),
-          _buildInfoCard([
-            _InfoItem(
-              icon: Icons.person_outline,
-              label: 'Father Name',
-              value: user.fatherName,
-            ),
-            _InfoItem(
-              icon: Icons.person_outline,
-              label: 'Mother Name',
-              value: user.motherName ?? 'N/A',
-            ),
-            _InfoItem(
-              icon: Icons.work_outline,
-              label: 'Father Job',
-              value: user.fatherJob ?? 'N/A',
-            ),
-            _InfoItem(
-              icon: Icons.work_outline,
-              label: 'Mother Job',
-              value: user.motherJob ?? 'N/A',
-            ),
-          ]),
-          SizedBox(height: 24.h),
-          _buildSectionTitle('Contact Details'),
-          SizedBox(height: 12.h),
-          _buildInfoCard([
-            _InfoItem(
-              icon: Icons.phone_outlined,
-              label: 'Phone',
-              value: user.parentPhone,
-            ),
-            _InfoItem(
-              icon: Icons.location_on_outlined,
-              label: 'Address',
-              value: user.address ?? 'N/A',
-            ),
-          ]),
-          SizedBox(height: 32.h),
-          _buildChangePasswordButton(),
+          Builder(
+            builder: (context) {
+              final localizations = AppLocalizations.of(context)!;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildAvatarSection(user.fatherName, null),
+                  SizedBox(height: 32.h),
+                  _buildSectionTitle(localizations.translate('personal_information')),
+                  SizedBox(height: 12.h),
+                  _buildInfoCard([
+                    _InfoItem(
+                      icon: Icons.person_outline,
+                      label: localizations.translate('father_name'),
+                      value: user.fatherName,
+                    ),
+                    _InfoItem(
+                      icon: Icons.person_outline,
+                      label: localizations.translate('mother_name'),
+                      value: user.motherName ?? 'N/A',
+                    ),
+                    _InfoItem(
+                      icon: Icons.work_outline,
+                      label: localizations.translate('father_job'),
+                      value: user.fatherJob ?? 'N/A',
+                    ),
+                    _InfoItem(
+                      icon: Icons.work_outline,
+                      label: localizations.translate('mother_job'),
+                      value: user.motherJob ?? 'N/A',
+                    ),
+                  ]),
+                  SizedBox(height: 24.h),
+                  _buildSectionTitle(localizations.translate('contact_details')),
+                  SizedBox(height: 12.h),
+                  _buildInfoCard([
+                    _InfoItem(
+                      icon: Icons.phone_outlined,
+                      label: localizations.translate('phone'),
+                      value: user.parentPhone,
+                    ),
+                    _InfoItem(
+                      icon: Icons.location_on_outlined,
+                      label: localizations.translate('address'),
+                      value: user.address ?? 'N/A',
+                    ),
+                  ]),
+                  SizedBox(height: 32.h),
+                  _buildChangePasswordButton(context),
+                ],
+              );
+            },
+          ),
           SizedBox(height: 24.h),
         ],
       ),
@@ -221,41 +237,51 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildAvatarSection(user.name, user.avatar),
-          SizedBox(height: 32.h),
-          _buildSectionTitle('Personal Information'),
-          SizedBox(height: 12.h),
-          _buildInfoCard([
-            _InfoItem(
-              icon: Icons.person_outline,
-              label: 'Name',
-              value: user.name,
-            ),
-            _InfoItem(
-              icon: Icons.email_outlined,
-              label: 'Email',
-              value: user.email,
-            ),
-            if (teacher != null) ...[
-              _InfoItem(
-                icon: Icons.school_outlined,
-                label: 'Department',
-                value: teacher.department,
-              ),
-              _InfoItem(
-                icon: Icons.stars_outlined,
-                label: 'Specialization',
-                value: teacher.specialization,
-              ),
-              _InfoItem(
-                icon: Icons.description_outlined,
-                label: 'Bio',
-                value: teacher.bio ?? 'N/A',
-              ),
-            ],
-          ]),
-          SizedBox(height: 32.h),
-          _buildChangePasswordButton(),
+          Builder(
+            builder: (context) {
+              final localizations = AppLocalizations.of(context)!;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildAvatarSection(user.name, user.avatar),
+                  SizedBox(height: 32.h),
+                  _buildSectionTitle(localizations.translate('personal_information')),
+                  SizedBox(height: 12.h),
+                  _buildInfoCard([
+                    _InfoItem(
+                      icon: Icons.person_outline,
+                      label: localizations.translate('name'),
+                      value: user.name,
+                    ),
+                    _InfoItem(
+                      icon: Icons.email_outlined,
+                      label: localizations.translate('email'),
+                      value: user.email,
+                    ),
+                    if (teacher != null) ...[
+                      _InfoItem(
+                        icon: Icons.school_outlined,
+                        label: localizations.translate('department'),
+                        value: teacher.department,
+                      ),
+                      _InfoItem(
+                        icon: Icons.stars_outlined,
+                        label: localizations.translate('specialization'),
+                        value: teacher.specialization,
+                      ),
+                      _InfoItem(
+                        icon: Icons.description_outlined,
+                        label: localizations.translate('bio'),
+                        value: teacher.bio ?? 'N/A',
+                      ),
+                    ],
+                  ]),
+                  SizedBox(height: 32.h),
+                  _buildChangePasswordButton(context),
+                ],
+              );
+            },
+          ),
           SizedBox(height: 24.h),
         ],
       ),
@@ -375,10 +401,12 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
   Widget _buildInfoCard(List<_InfoItem> items) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: AppColors.grey200.withOpacity(0.6),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200.withOpacity(0.6),
           width: 1.2,
         ),
         boxShadow: [
@@ -462,7 +490,8 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
     );
   }
 
-  Widget _buildChangePasswordButton() {
+  Widget _buildChangePasswordButton(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       height: 52.h,
@@ -495,7 +524,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                 ),
                 SizedBox(width: 8.w),
                 Text(
-                  'Change Password',
+                  localizations.translate('change_password'),
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
