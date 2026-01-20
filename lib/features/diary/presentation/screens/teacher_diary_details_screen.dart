@@ -131,7 +131,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Diary Details'),
         backgroundColor: AppColors.primary,
@@ -219,7 +219,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
               'Loading diary details...',
               style: TextStyle(
                 fontSize: 14.sp,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -253,7 +253,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 8.h),
@@ -262,7 +262,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 ),
               ),
               SizedBox(height: 24.h),
@@ -313,7 +313,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 8.h),
@@ -322,7 +322,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -353,10 +353,12 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: AppColors.grey200.withOpacity(0.6),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200.withOpacity(0.6),
           width: 1.2,
         ),
         boxShadow: [
@@ -384,7 +386,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 _formatDate(_diary!.diaryDate),
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -396,7 +398,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
               letterSpacing: 0.1,
               height: 1.3,
             ),
@@ -410,10 +412,12 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: AppColors.grey200.withOpacity(0.6),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200.withOpacity(0.6),
           width: 1.2,
         ),
         boxShadow: [
@@ -447,7 +451,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                 ),
               ),
             ],
@@ -463,7 +467,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
               _diary!.description ?? 'No description provided.',
               style: TextStyle(
                 fontSize: 14.sp,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                 height: 1.6,
                 fontWeight: FontWeight.w500,
               ),
@@ -478,10 +482,12 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: AppColors.grey200.withOpacity(0.6),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200.withOpacity(0.6),
           width: 1.2,
         ),
         boxShadow: [
@@ -515,7 +521,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                 ),
               ),
             ],
@@ -584,7 +590,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: AppColors.grey500,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -594,7 +600,7 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                   ),
                 ),
               ],

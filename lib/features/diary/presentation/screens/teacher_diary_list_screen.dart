@@ -176,7 +176,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                           localizations.translate('loading_diaries'),
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -210,7 +210,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 8.h),
@@ -219,7 +219,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14.sp,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                             ),
                           ),
                           SizedBox(height: 24.h),
@@ -318,7 +318,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
               ),
             ),
             SizedBox(height: 8.h),
@@ -327,7 +327,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.sp,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
@@ -343,10 +343,12 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: AppColors.grey200.withOpacity(0.6),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200.withOpacity(0.6),
           width: 1.2,
         ),
         boxShadow: [
@@ -377,7 +379,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                         style: TextStyle(
                           fontSize: 17.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                           letterSpacing: 0.1,
                         ),
                         maxLines: 2,
@@ -451,7 +453,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                           ),
                         ),
                       ),
@@ -474,7 +476,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                         _formatDate(diary.diaryDate),
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -495,7 +497,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                         diary.academicSession!.title,
                         style: TextStyle(
                           fontSize: 11.sp,
-                          color: AppColors.grey500,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -513,7 +515,9 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
   Widget _buildOptionsMenu(TeacherDiary diary) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.grey100,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.grey100,
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: PopupMenuButton<String>(
@@ -540,6 +544,7 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontWeight: FontWeight.w500,
+                                    color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
                                   ),
                                 ),
                               ],

@@ -76,7 +76,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                           AppLocalizations.of(context)!.translate('loading_profile'),
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -110,7 +110,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 8.h),
@@ -119,7 +119,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14.sp,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -150,7 +150,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                         AppLocalizations.of(context)!.translate('no_profile_data_found'),
                         style: TextStyle(
                           fontSize: 16.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -311,7 +311,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                   padding: EdgeInsets.all(3.w),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                   ),
                   child: CircleAvatar(
                     radius: 60.r,
@@ -364,7 +364,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
             style: TextStyle(
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
               letterSpacing: 0.3,
             ),
           ),
@@ -390,7 +390,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
             letterSpacing: 0.3,
           ),
         ),
@@ -427,7 +427,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                 Divider(
                   height: 1,
                   thickness: 1,
-                  color: AppColors.grey200.withOpacity(0.5),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey200.withOpacity(0.5),
                 ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -462,7 +464,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             item.label,
                             style: TextStyle(
                               fontSize: 12.sp,
-                              color: AppColors.grey500,
+                              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.2,
                             ),
@@ -472,7 +474,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             item.value,
                             style: TextStyle(
                               fontSize: 15.sp,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.1,
                             ),

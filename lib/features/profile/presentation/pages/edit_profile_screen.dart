@@ -122,7 +122,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final auth = context.read<AuthProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -149,7 +149,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           'Saving changes...',
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -230,7 +230,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               'Update your profile information below. All required fields must be filled.',
               style: TextStyle(
                 fontSize: 13.sp,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
@@ -258,7 +258,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
             letterSpacing: 0.3,
           ),
         ),
@@ -341,7 +341,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                   letterSpacing: 0.2,
                 ),
               ),
@@ -368,18 +368,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   : null,
               style: TextStyle(
                 fontSize: 15.sp,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 counterText: '',
                 hintText: 'Enter $label',
                 hintStyle: TextStyle(
-                  color: AppColors.grey400,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w400,
                 ),
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).cardColor,
                 filled: true,
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16.w,
@@ -388,14 +388,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14.r),
                   borderSide: BorderSide(
-                    color: AppColors.grey200.withOpacity(0.6),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.borderDark
+                        : AppColors.grey200.withOpacity(0.6),
                     width: 1.2,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14.r),
                   borderSide: BorderSide(
-                    color: AppColors.grey200.withOpacity(0.6),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.borderDark
+                        : AppColors.grey200.withOpacity(0.6),
                     width: 1.2,
                   ),
                 ),

@@ -84,6 +84,16 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusBarHeight = MediaQuery.of(context).padding.top;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Professional dark theme gradient that matches light theme style
+    final defaultGradientColors = isDark
+        ? [
+            const Color(0xFF283447), // Slightly lighter dark blue-gray
+            const Color(0xFF1F2937), // backgroundDark
+            const Color(0xFF111827), // darker shade
+          ]
+        : [AppColors.primary, AppColors.primaryDark, AppColors.accent];
 
     return Container(
       padding:
@@ -92,17 +102,15 @@ class CustomAppBar extends StatelessWidget {
       height: (height ?? 60.h) + statusBarHeight,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors:
-              gradientColors ??
-              [AppColors.primary, AppColors.primaryDark, AppColors.accent],
+          colors: gradientColors ?? defaultGradientColors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: (gradientColors?.first ?? AppColors.primary).withOpacity(
-              0.2,
-            ),
+            color: isDark
+                ? Colors.black.withOpacity(0.4)
+                : (gradientColors?.first ?? AppColors.primary).withOpacity(0.2),
             offset: Offset(0, 2.h),
             blurRadius: 20.r,
             spreadRadius: 4.r,
@@ -142,6 +150,7 @@ class CustomAppBar extends StatelessWidget {
   }
 
   Widget _buildBackButton(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: onBackPressed ?? () => _handleBackPress(context),
       borderRadius: BorderRadius.circular(12.r),
@@ -149,7 +158,7 @@ class CustomAppBar extends StatelessWidget {
         width: 36.w,
         height: 36.w,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.12),
+          color: Colors.white.withOpacity(isDark ? 0.15 : 0.12),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Icon(
@@ -183,6 +192,7 @@ class MarkAllReadAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!show) return const SizedBox.shrink();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: EdgeInsets.only(right: 8.w),
@@ -194,7 +204,7 @@ class MarkAllReadAction extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withOpacity(isDark ? 0.2 : 0.2),
               borderRadius: BorderRadius.circular(20.r),
             ),
             child: Row(
@@ -236,6 +246,7 @@ class IconAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final button = InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
@@ -243,7 +254,7 @@ class IconAction extends StatelessWidget {
         width: 36.w,
         height: 36.w,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.12),
+          color: Colors.white.withOpacity(isDark ? 0.15 : 0.12),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Icon(icon, color: Colors.white, size: size ?? 18.sp),
@@ -275,6 +286,7 @@ class BadgeAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final button = InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
@@ -282,7 +294,7 @@ class BadgeAction extends StatelessWidget {
         width: 36.w,
         height: 36.w,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.12),
+          color: Colors.white.withOpacity(isDark ? 0.15 : 0.12),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Stack(

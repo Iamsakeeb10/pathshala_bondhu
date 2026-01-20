@@ -46,7 +46,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -118,10 +118,12 @@ class _ParentsScreenState extends State<ParentsScreen> {
         return Container(
           padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withOpacity(
+                  Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
+                ),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -134,7 +136,10 @@ class _ParentsScreenState extends State<ParentsScreen> {
             },
             decoration: InputDecoration(
               hintText: 'Search parent by name or phone',
-              hintStyle: TextStyle(color: AppColors.grey400, fontSize: 14.sp),
+              hintStyle: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
+                fontSize: 14.sp,
+              ),
               prefixIcon: provider.isSearching
                   ? Padding(
                       padding: EdgeInsets.all(12.w),
@@ -162,14 +167,24 @@ class _ParentsScreenState extends State<ParentsScreen> {
                     )
                   : null,
               filled: true,
-              fillColor: AppColors.grey100,
+              fillColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.surfaceDark
+                  : AppColors.grey100,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : Colors.transparent,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : Colors.transparent,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),

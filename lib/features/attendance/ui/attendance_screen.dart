@@ -31,7 +31,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -60,10 +60,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(color: AppColors.borderDark, width: 1.2)
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05,
+            ),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -75,8 +80,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.grey300),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey300,
+                ),
                 borderRadius: BorderRadius.circular(10.r),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.surfaceDark
+                    : Colors.transparent,
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
@@ -87,7 +99,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     final monthName = AttendanceProvider.months[index];
                     return DropdownMenuItem(
                       value: monthNum,
-                      child: Text(monthName),
+                      child: Text(
+                        monthName,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
+                        ),
+                      ),
                     );
                   }),
                   onChanged: (value) {
@@ -102,8 +119,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.grey300),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey300,
+                ),
                 borderRadius: BorderRadius.circular(10.r),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.surfaceDark
+                    : Colors.transparent,
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
@@ -113,7 +137,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       .map((year) {
                         return DropdownMenuItem(
                           value: year,
-                          child: Text(year.toString()),
+                          child: Text(
+                            year.toString(),
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
+                            ),
+                          ),
                         );
                       })
                       .toList(),
@@ -184,11 +213,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : Colors.transparent,
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -218,14 +255,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         '${child.classInfo} • ID: ${child.studentId}',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -280,7 +317,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         ),
         Text(
           label,
-          style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+          ),
         ),
       ],
     );
@@ -302,9 +342,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       margin: EdgeInsets.only(bottom: 8.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.1),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? statusColor.withOpacity(0.15)
+            : statusColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: statusColor.withOpacity(0.3)),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? statusColor.withOpacity(0.4)
+              : statusColor.withOpacity(0.3),
+        ),
       ),
       child: Row(
         children: [
@@ -325,6 +371,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
+                    color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                   ),
                 ),
                 Text(

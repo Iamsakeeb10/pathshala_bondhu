@@ -32,7 +32,7 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -139,11 +139,19 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : Colors.transparent,
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -174,14 +182,14 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         '${child.classInfo} • ID: ${child.studentId}',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -216,9 +224,15 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: AppColors.grey50,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.grey50,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.grey200),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,7 +272,7 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 8.h),
@@ -267,14 +281,14 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
               Icon(
                 Icons.access_time,
                 size: 16.sp,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
               ),
               SizedBox(width: 6.w),
               Text(
                 '${exam.startTime} - ${exam.endTime}',
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 ),
               ),
             ],
@@ -282,13 +296,17 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
           SizedBox(height: 4.h),
           Row(
             children: [
-              Icon(Icons.room, size: 16.sp, color: AppColors.textSecondary),
+              Icon(
+                Icons.room,
+                size: 16.sp,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+              ),
               SizedBox(width: 6.w),
               Text(
                 'Room: ${exam.roomNumber}',
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 ),
               ),
             ],

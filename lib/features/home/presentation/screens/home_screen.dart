@@ -413,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                   letterSpacing: 0.3,
                 ),
               ),
@@ -427,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
               ),
             ),
           ),
@@ -437,13 +437,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTopSection(double sliderHeight) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primary, AppColors.primaryDark, AppColors.accent],
+          colors: isDark
+              ? [
+                  const Color(0xFF283447), // Professional dark blue-gray
+                  const Color(0xFF1F2937), // backgroundDark
+                  const Color(0xFF111827), // darker shade
+                ]
+              : [AppColors.primary, AppColors.primaryDark, AppColors.accent],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(28.r),
@@ -451,7 +458,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.25),
+            color: isDark
+                ? Colors.black.withOpacity(0.4)
+                : AppColors.primary.withOpacity(0.25),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -504,22 +513,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 6.h),
 
                   // Name - Bold and prominent
-                  Text(
-                    userName,
-                    style: TextStyle(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      height: 1.1,
-                      letterSpacing: 0.5,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withOpacity(0.15),
-                          offset: Offset(0, 2.h),
-                          blurRadius: 8.r,
+                  Builder(
+                    builder: (context) {
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      return Text(
+                        userName,
+                        style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.1,
+                          letterSpacing: 0.5,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(isDark ? 0.3 : 0.15),
+                              offset: Offset(0, 2.h),
+                              blurRadius: 8.r,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
 
                   // Designation Badge - Modern pill design
@@ -804,10 +818,12 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(18.r),
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(18.r),
             border: Border.all(
-              color: AppColors.grey200.withOpacity(0.6),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.borderDark
+                  : AppColors.grey200.withOpacity(0.6),
               width: 1.2,
             ),
             boxShadow: [
@@ -858,7 +874,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 11.5.sp,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                     height: 1.3,
                     letterSpacing: 0.1,
                   ),

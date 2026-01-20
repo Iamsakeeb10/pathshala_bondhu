@@ -32,7 +32,7 @@ class _BooksScreenState extends State<BooksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -149,11 +149,19 @@ class _BooksScreenState extends State<BooksScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : Colors.transparent,
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -185,14 +193,14 @@ class _BooksScreenState extends State<BooksScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         '${child.classInfo} • ID: ${child.studentId}',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -249,7 +257,7 @@ class _BooksScreenState extends State<BooksScreen> {
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -279,28 +287,28 @@ class _BooksScreenState extends State<BooksScreen> {
                 'Subject: ${book.subject}',
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 ),
               ),
               Text(
                 'Author: ${book.author}',
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 ),
               ),
               Text(
                 'Publisher: ${book.publisher}',
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 ),
               ),
               Text(
                 'Edition: ${book.edition}',
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                 ),
               ),
             ],

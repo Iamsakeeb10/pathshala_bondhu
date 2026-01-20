@@ -53,11 +53,19 @@ class PersonCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : Colors.transparent,
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
+            ),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -87,7 +95,7 @@ class PersonCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -115,7 +123,7 @@ class PersonCard extends StatelessWidget {
                           spacing: 8.w,
                           runSpacing: 6.h,
                           children: chips
-                              .map((chip) => _buildChip(chip))
+                              .map((chip) => _buildChip(context, chip))
                               .toList(),
                         ),
                       ],
@@ -156,7 +164,7 @@ class PersonCard extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 16.sp,
-                  color: AppColors.grey400,
+                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
                 ),
               ],
             ),
@@ -206,11 +214,13 @@ class PersonCard extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(PersonCardChip chip) {
+  Widget _buildChip(BuildContext context, PersonCardChip chip) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: AppColors.grey100,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.grey100,
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
@@ -219,7 +229,7 @@ class PersonCard extends StatelessWidget {
           Icon(
             chip.icon,
             size: 12.sp,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
           ),
           SizedBox(width: 5.w),
           Flexible(
@@ -228,7 +238,7 @@ class PersonCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11.sp,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

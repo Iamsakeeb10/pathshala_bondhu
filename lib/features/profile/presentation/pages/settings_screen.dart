@@ -110,7 +110,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -213,7 +215,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -346,7 +350,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -468,7 +474,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -477,6 +485,7 @@ class SettingsScreen extends StatelessWidget {
       child: Column(
         children: [
           _buildAboutItem(
+            context,
             icon: Icons.info_rounded,
             title: localizations.translate('app_version'),
             subtitle: '1.0.0',
@@ -485,9 +494,12 @@ class SettingsScreen extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: AppColors.grey200.withOpacity(0.5),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.borderDark
+                : AppColors.grey200.withOpacity(0.5),
           ),
           _buildAboutItem(
+            context,
             icon: Icons.privacy_tip_rounded,
             title: localizations.translate('privacy_policy'),
             hasArrow: true,
@@ -496,9 +508,12 @@ class SettingsScreen extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: AppColors.grey200.withOpacity(0.5),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.borderDark
+                : AppColors.grey200.withOpacity(0.5),
           ),
           _buildAboutItem(
+            context,
             icon: Icons.description_rounded,
             title: localizations.translate('terms_conditions'),
             hasArrow: true,
@@ -510,7 +525,8 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutItem({
+  Widget _buildAboutItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
     String? subtitle,

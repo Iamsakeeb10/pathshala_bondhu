@@ -31,7 +31,7 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -158,11 +158,19 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : Colors.transparent,
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -194,14 +202,14 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         '${child.classInfo} • ID: ${child.studentId}',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -259,9 +267,15 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
       margin: EdgeInsets.only(bottom: 8.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: AppColors.grey50,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.grey50,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.grey200),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200,
+        ),
       ),
       child: Row(
         children: [
@@ -283,7 +297,7 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -291,14 +305,14 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
                   '${routine.startTime} - ${routine.endTime}',
                   style: TextStyle(
                     fontSize: 13.sp,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                   ),
                 ),
                 Text(
                   'Teacher: ${routine.teacherName}',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                   ),
                 ),
                 if (routine.roomNumber != '---')
@@ -306,7 +320,7 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
                     'Room: ${routine.roomNumber}',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                     ),
                   ),
               ],

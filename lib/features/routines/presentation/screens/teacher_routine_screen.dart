@@ -137,11 +137,11 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
       margin: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 12.h),
       height: 48.h,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.06),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -380,11 +380,16 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: isOngoing
             ? Border.all(color: AppColors.success, width: 2)
-            : Border.all(color: AppColors.grey200.withOpacity(0.6), width: 1.2),
+            : Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.borderDark
+                    : AppColors.grey200.withOpacity(0.6),
+                width: 1.2,
+              ),
         boxShadow: [
           BoxShadow(
             color: isOngoing

@@ -57,7 +57,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -184,7 +184,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                     vertical: 12.h,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Row(
@@ -205,14 +205,14 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                             ),
                           ),
                         ],
                       ),
                       Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.grey600,
+                        color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey600,
                         size: 24.sp,
                       ),
                     ],
@@ -229,11 +229,19 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
   Widget _buildDiaryCard(ParentDiaryEntry diary) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : Colors.transparent,
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -279,7 +287,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                   diary.teacherName,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -291,7 +299,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
               ),
             ),
             SizedBox(height: 8.h),
@@ -299,13 +307,18 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
               diary.description,
               style: TextStyle(
                 fontSize: 14.sp,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
                 height: 1.5,
               ),
             ),
-            if (diary.submissionDate.isNotEmpty) ...[
+              if (diary.submissionDate.isNotEmpty) ...[
               SizedBox(height: 12.h),
-              Divider(color: AppColors.grey200, height: 1),
+              Divider(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.borderDark
+                    : AppColors.grey200,
+                height: 1,
+              ),
               SizedBox(height: 12.h),
               Row(
                 children: [
@@ -320,7 +333,7 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -372,13 +385,16 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 8.h),
           Text(
             'There are no diary entries for this date.',
-            style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -399,14 +415,16 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
               ),
             ),
             SizedBox(height: 8.h),
             Text(
               provider.errorMessage ?? 'Unknown error',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+              ),
             ),
             SizedBox(height: 24.h),
             ElevatedButton.icon(

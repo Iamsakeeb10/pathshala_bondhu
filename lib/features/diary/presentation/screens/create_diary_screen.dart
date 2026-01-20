@@ -278,7 +278,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -305,7 +305,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                           'Loading form data...',
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -496,7 +496,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                   ),
                 ),
                 SizedBox(height: 4.h),
@@ -506,7 +506,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                       : 'Fill in the details to create a new class diary.',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
                   ),
@@ -527,10 +527,12 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: AppColors.grey200.withOpacity(0.6),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200.withOpacity(0.6),
           width: 1.2,
         ),
         boxShadow: [
@@ -560,7 +562,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                 ),
               ),
             ],
@@ -593,7 +595,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                 letterSpacing: 0.2,
               ),
             ),
@@ -614,10 +616,12 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: AppColors.grey200.withOpacity(0.6),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.borderDark
+                    : AppColors.grey200.withOpacity(0.6),
                 width: 1.2,
               ),
             ),
@@ -627,7 +631,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                 hint: Text(
                   hint,
                   style: TextStyle(
-                    color: AppColors.grey400,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                   ),
@@ -645,7 +649,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                       itemLabel(item),
                       style: TextStyle(
                         fontSize: 14.sp,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

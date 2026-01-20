@@ -498,12 +498,14 @@ class _NotificationCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: notification.isRead
-            ? AppColors.surfaceLight
+            ? Theme.of(context).cardColor
             : color.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: notification.isRead
-              ? AppColors.grey200.withOpacity(0.6)
+              ? (Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.borderDark
+                  : AppColors.grey200.withOpacity(0.6))
               : color.withOpacity(0.15),
           width: 1.w,
         ),

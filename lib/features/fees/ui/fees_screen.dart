@@ -62,10 +62,13 @@ class _FeesScreenState extends State<FeesScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(color: AppColors.borderDark, width: 1.2)
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -75,15 +78,26 @@ class _FeesScreenState extends State<FeesScreen> {
         children: [
           Text(
             '${localizations.translate('academic_year')}:',
-            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
+            ),
           ),
           SizedBox(width: 12.w),
           Expanded(
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.grey300),
+                border: Border.all(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey300,
+                ),
                 borderRadius: BorderRadius.circular(10.r),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.surfaceDark
+                    : Colors.transparent,
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
@@ -93,7 +107,12 @@ class _FeesScreenState extends State<FeesScreen> {
                       .map((year) {
                         return DropdownMenuItem(
                           value: year,
-                          child: Text(year.toString()),
+                          child: Text(
+                            year.toString(),
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
+                            ),
+                          ),
                         );
                       })
                       .toList(),
@@ -141,7 +160,6 @@ class _FeesScreenState extends State<FeesScreen> {
   }
 
   Widget _buildFeesList(FeesResponse data, BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
     final studentProvider = context.watch<StudentProvider>();
     final selectedStudent = studentProvider.selectedStudent;
 
@@ -186,20 +204,22 @@ class _FeesScreenState extends State<FeesScreen> {
   }
 
   Widget _buildStudentFees(
-    ChildFees child, [
+    ChildFees child,
     List<MonthlyFee>? overrideMonthlyBreakdown,
-    BuildContext? context,
-  ]) {
-    final localizations = context != null ? AppLocalizations.of(context)! : null;
+    BuildContext context,
+  ) {
     final monthlyBreakdown = overrideMonthlyBreakdown ?? child.monthlyBreakdown;
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(color: AppColors.borderDark, width: 1.2)
+            : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -229,14 +249,14 @@ class _FeesScreenState extends State<FeesScreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         '${child.classInfo} • ID: ${child.studentId}',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -282,23 +302,33 @@ class _FeesScreenState extends State<FeesScreen> {
     );
   }
 
-  Widget _buildMonthCard(MonthlyFee fee, BuildContext? context) {
-    final localizations = context != null ? AppLocalizations.of(context)! : null;
+  Widget _buildMonthCard(MonthlyFee fee, BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     final isPaid = fee.isPaid;
     final color = isPaid ? Colors.green : Colors.red;
 
     return Container(
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? color.withOpacity(0.15)
+            : color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? color.withOpacity(0.4)
+              : color.withOpacity(0.3),
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             fee.monthName.substring(0, 3),
-            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).textTheme.titleSmall?.color ?? AppColors.textPrimary,
+            ),
           ),
           SizedBox(height: 4.h),
           Text(
@@ -311,8 +341,8 @@ class _FeesScreenState extends State<FeesScreen> {
           ),
           Text(
             isPaid 
-                ? (localizations?.translate('paid') ?? 'Paid')
-                : (localizations?.translate('unpaid') ?? 'Unpaid'),
+                ? localizations.translate('paid')
+                : localizations.translate('unpaid'),
             style: TextStyle(fontSize: 10.sp, color: color),
           ),
         ],

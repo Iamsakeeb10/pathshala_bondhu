@@ -70,30 +70,41 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             // Gradient Header with Profile
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primary,
-                    AppColors.primaryDark,
-                    AppColors.accent,
-                  ],
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(32.r),
-                  bottomRight: Radius.circular(32.r),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.25),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+            Builder(
+              builder: (context) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                return Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? [
+                              const Color(0xFF283447), // Professional dark blue-gray
+                              const Color(0xFF1F2937), // backgroundDark
+                              const Color(0xFF111827), // darker shade
+                            ]
+                          : [
+                              AppColors.primary,
+                              AppColors.primaryDark,
+                              AppColors.accent,
+                            ],
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(32.r),
+                      bottomRight: Radius.circular(32.r),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withOpacity(0.4)
+                            : AppColors.primary.withOpacity(0.25),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                ],
-              ),
               child: SafeArea(
                 bottom: false,
                 child: Padding(
@@ -182,6 +193,13 @@ class ProfileScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           letterSpacing: 0.3,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.3),
+                              offset: Offset(0, 2.h),
+                              blurRadius: 8.r,
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(height: 4.h),
@@ -208,6 +226,8 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               ),
+                );
+              },
             ),
 
             // Menu Items

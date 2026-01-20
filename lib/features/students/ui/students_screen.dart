@@ -33,7 +33,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -94,14 +94,21 @@ class _StudentsScreenState extends State<StudentsScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: isSelected
             ? Border.all(color: AppColors.primary, width: 2)
-            : null,
+            : Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.borderDark
+                    : Colors.transparent,
+                width: 1.2,
+              ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(
+              Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.06,
+            ),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -158,7 +165,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
                             style: TextStyle(
                               fontSize: 17.sp,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 4.h),
@@ -216,7 +223,9 @@ class _StudentsScreenState extends State<StudentsScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color: AppColors.grey100,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.grey100,
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
@@ -229,7 +238,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
             ),
           ),
         ],

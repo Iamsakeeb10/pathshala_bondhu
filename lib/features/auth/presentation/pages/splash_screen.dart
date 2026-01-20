@@ -84,6 +84,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -92,11 +93,17 @@ class _SplashScreenState extends State<SplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary,
-              AppColors.primaryDark,
-              AppColors.primary.withBlue(180),
-            ],
+            colors: isDark
+                ? [
+                    const Color(0xFF283447), // Professional dark blue-gray
+                    const Color(0xFF1F2937), // backgroundDark
+                    const Color(0xFF111827), // darker shade
+                  ]
+                : [
+                    AppColors.primary,
+                    AppColors.primaryDark,
+                    AppColors.primary.withBlue(180),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -121,11 +128,11 @@ class _SplashScreenState extends State<SplashScreen>
                   width: 140.w,
                   height: 140.w,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF283447) : Colors.white,
                     borderRadius: BorderRadius.circular(30.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withOpacity(isDark ? 0.5 : 0.2),
                         blurRadius: 30,
                         offset: const Offset(0, 15),
                       ),
@@ -161,6 +168,15 @@ class _SplashScreenState extends State<SplashScreen>
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         letterSpacing: 1.2,
+                        shadows: isDark
+                            ? [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.5),
+                                  offset: Offset(0, 2.h),
+                                  blurRadius: 8.r,
+                                ),
+                              ]
+                            : null,
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -171,6 +187,15 @@ class _SplashScreenState extends State<SplashScreen>
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withOpacity(0.9),
                         letterSpacing: 2,
+                        shadows: isDark
+                            ? [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  offset: Offset(0, 1.h),
+                                  blurRadius: 4.r,
+                                ),
+                              ]
+                            : null,
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -180,8 +205,14 @@ class _SplashScreenState extends State<SplashScreen>
                         vertical: 6.h,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withOpacity(isDark ? 0.15 : 0.2),
                         borderRadius: BorderRadius.circular(20.r),
+                        border: isDark
+                            ? Border.all(
+                                color: Colors.white.withOpacity(0.1),
+                                width: 1,
+                              )
+                            : null,
                       ),
                       child: Text(
                         'Your School Companion',
@@ -215,7 +246,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withOpacity(0.8),
+                          Colors.white.withOpacity(isDark ? 0.9 : 0.8),
                         ),
                       ),
                     ),
@@ -224,7 +255,16 @@ class _SplashScreenState extends State<SplashScreen>
                       'Loading...',
                       style: TextStyle(
                         fontSize: 13.sp,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withOpacity(isDark ? 0.85 : 0.7),
+                        shadows: isDark
+                            ? [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  offset: Offset(0, 1.h),
+                                  blurRadius: 2.r,
+                                ),
+                              ]
+                            : null,
                       ),
                     ),
                   ],

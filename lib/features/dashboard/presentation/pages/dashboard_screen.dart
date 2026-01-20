@@ -53,7 +53,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         showElevation: true,
         height: 65,
         iconSize: 24,
-        backgroundColor: AppColors.surfaceLight,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF283447)
+            : Theme.of(context).cardColor,
         animationDuration: const Duration(milliseconds: 250),
         animationCurve: Curves.easeInOutCubic,
         shadows: [
@@ -104,7 +106,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
           ),
           activeColor: AppColors.primary,
-          inactiveColor: AppColors.textSecondary,
+          inactiveColor: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.textDarkSecondary
+              : AppColors.textSecondary,
         ),
         FlashyTabBarItem(
           icon: const Icon(Icons.school_rounded),
@@ -113,7 +117,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
           ),
           activeColor: AppColors.primary,
-          inactiveColor: AppColors.textSecondary,
+          inactiveColor: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.textDarkSecondary
+              : AppColors.textSecondary,
         ),
         FlashyTabBarItem(
           icon: const Icon(Icons.family_restroom_rounded),
@@ -122,7 +128,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
           ),
           activeColor: AppColors.primary,
-          inactiveColor: AppColors.textSecondary,
+          inactiveColor: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.textDarkSecondary
+              : AppColors.textSecondary,
         ),
         FlashyTabBarItem(
           icon: const Icon(Icons.person_rounded),
@@ -131,7 +139,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
           ),
           activeColor: AppColors.primary,
-          inactiveColor: AppColors.textSecondary,
+          inactiveColor: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.textDarkSecondary
+              : AppColors.textSecondary,
         ),
       ];
     }
@@ -139,52 +149,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Parent role (or default)
     return [
       FlashyTabBarItem(
-        icon: Icon(
-          Icons.home_rounded,
-          color: AppColors.dividerDark.withOpacity(0.7),
-        ),
+        icon: const Icon(Icons.home_rounded),
         title: Text(
           'Home',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
         ),
         activeColor: AppColors.primary,
-        inactiveColor: AppColors.textSecondary,
+        inactiveColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.textDarkSecondary
+            : AppColors.textSecondary,
       ),
       FlashyTabBarItem(
-        icon: Icon(
-          Icons.people_rounded,
-          color: AppColors.dividerDark.withOpacity(0.7),
-        ),
+        icon: const Icon(Icons.people_rounded),
         title: Text(
           'Students',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
         ),
         activeColor: AppColors.primary,
-        inactiveColor: AppColors.textSecondary,
+        inactiveColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.textDarkSecondary
+            : AppColors.textSecondary,
       ),
       FlashyTabBarItem(
-        icon: Icon(
-          Icons.school_rounded,
-          color: AppColors.dividerDark.withOpacity(0.7),
-        ),
+        icon: const Icon(Icons.school_rounded),
         title: Text(
           'Teachers',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
         ),
         activeColor: AppColors.primary,
-        inactiveColor: AppColors.textSecondary,
+        inactiveColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.textDarkSecondary
+            : AppColors.textSecondary,
       ),
       FlashyTabBarItem(
-        icon: Icon(
-          Icons.person_rounded,
-          color: AppColors.dividerDark.withOpacity(0.7),
-        ),
+        icon: const Icon(Icons.person_rounded),
         title: Text(
           'Profile',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
         ),
         activeColor: AppColors.primary,
-        inactiveColor: AppColors.textSecondary,
+        inactiveColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.textDarkSecondary
+            : AppColors.textSecondary,
       ),
     ];
   }

@@ -108,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final localizations = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: SizedBox.expand(
@@ -116,11 +117,17 @@ class _LoginScreenState extends State<LoginScreen>
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppColors.primary.withOpacity(0.1),
-                AppColors.backgroundLight,
-                AppColors.primaryLight.withOpacity(0.05),
-              ],
+              colors: isDark
+                  ? [
+                      const Color(0xFF283447), // Professional dark blue-gray
+                      const Color(0xFF1F2937), // backgroundDark
+                      const Color(0xFF111827), // darker shade
+                    ]
+                  : [
+                      AppColors.primary.withOpacity(0.1),
+                      AppColors.backgroundLight,
+                      AppColors.primaryLight.withOpacity(0.05),
+                    ],
             ),
           ),
           child: SafeArea(
@@ -132,15 +139,15 @@ class _LoginScreenState extends State<LoginScreen>
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 20.h),
-                    _buildHeader(localizations),
+                    _buildHeader(localizations, isDark),
                     SizedBox(height: 40.h),
-                    _buildRoleSelector(localizations),
+                    _buildRoleSelector(localizations, isDark),
                     SizedBox(height: 32.h),
                     _buildLoginForm(localizations),
                     SizedBox(height: 24.h),
                     _buildLoginButton(authProvider, localizations),
                     SizedBox(height: 16.h),
-                    _buildForgotPassword(localizations),
+                    _buildForgotPassword(localizations, isDark),
                   ],
                 ),
               ),
@@ -151,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildHeader(AppLocalizations localizations) {
+  Widget _buildHeader(AppLocalizations localizations, bool isDark) {
     return Column(
       children: [
         Container(
@@ -162,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen>
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withOpacity(isDark ? 0.4 : 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -176,24 +183,52 @@ class _LoginScreenState extends State<LoginScreen>
           style: TextStyle(
             fontSize: 28.sp,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: isDark
+                ? Colors.white
+                : (Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary),
+            shadows: isDark
+                ? [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.3),
+                      offset: Offset(0, 2.h),
+                      blurRadius: 8.r,
+                    ),
+                  ]
+                : null,
           ),
         ),
         SizedBox(height: 8.h),
         Text(
           localizations.translate('sign_in_to_continue'),
-          style: TextStyle(fontSize: 16.sp, color: AppColors.textSecondary),
+          style: TextStyle(
+            fontSize: 16.sp,
+            color: isDark
+                ? Colors.white.withOpacity(0.85)
+                : (Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary),
+            shadows: isDark
+                ? [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.2),
+                      offset: Offset(0, 1.h),
+                      blurRadius: 4.r,
+                    ),
+                  ]
+                : null,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildRoleSelector(AppLocalizations localizations) {
+  Widget _buildRoleSelector(AppLocalizations localizations, bool isDark) {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: AppColors.grey100,
+        color: isDark ? AppColors.surfaceDark : AppColors.grey100,
         borderRadius: BorderRadius.circular(12.r),
+        border: isDark
+            ? Border.all(color: AppColors.borderDark, width: 1.2)
+            : null,
       ),
       child: Row(
         children: [
@@ -223,7 +258,9 @@ class _LoginScreenState extends State<LoginScreen>
     required IconData icon,
   }) {
     final isSelected = _selectedRole == role;
-    return GestureDetector(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Builder(
+      builder: (context) => GestureDetector(
       onTap: () => _switchRole(role),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -234,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen>
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withOpacity(isDark ? 0.4 : 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -247,7 +284,11 @@ class _LoginScreenState extends State<LoginScreen>
             Icon(
               icon,
               size: 20.sp,
-              color: isSelected ? Colors.white : AppColors.textSecondary,
+              color: isSelected
+                  ? Colors.white
+                  : (isDark
+                      ? AppColors.textDarkSecondary
+                      : AppColors.textSecondary),
             ),
             SizedBox(width: 8.w),
             Text(
@@ -255,12 +296,17 @@ class _LoginScreenState extends State<LoginScreen>
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.textSecondary,
+                color: isSelected
+                    ? Colors.white
+                    : (isDark
+                        ? AppColors.textDarkSecondary
+                        : AppColors.textSecondary),
               ),
             ),
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -320,7 +366,10 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildPasswordField(AppLocalizations localizations) {
-    return CustomTextField(
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return CustomTextField(
       controller: _passwordController,
       label: localizations.translate('password'),
       hint: localizations.translate('enter_password'),
@@ -333,7 +382,9 @@ class _LoginScreenState extends State<LoginScreen>
               ? Icons.visibility_outlined
               : Icons.visibility_off_outlined,
           size: 22.sp,
-          color: AppColors.textSecondary,
+          color: isDark
+              ? AppColors.textDarkSecondary
+              : AppColors.textSecondary,
         ),
         onPressed: () {
           setState(() {
@@ -352,6 +403,8 @@ class _LoginScreenState extends State<LoginScreen>
           return 'Password must not exceed 10 characters';
         }
         return null;
+      },
+    );
       },
     );
   }
@@ -381,7 +434,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildForgotPassword(AppLocalizations localizations) {
+  Widget _buildForgotPassword(AppLocalizations localizations, bool isDark) {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton(
@@ -392,8 +445,19 @@ class _LoginScreenState extends State<LoginScreen>
           localizations.translate('forgot_password'),
           style: TextStyle(
             fontSize: 14.sp,
-            color: AppColors.primaryDark,
+            color: isDark
+                ? AppColors.primaryLight
+                : AppColors.primaryDark,
             fontWeight: FontWeight.w600,
+            shadows: isDark
+                ? [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.2),
+                      offset: Offset(0, 1.h),
+                      blurRadius: 2.r,
+                    ),
+                  ]
+                : null,
           ),
         ),
       ),

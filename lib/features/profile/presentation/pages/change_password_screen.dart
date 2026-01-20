@@ -76,7 +76,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
@@ -183,7 +183,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
                   ),
                 ),
                 SizedBox(height: 4.h),
@@ -191,7 +191,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   'Create a strong password to keep your account secure.',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
                   ),
@@ -224,7 +224,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
                 letterSpacing: 0.2,
               ),
             ),
@@ -252,18 +252,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     : null,
             style: TextStyle(
               fontSize: 15.sp,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
               counterText: '',
               hintText: 'Enter $label',
               hintStyle: TextStyle(
-                color: AppColors.grey400,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
               ),
-              fillColor: Colors.white,
+              fillColor: Theme.of(context).cardColor,
               filled: true,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 16.w,
@@ -282,14 +282,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14.r),
                 borderSide: BorderSide(
-                  color: AppColors.grey200.withOpacity(0.6),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey200.withOpacity(0.6),
                   width: 1.2,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14.r),
                 borderSide: BorderSide(
-                  color: AppColors.grey200.withOpacity(0.6),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey200.withOpacity(0.6),
                   width: 1.2,
                 ),
               ),
@@ -321,9 +325,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: AppColors.grey100,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.grey100,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.grey200.withOpacity(0.6), width: 1),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.borderDark
+              : AppColors.grey200.withOpacity(0.6),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +344,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 8.h),
@@ -361,7 +372,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               text,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: AppColors.grey600,
+                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey600,
                 fontWeight: FontWeight.w500,
               ),
             ),
