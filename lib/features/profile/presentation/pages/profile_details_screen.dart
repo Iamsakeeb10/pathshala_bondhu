@@ -73,10 +73,14 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                         ),
                         SizedBox(height: 16.h),
                         Text(
-                          AppLocalizations.of(context)!.translate('loading_profile'),
+                          AppLocalizations.of(
+                            context,
+                          )!.translate('loading_profile'),
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
+                                AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -106,11 +110,17 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                           ),
                           SizedBox(height: 16.h),
                           Text(
-                            AppLocalizations.of(context)!.translate('error_loading_profile'),
+                            AppLocalizations.of(
+                              context,
+                            )!.translate('error_loading_profile'),
                             style: TextStyle(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.titleLarge?.color ??
+                                  AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 8.h),
@@ -119,7 +129,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14.sp,
-                              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.color ??
+                                  AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -147,10 +161,14 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                       ),
                       SizedBox(height: 16.h),
                       Text(
-                        AppLocalizations.of(context)!.translate('no_profile_data_found'),
+                        AppLocalizations.of(
+                          context,
+                        )!.translate('no_profile_data_found'),
                         style: TextStyle(
                           fontSize: 16.sp,
-                          color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                          color:
+                              Theme.of(context).textTheme.bodyMedium?.color ??
+                              AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -179,7 +197,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                 children: [
                   _buildAvatarSection(user.fatherName, null),
                   SizedBox(height: 32.h),
-                  _buildSectionTitle(localizations.translate('personal_information')),
+                  _buildSectionTitle(
+                    localizations.translate('personal_information'),
+                  ),
                   SizedBox(height: 12.h),
                   _buildInfoCard([
                     _InfoItem(
@@ -204,7 +224,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                     ),
                   ]),
                   SizedBox(height: 24.h),
-                  _buildSectionTitle(localizations.translate('contact_details')),
+                  _buildSectionTitle(
+                    localizations.translate('contact_details'),
+                  ),
                   SizedBox(height: 12.h),
                   _buildInfoCard([
                     _InfoItem(
@@ -219,7 +241,6 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                     ),
                   ]),
                   SizedBox(height: 32.h),
-                  _buildChangePasswordButton(context),
                 ],
               );
             },
@@ -245,7 +266,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                 children: [
                   _buildAvatarSection(user.name, user.avatar),
                   SizedBox(height: 32.h),
-                  _buildSectionTitle(localizations.translate('personal_information')),
+                  _buildSectionTitle(
+                    localizations.translate('personal_information'),
+                  ),
                   SizedBox(height: 12.h),
                   _buildInfoCard([
                     _InfoItem(
@@ -364,7 +387,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
             style: TextStyle(
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+              color:
+                  Theme.of(context).textTheme.titleLarge?.color ??
+                  AppColors.textPrimary,
               letterSpacing: 0.3,
             ),
           ),
@@ -390,7 +415,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+            color:
+                Theme.of(context).textTheme.titleLarge?.color ??
+                AppColors.textPrimary,
             letterSpacing: 0.3,
           ),
         ),
@@ -464,7 +491,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             item.label,
                             style: TextStyle(
                               fontSize: 12.sp,
-                              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.color ??
+                                  AppColors.grey500,
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.2,
                             ),
@@ -474,7 +505,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             item.value,
                             style: TextStyle(
                               fontSize: 15.sp,
-                              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.titleLarge?.color ??
+                                  AppColors.textPrimary,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.1,
                             ),

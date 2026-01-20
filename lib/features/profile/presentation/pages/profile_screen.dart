@@ -81,7 +81,9 @@ class ProfileScreen extends StatelessWidget {
                       end: Alignment.bottomRight,
                       colors: isDark
                           ? [
-                              const Color(0xFF283447), // Professional dark blue-gray
+                              const Color(
+                                0xFF283447,
+                              ), // Professional dark blue-gray
                               const Color(0xFF1F2937), // backgroundDark
                               const Color(0xFF111827), // darker shade
                             ]
@@ -105,127 +107,128 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-              child: SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 32.h),
-                  child: Column(
-                    children: [
-                      // Avatar with premium styling
-                      Stack(
+                  child: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 32.h),
+                      child: Column(
                         children: [
-                          Container(
-                            padding: EdgeInsets.all(4.w),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.white.withOpacity(0.3),
-                                  Colors.white.withOpacity(0.1),
-                                ],
-                              ),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.all(3.w),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                              ),
-                              child: CircleAvatar(
-                                radius: 50.r,
-                                backgroundColor: AppColors.primary.withOpacity(
-                                  0.15,
+                          // Avatar with premium styling
+                          Stack(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(4.w),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.white.withOpacity(0.3),
+                                      Colors.white.withOpacity(0.1),
+                                    ],
+                                  ),
                                 ),
-                                backgroundImage: user?.avatarUrl != null
-                                    ? NetworkImage(user!.avatarUrl!)
-                                    : null,
-                                child: user?.avatarUrl == null
-                                    ? Text(
-                                        (user?.name.isNotEmpty ?? false)
-                                            ? user!.name[0].toUpperCase()
-                                            : '?',
-                                        style: TextStyle(
-                                          fontSize: 36.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primary,
-                                        ),
-                                      )
-                                    : null,
+                                child: Container(
+                                  padding: EdgeInsets.all(3.w),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 50.r,
+                                    backgroundColor: AppColors.primary
+                                        .withOpacity(0.15),
+                                    backgroundImage: user?.avatarUrl != null
+                                        ? NetworkImage(user!.avatarUrl!)
+                                        : null,
+                                    child: user?.avatarUrl == null
+                                        ? Text(
+                                            (user?.name.isNotEmpty ?? false)
+                                                ? user!.name[0].toUpperCase()
+                                                : '?',
+                                            style: TextStyle(
+                                              fontSize: 36.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primary,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                ),
                               ),
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: Container(
+                                  padding: EdgeInsets.all(8.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.success,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 3,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.success.withOpacity(
+                                          0.3,
+                                        ),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.verified,
+                                    color: Colors.white,
+                                    size: 16.sp,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            user?.name ?? 'User',
+                            style: TextStyle(
+                              fontSize: 24.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 0.3,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  offset: Offset(0, 2.h),
+                                  blurRadius: 8.r,
+                                ),
+                              ],
                             ),
                           ),
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(8.w),
-                              decoration: BoxDecoration(
-                                color: AppColors.success,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.success.withOpacity(0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.verified,
+                          SizedBox(height: 4.h),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Text(
+                              user?.role.name.toUpperCase() ?? '',
+                              style: TextStyle(
+                                fontSize: 12.sp,
                                 color: Colors.white,
-                                size: 16.sp,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 16.h),
-                      Text(
-                        user?.name ?? 'User',
-                        style: TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 0.3,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black.withOpacity(0.3),
-                              offset: Offset(0, 2.h),
-                              blurRadius: 8.r,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: Text(
-                          user?.role.name.toUpperCase() ?? '',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
                 );
               },
             ),
@@ -252,9 +255,7 @@ class ProfileScreen extends StatelessWidget {
                     title: localizations.translate('change_password'),
                     subtitle: localizations.translate('update_password'),
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(localizations.translate('coming_soon'))),
-                      );
+                      context.push('/profile/details/change-password');
                     },
                   ),
                   SizedBox(height: 24.h),
@@ -272,10 +273,14 @@ class ProfileScreen extends StatelessWidget {
                     context,
                     icon: Icons.notifications_outlined,
                     title: localizations.translate('notifications'),
-                    subtitle: localizations.translate('manage_notification_settings'),
+                    subtitle: localizations.translate(
+                      'manage_notification_settings',
+                    ),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(localizations.translate('coming_soon'))),
+                        SnackBar(
+                          content: Text(localizations.translate('coming_soon')),
+                        ),
                       );
                     },
                   ),
@@ -289,7 +294,9 @@ class ProfileScreen extends StatelessWidget {
                     subtitle: localizations.translate('get_help_account'),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(localizations.translate('coming_soon'))),
+                        SnackBar(
+                          content: Text(localizations.translate('coming_soon')),
+                        ),
                       );
                     },
                   ),
@@ -301,7 +308,9 @@ class ProfileScreen extends StatelessWidget {
                     subtitle: localizations.translate('app_version_info'),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(localizations.translate('coming_soon'))),
+                        SnackBar(
+                          content: Text(localizations.translate('coming_soon')),
+                        ),
                       );
                     },
                   ),
@@ -321,7 +330,9 @@ class ProfileScreen extends StatelessWidget {
                       '${localizations.translate('version')} 1.0.0',
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                        color:
+                            Theme.of(context).textTheme.bodySmall?.color ??
+                            AppColors.grey500,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -344,7 +355,9 @@ class ProfileScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.sp,
             fontWeight: FontWeight.w700,
-            color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+            color:
+                Theme.of(context).textTheme.bodySmall?.color ??
+                AppColors.textSecondary,
             letterSpacing: 0.5,
           ),
         ),
@@ -374,8 +387,8 @@ class ProfileScreen extends StatelessWidget {
               color: isDestructive
                   ? AppColors.error.withOpacity(0.2)
                   : (Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.borderDark
-                      : AppColors.grey200.withOpacity(0.6)),
+                        ? AppColors.borderDark
+                        : AppColors.grey200.withOpacity(0.6)),
               width: 1.2,
             ),
             boxShadow: [
@@ -433,7 +446,8 @@ class ProfileScreen extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: isDestructive
                             ? AppColors.error
-                            : (Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary),
+                            : (Theme.of(context).textTheme.titleLarge?.color ??
+                                  AppColors.textPrimary),
                         letterSpacing: 0.1,
                       ),
                     ),
@@ -443,7 +457,9 @@ class ProfileScreen extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.grey500,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -454,7 +470,9 @@ class ProfileScreen extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16.sp,
-                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    AppColors.grey400,
               ),
             ],
           ),
