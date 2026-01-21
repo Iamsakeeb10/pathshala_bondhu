@@ -20,7 +20,9 @@ class TeacherAttendanceProvider extends ChangeNotifier {
   // Mark Attendance State
   List<TeacherStudent> _students = [];
   Map<int, String> _attendanceMap = {}; // studentId (int ID) -> status ('present'/'absent')
+  Map<int, String> _remarksMap = {}; // studentId (int ID) -> remarks (optional)
   bool _isSubmitting = false;
+  bool _isAlreadySubmitted = false;
 
   // History State
   List<AttendanceHistoryRecord> _historyRecords = [];
@@ -39,11 +41,13 @@ class TeacherAttendanceProvider extends ChangeNotifier {
   
   List<TeacherStudent> get students => _students;
   Map<int, String> get attendanceMap => _attendanceMap;
+  Map<int, String> get remarksMap => _remarksMap;
   bool get isSubmitting => _isSubmitting;
   
   List<AttendanceHistoryRecord> get historyRecords => _historyRecords;
   DateTime get selectedHistoryDate => _selectedHistoryDate;
   bool get isLoadingHistory => _isLoadingHistory;
+  bool get isAlreadySubmitted => _isAlreadySubmitted;
 
   /// Fetch initial data (classes and sessions)
   Future<void> fetchInitialData() async {
@@ -95,9 +99,40 @@ class TeacherAttendanceProvider extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     _attendanceMap.clear();
+    _remarksMap.clear();
+    _isAlreadySubmitted = false;
     notifyListeners();
 
     try {
+      // Set selected class and session from IDs
+      try {
+        _selectedClass = _classes.firstWhere((c) => c.id == classId);
+      } catch (_) {
+        if (_classes.isNotEmpty) _selectedClass = _classes.first;
+      }
+      
+      try {
+        _selectedSession = _sessions.firstWhere((s) => s.id == sessionId);
+      } catch (_) {
+        if (_sessions.isNotEmpty) _selectedSession = _sessions.first;
+      }
+
+      // Check if attendance already exists for today
+      final today = DateTime.now();
+      final todayStr = today.toIso8601String().split('T')[0];
+      
+      try {
+        final existingRecords = await _service.getAttendanceHistory(
+          classId: classId,
+          academicSessionId: sessionId,
+          date: todayStr,
+        );
+        _isAlreadySubmitted = existingRecords.isNotEmpty;
+      } catch (_) {
+        // If check fails, assume not submitted
+        _isAlreadySubmitted = false;
+      }
+
       _students = await _service.getStudents(
         classId: classId,
         academicSessionId: sessionId,
@@ -111,8 +146,10 @@ class TeacherAttendanceProvider extends ChangeNotifier {
       // Based on UI req "Select All -> Present", implies they initiate action.
       // But keeping map valid is good.
       
-      for (var student in _students) {
-        _attendanceMap[student.id] = 'present';
+      if (!_isAlreadySubmitted) {
+        for (var student in _students) {
+          _attendanceMap[student.id] = 'present';
+        }
       }
 
       _isLoading = false;
@@ -127,7 +164,26 @@ class TeacherAttendanceProvider extends ChangeNotifier {
   /// Mark single student
   void markStudent(int studentId, String status) {
     _attendanceMap[studentId] = status;
+    // Clear remarks if student is marked as present
+    if (status == 'present') {
+      _remarksMap.remove(studentId);
+    }
     notifyListeners();
+  }
+
+  /// Set remarks for a student
+  void setRemarks(int studentId, String? remarks) {
+    if (remarks != null && remarks.trim().isNotEmpty) {
+      _remarksMap[studentId] = remarks.trim();
+    } else {
+      _remarksMap.remove(studentId);
+    }
+    notifyListeners();
+  }
+
+  /// Get remarks for a student
+  String? getRemarks(int studentId) {
+    return _remarksMap[studentId];
   }
 
   /// Mark all students
@@ -150,6 +206,7 @@ class TeacherAttendanceProvider extends ChangeNotifier {
         return AttendanceSubmissionEntry(
           studentId: e.key,
           status: e.value,
+          remarks: _remarksMap[e.key],
         );
       }).toList();
 
@@ -162,6 +219,8 @@ class TeacherAttendanceProvider extends ChangeNotifier {
 
       await _service.submitAttendance(payload);
       
+      // Mark as already submitted after successful submission
+      _isAlreadySubmitted = true;
       _isSubmitting = false;
       notifyListeners();
       return true;
@@ -210,7 +269,9 @@ class TeacherAttendanceProvider extends ChangeNotifier {
     _selectedSession = null;
     _students = [];
     _attendanceMap = {};
+    _remarksMap = {};
     _isSubmitting = false;
+    _isAlreadySubmitted = false;
     _historyRecords = [];
     _selectedHistoryDate = DateTime.now();
     _isLoadingHistory = false;

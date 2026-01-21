@@ -91,7 +91,15 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: const [MarkAttendanceTab(), AttendanceHistoryTab()],
+              children: [
+                MarkAttendanceTab(
+                  onSubmitted: () {
+                    // Switch to history tab after successful submission
+                    _tabController.animateTo(1);
+                  },
+                ),
+                const AttendanceHistoryTab(),
+              ],
             ),
           ),
         ],

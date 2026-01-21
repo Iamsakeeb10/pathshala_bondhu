@@ -5,11 +5,15 @@ import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/utils/image_url_helper.dart';
+import '../../../../shared/widgets/custom_text_field.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../data/models/teacher_attendance_models.dart';
 import '../../provider/teacher_attendance_provider.dart';
 
 class MarkAttendanceTab extends StatelessWidget {
-  const MarkAttendanceTab({super.key});
+  final VoidCallback? onSubmitted;
+  
+  const MarkAttendanceTab({super.key, this.onSubmitted});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +28,51 @@ class MarkAttendanceTab extends StatelessWidget {
 
         if (provider.errorMessage != null && provider.students.isEmpty) {
           return Center(child: Text(provider.errorMessage!));
+        }
+
+        if (provider.isAlreadySubmitted) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(20.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.success.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.check_circle_outline_rounded,
+                      size: 64.sp,
+                      color: AppColors.success,
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+                  Text(
+                    'Attendance Already Submitted',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.titleLarge?.color ??
+                          AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    'Attendance for today has already been submitted.\nYou can view it in the History tab.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Theme.of(context).textTheme.bodyMedium?.color ??
+                          AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
 
         if (provider.students.isEmpty) {
@@ -141,6 +190,8 @@ class MarkAttendanceTab extends StatelessWidget {
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 'Roll: ${student.rollNo} • ID: ${student.studentId}',
@@ -148,12 +199,14 @@ class MarkAttendanceTab extends StatelessWidget {
                                   fontSize: 12.sp,
                                   color: AppColors.textSecondary,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
                         ),
 
-                        // Toggle Buttons
+                        // Toggle Buttons and Remarks
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -172,6 +225,17 @@ class MarkAttendanceTab extends StatelessWidget {
                               onTap: () =>
                                   provider.markStudent(student.id, 'absent'),
                             ),
+                            if (!isPresent) ...[
+                              SizedBox(width: 8.w),
+                              _RemarksButton(
+                                hasRemarks: provider.getRemarks(student.id) != null,
+                                onTap: () => _showRemarksDialog(
+                                  context,
+                                  provider,
+                                  student,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ],
@@ -210,6 +274,9 @@ class MarkAttendanceTab extends StatelessWidget {
                           ).format(DateTime.now());
                           final success = await provider.submitAttendance(date);
                           if (success && context.mounted) {
+                            // Refresh history for today so it shows in history tab
+                            await provider.fetchHistory(DateTime.now());
+                            
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
@@ -218,11 +285,11 @@ class MarkAttendanceTab extends StatelessWidget {
                                 backgroundColor: Colors.green,
                               ),
                             );
-                            Navigator.pop(
-                              context,
-                            ); // Go back after success? Or stay? Plan didn't specify, likely stay or go back.
-                            // Requirement says "Submit & Navigate". Usually submit closes or shows success.
-                            // Let's pop.
+                            
+                            // Switch to history tab to show submitted attendance
+                            if (onSubmitted != null) {
+                              onSubmitted!();
+                            }
                           } else if (context.mounted &&
                               provider.errorMessage != null) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -296,6 +363,253 @@ class _AttendanceToggleButton extends StatelessWidget {
           icon,
           size: 20.sp,
           color: isActive ? Colors.white : AppColors.grey400,
+        ),
+      ),
+    );
+  }
+}
+
+class _RemarksButton extends StatelessWidget {
+  final bool hasRemarks;
+  final VoidCallback onTap;
+
+  const _RemarksButton({
+    required this.hasRemarks,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8.r),
+      child: Container(
+        padding: EdgeInsets.all(8.w),
+        decoration: BoxDecoration(
+          color: hasRemarks
+              ? AppColors.warning.withOpacity(0.15)
+              : AppColors.grey200.withOpacity(0.5),
+          border: Border.all(
+            color: hasRemarks ? AppColors.warning : AppColors.grey300,
+            width: hasRemarks ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Icon(
+          hasRemarks ? Icons.note_rounded : Icons.note_outlined,
+          size: 20.sp,
+          color: hasRemarks ? AppColors.warning : AppColors.grey600,
+        ),
+      ),
+    );
+  }
+}
+
+void _showRemarksDialog(
+  BuildContext context,
+  TeacherAttendanceProvider provider,
+  TeacherStudent student,
+) {
+  showDialog(
+    context: context,
+    builder: (context) => _RemarksDialog(
+      provider: provider,
+      student: student,
+    ),
+  );
+}
+
+class _RemarksDialog extends StatefulWidget {
+  final TeacherAttendanceProvider provider;
+  final TeacherStudent student;
+
+  const _RemarksDialog({
+    required this.provider,
+    required this.student,
+  });
+
+  @override
+  State<_RemarksDialog> createState() => _RemarksDialogState();
+}
+
+class _RemarksDialogState extends State<_RemarksDialog> {
+  late TextEditingController _remarksController;
+
+  @override
+  void initState() {
+    super.initState();
+    _remarksController = TextEditingController(
+      text: widget.provider.getRemarks(widget.student.id) ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _remarksController.dispose();
+    super.dispose();
+  }
+
+  void _handleClear() {
+    // Dismiss keyboard first
+    FocusScope.of(context).unfocus();
+    widget.provider.setRemarks(widget.student.id, null);
+    // Use a small delay to ensure keyboard is dismissed before closing dialog
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    });
+  }
+
+  void _handleSave() {
+    // Dismiss keyboard first
+    FocusScope.of(context).unfocus();
+    widget.provider.setRemarks(
+      widget.student.id,
+      _remarksController.text,
+    );
+    // Use a small delay to ensure keyboard is dismissed before closing dialog
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        padding: EdgeInsets.all(24.w),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(
+                      Icons.note_rounded,
+                      color: AppColors.warning,
+                      size: 24.sp,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Add Remarks',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.titleLarge?.color ??
+                                AppColors.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          widget.student.user.name,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Theme.of(context).textTheme.bodySmall?.color ??
+                                AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        if (mounted) {
+                          Navigator.pop(context);
+                        }
+                      });
+                    },
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: 20.sp,
+                      color: AppColors.grey600,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24.h),
+              // Text Field
+              CustomTextField(
+                label: 'Reason for Absence (Optional)',
+                hint: 'Enter reason why student is absent...',
+                controller: _remarksController,
+                maxLines: 4,
+                prefixIcon: Icon(
+                  Icons.edit_note_rounded,
+                  color: AppColors.primary,
+                  size: 20.sp,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              // Action Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: _handleClear,
+                    child: Text(
+                      'Clear',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  ElevatedButton(
+                    onPressed: _handleSave,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 12.h,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
