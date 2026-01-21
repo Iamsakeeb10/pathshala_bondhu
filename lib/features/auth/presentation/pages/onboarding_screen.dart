@@ -108,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    color: const Color.fromARGB(255, 239, 159, 93),
                   ),
                 ),
 
@@ -185,7 +185,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.w600,
-              color: AppColors.primary,
+              color: const Color.fromARGB(255, 203, 161, 60),
             ),
           ),
         ],

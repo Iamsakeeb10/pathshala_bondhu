@@ -186,7 +186,7 @@ class MarkAttendanceTab extends StatelessWidget {
                 16.w,
                 16.w,
                 16.w,
-                MediaQuery.of(context).padding.bottom,
+                MediaQuery.of(context).padding.bottom + 16.h,
               ),
               decoration: BoxDecoration(
                 color: Colors.white,

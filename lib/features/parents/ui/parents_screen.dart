@@ -3,18 +3,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
-import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../../../shared/widgets/person_card.dart';
 import '../../../shared/widgets/custom_appbar.dart';
+import '../../chat/screens/chat_screen.dart';
 import '../data/models/parent_model.dart';
 import '../provider/parents_provider.dart';
-import '../../chat/screens/chat_screen.dart';
 
 /// Screen displaying list of parents with search functionality
 ///
-/// Only visible to Teacher role
+/// Only visible to Teacher role with professional design
 class ParentsScreen extends StatefulWidget {
   const ParentsScreen({super.key});
 
@@ -51,11 +50,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
       body: Column(
         children: [
           CustomAppBar(title: 'Parents', showBackButton: false),
-
-          // Search bar
-          _buildSearchBar(),
-
-          // Parents list
+          _buildHeader(context),
           Expanded(
             child: Consumer<ParentsProvider>(
               builder: (context, provider, child) {
@@ -77,24 +72,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
 
                 // Empty state (with search context)
                 if (provider.isEmpty) {
-                  return EmptyState(
-                    icon: Icons.family_restroom_outlined,
-                    message: provider.searchQuery.isNotEmpty
-                        ? 'No parents found for your search'
-                        : 'No parents found',
-                    subMessage: provider.searchQuery.isNotEmpty
-                        ? 'Try a different search term'
-                        : 'Parents list is empty.',
-                    onAction: provider.searchQuery.isNotEmpty
-                        ? () {
-                            _searchController.clear();
-                            provider.clearSearch();
-                          }
-                        : null,
-                    actionLabel: provider.searchQuery.isNotEmpty
-                        ? 'Clear Search'
-                        : null,
-                  );
+                  return _buildEmptyState(provider);
                 }
 
                 // Data state
@@ -111,93 +89,173 @@ class _ParentsScreenState extends State<ParentsScreen> {
     );
   }
 
-  /// Search bar with clear button and search icon
-  Widget _buildSearchBar() {
-    return Consumer<ParentsProvider>(
-      builder: (context, provider, child) {
-        return Container(
-          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(
-                  Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.04,
-                ),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 20.h),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryDark, AppColors.accent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(24.r),
+          bottomRight: Radius.circular(24.r),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.2),
+            offset: Offset(0, 2.h),
+            blurRadius: 20.r,
+            spreadRadius: 4.r,
           ),
-          child: TextField(
-            controller: _searchController,
-            onChanged: (value) {
-              provider.searchParents(value);
-            },
-            decoration: InputDecoration(
-              hintText: 'Search parent by name or phone',
-              hintStyle: TextStyle(
-                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
-                fontSize: 14.sp,
-              ),
-              prefixIcon: provider.isSearching
-                  ? Padding(
-                      padding: EdgeInsets.all(12.w),
-                      child: SizedBox(
-                        width: 20.w,
-                        height: 20.w,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.primary,
-                        ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Stats Card
+          Consumer<ParentsProvider>(
+            builder: (context, provider, child) {
+              if (provider.parents.isEmpty && !provider.isLoading) {
+                return const SizedBox.shrink();
+              }
+
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                    )
-                  : Icon(Icons.search, color: AppColors.grey400, size: 22.sp),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      onPressed: () {
-                        _searchController.clear();
-                        provider.clearSearch();
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: AppColors.grey500,
+                      child: Icon(
+                        Icons.family_restroom_rounded,
+                        color: Colors.white,
                         size: 20.sp,
                       ),
-                    )
-                  : null,
-              filled: true,
-              fillColor: Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.surfaceDark
-                  : AppColors.grey100,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.borderDark
-                      : Colors.transparent,
+                    ),
+                    SizedBox(width: 12.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${provider.parents.length} Parents',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'Connected families',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.white.withOpacity(0.85),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.borderDark
-                      : Colors.transparent,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-              ),
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16.w,
-                vertical: 14.h,
-              ),
-            ),
+              );
+            },
           ),
-        );
-      },
+
+          SizedBox(height: 16.h),
+
+          // Search Bar
+          Consumer<ParentsProvider>(
+            builder: (context, provider, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    provider.searchParents(value);
+                  },
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color:
+                        Theme.of(context).textTheme.bodyLarge?.color ??
+                        AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Search parents by name or phone...',
+                    hintStyle: TextStyle(
+                      fontSize: 14.sp,
+                      color:
+                          Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.color?.withOpacity(0.6) ??
+                          AppColors.grey400,
+                    ),
+                    prefixIcon: provider.isSearching
+                        ? Padding(
+                            padding: EdgeInsets.all(12.w),
+                            child: SizedBox(
+                              width: 20.w,
+                              height: 20.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            Icons.search_rounded,
+                            color: AppColors.primary,
+                            size: 22.sp,
+                          ),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.clear_rounded,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.color ??
+                                  AppColors.grey400,
+                              size: 20.sp,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              provider.clearSearch();
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 14.h,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -221,7 +279,11 @@ class _ParentsScreenState extends State<ParentsScreen> {
           if (index == provider.parents.length) {
             return Padding(
               padding: EdgeInsets.all(16.w),
-              child: const Center(child: CircularProgressIndicator()),
+              child: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+              ),
             );
           }
 
@@ -255,8 +317,8 @@ class _ParentsScreenState extends State<ParentsScreen> {
       chips.add(
         PersonCardChip(
           icon: Icons.location_on_outlined,
-          label: parent.address!.length > 25
-              ? '${parent.address!.substring(0, 25)}...'
+          label: parent.address!.length > 30
+              ? '${parent.address!.substring(0, 30)}...'
               : parent.address!,
         ),
       );
@@ -265,7 +327,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
     // Build subtitle from mother name
     String? subtitle;
     if (parent.motherName.isNotEmpty && parent.motherName != 'Anonymous') {
-      subtitle = 'Mother: ${parent.motherName}';
+      subtitle = parent.motherName;
     }
 
     return PersonCard(
@@ -283,23 +345,286 @@ class _ParentsScreenState extends State<ParentsScreen> {
             builder: (_) => ChatScreen(
               otherUserId: parent.id,
               otherUserName: parent.fatherName,
-              // Parent model doesn't have an avatar URL in the list model currently,
-              // passing null or we could try to look it up if available later.
-              otherUserImage: null, 
+              otherUserImage: null,
             ),
           ),
         );
       },
       onTap: () {
-        // For now, just show a snackbar - can add detail screen later
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${parent.fatherName}'),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 1),
-          ),
-        );
+        _showParentDetails(parent);
       },
+    );
+  }
+
+  void _showParentDetails(ParentListModel parent) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24.r),
+            topRight: Radius.circular(24.r),
+          ),
+        ),
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: AppColors.grey300,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+            SizedBox(height: 24.h),
+
+            // Father Info
+            Row(
+              children: [
+                Icon(
+                  Icons.person_outline,
+                  color: AppColors.student,
+                  size: 20.sp,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'Father',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color:
+                        Theme.of(context).textTheme.bodySmall?.color ??
+                        AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              parent.fatherName,
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color:
+                    Theme.of(context).textTheme.titleLarge?.color ??
+                    AppColors.textPrimary,
+              ),
+            ),
+
+            // Mother Info
+            if (parent.motherName.isNotEmpty &&
+                parent.motherName != 'Anonymous') ...[
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Icon(
+                    Icons.person_outline,
+                    color: AppColors.student,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Mother',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color:
+                          Theme.of(context).textTheme.bodySmall?.color ??
+                          AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                parent.motherName,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      Theme.of(context).textTheme.titleMedium?.color ??
+                      AppColors.textPrimary,
+                ),
+              ),
+            ],
+
+            // Phone
+            if (parent.parentPhone.isNotEmpty) ...[
+              SizedBox(height: 16.h),
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.surfaceDark
+                      : AppColors.grey100,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.phone_outlined,
+                      color: AppColors.primary,
+                      size: 20.sp,
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      parent.parentPhone,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color:
+                            Theme.of(context).textTheme.bodyLarge?.color ??
+                            AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Address
+            if (parent.address != null && parent.address!.isNotEmpty) ...[
+              SizedBox(height: 12.h),
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.surfaceDark
+                      : AppColors.grey100,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      color: AppColors.primary,
+                      size: 20.sp,
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Text(
+                        parent.address!,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color:
+                              Theme.of(context).textTheme.bodyLarge?.color ??
+                              AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            SizedBox(height: 24.h),
+
+            // Action Button
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatScreen(
+                      otherUserId: parent.id,
+                      otherUserName: parent.fatherName,
+                      otherUserImage: null,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.chat_bubble_outline_rounded),
+              label: const Text('Start Chat'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                elevation: 0,
+              ),
+            ),
+            SizedBox(height: 16.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ParentsProvider provider) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              provider.searchQuery.isNotEmpty
+                  ? Icons.search_off_rounded
+                  : Icons.family_restroom_outlined,
+              size: 56.sp,
+              color: AppColors.primary,
+            ),
+          ),
+          SizedBox(height: 24.h),
+          Text(
+            provider.searchQuery.isNotEmpty
+                ? 'No Parents Found'
+                : 'No Parents Available',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color:
+                  Theme.of(context).textTheme.titleLarge?.color ??
+                  AppColors.textPrimary,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            provider.searchQuery.isNotEmpty
+                ? 'Try searching with different keywords'
+                : 'Parents list is empty',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ??
+                  AppColors.textSecondary,
+            ),
+          ),
+          if (provider.searchQuery.isNotEmpty) ...[
+            SizedBox(height: 24.h),
+            OutlinedButton.icon(
+              onPressed: () {
+                _searchController.clear();
+                provider.clearSearch();
+              },
+              icon: const Icon(Icons.clear_rounded),
+              label: const Text('Clear Search'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: BorderSide(color: AppColors.primary),
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
