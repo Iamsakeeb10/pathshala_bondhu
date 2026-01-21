@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/utils/image_url_helper.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../provider/teacher_attendance_provider.dart';
 
@@ -114,10 +115,10 @@ class MarkAttendanceTab extends StatelessWidget {
                         CircleAvatar(
                           radius: 20.r,
                           backgroundColor: AppColors.primaryLight,
-                          backgroundImage: student.user.avatar != null
-                              ? NetworkImage(student.user.avatar!)
+                          backgroundImage: ImageUrlHelper.resolveAvatarUrl(student.user.avatar).isNotEmpty
+                              ? NetworkImage(ImageUrlHelper.resolveAvatarUrl(student.user.avatar))
                               : null,
-                          child: student.user.avatar == null
+                          child: ImageUrlHelper.resolveAvatarUrl(student.user.avatar).isEmpty
                               ? Text(
                                   student.user.name.substring(0, 1),
                                   style: TextStyle(

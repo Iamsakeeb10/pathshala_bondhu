@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/utils/image_url_helper.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../auth/data/models/parent_models.dart';
 import '../../../auth/data/models/teacher_models.dart';
@@ -339,10 +340,10 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                   child: CircleAvatar(
                     radius: 60.r,
                     backgroundColor: AppColors.primary.withOpacity(0.1),
-                    backgroundImage: avatar != null
-                        ? NetworkImage(avatar)
+                    backgroundImage: ImageUrlHelper.resolveAvatarUrl(avatar).isNotEmpty
+                        ? NetworkImage(ImageUrlHelper.resolveAvatarUrl(avatar))
                         : null,
-                    child: avatar == null
+                    child: ImageUrlHelper.resolveAvatarUrl(avatar).isEmpty
                         ? Text(
                             name.isNotEmpty ? name[0].toUpperCase() : '?',
                             style: TextStyle(

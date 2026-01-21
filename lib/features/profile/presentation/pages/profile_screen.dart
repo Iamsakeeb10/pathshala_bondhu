@@ -7,6 +7,7 @@ import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../core/services/logout_service.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/utils/image_url_helper.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -139,10 +140,10 @@ class ProfileScreen extends StatelessWidget {
                                     radius: 50.r,
                                     backgroundColor: AppColors.primary
                                         .withOpacity(0.15),
-                                    backgroundImage: user?.avatarUrl != null
-                                        ? NetworkImage(user!.avatarUrl!)
+                                    backgroundImage: ImageUrlHelper.resolveAvatarUrl(user?.avatarUrl).isNotEmpty
+                                        ? NetworkImage(ImageUrlHelper.resolveAvatarUrl(user?.avatarUrl))
                                         : null,
-                                    child: user?.avatarUrl == null
+                                    child: ImageUrlHelper.resolveAvatarUrl(user?.avatarUrl).isEmpty
                                         ? Text(
                                             (user?.name.isNotEmpty ?? false)
                                                 ? user!.name[0].toUpperCase()
