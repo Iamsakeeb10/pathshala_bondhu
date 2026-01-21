@@ -135,15 +135,23 @@ class TeacherDiaryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Fetch classes and sessions together
       final results = await Future.wait([
         _repository.fetchClasses(),
         _repository.fetchAcademicSessions(),
-        _repository.fetchSubjects(),
       ]);
 
       _classes = results[0] as List<TeacherClass>;
       _sessions = results[1] as List<TeacherAcademicSession>;
-      _subjects = results[2] as List<DiarySubject>;
+
+      // Fetch subjects separately - if it fails, we still have classes and sessions
+      try {
+        _subjects = await _repository.fetchSubjects();
+      } catch (e) {
+        // Log error but don't block the form - subjects will just be empty
+        _errorMessage = 'Warning: ${e.toString().replaceAll('Exception: ', '')}';
+        _subjects = [];
+      }
 
       _isLoading = false;
       notifyListeners();

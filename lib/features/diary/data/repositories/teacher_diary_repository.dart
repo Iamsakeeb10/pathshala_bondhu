@@ -136,30 +136,63 @@ class TeacherDiaryRepository {
       // Since there is no direct /teacher/subjects endpoint, we fetch routines
       // and extract unique subjects from there. This is a workaround.
       final response = await _dioClient.get(ApiEndpoints.teacherRoutines);
-      if (response.statusCode == 200 && response.data['routines'] != null) {
-        final List<dynamic> routinesJson = response.data['routines'];
-        final routines = routinesJson
-            .map((json) => TeacherRoutine.fromJson(json))
-            .toList();
-
-        final Map<int, DiarySubject> uniqueSubjects = {};
-        for (var routine in routines) {
-          if (routine.subject != null) {
-            // Convert RoutineSubject to DiarySubject
-            uniqueSubjects[routine.subject!.id] = DiarySubject(
-              id: routine.subject!.id,
-              name: routine.subject!.name,
-              code: routine.subject!.code,
-            );
-          }
+      
+      if (response.statusCode == 200) {
+        // Check if routines exist in response
+        final responseData = response.data;
+        if (responseData is! Map<String, dynamic>) {
+          throw Exception('Invalid response format from routines API');
         }
-        return uniqueSubjects.values.toList();
+
+        if (responseData['routines'] != null) {
+          final List<dynamic> routinesJson = responseData['routines'];
+          if (routinesJson.isEmpty) {
+            // No routines available, return empty list
+            return [];
+          }
+
+          final List<TeacherRoutine> routines = [];
+          for (var json in routinesJson) {
+            try {
+              routines.add(TeacherRoutine.fromJson(json));
+            } catch (e) {
+              // Skip invalid routine entries
+              continue;
+            }
+          }
+
+          final Map<int, DiarySubject> uniqueSubjects = {};
+          for (var routine in routines) {
+            if (routine.subject != null) {
+              // Convert RoutineSubject to DiarySubject
+              uniqueSubjects[routine.subject!.id] = DiarySubject(
+                id: routine.subject!.id,
+                name: routine.subject!.name,
+                code: routine.subject!.code,
+              );
+            }
+          }
+          
+          if (uniqueSubjects.isEmpty) {
+            throw Exception('No subjects found in routines. Please ensure your routines have subjects assigned.');
+          }
+          
+          return uniqueSubjects.values.toList();
+        }
+        // If routines key doesn't exist, throw error
+        throw Exception('Routines data not found in API response');
       }
-      return [];
+      throw Exception('Failed to fetch subjects: Invalid response status ${response.statusCode}');
+    } on DioException catch (e) {
+      final errorMessage = e.response?.data['message'] ?? 
+          (e.response?.data is Map ? e.response?.data.toString() : 'Network error');
+      throw Exception('Failed to fetch subjects: $errorMessage');
     } catch (e) {
-      // Fail silently or return empty, users can't select subject
-      print('Failed to fetch subjects from routines: $e');
-      return [];
+      // Re-throw if it's already an Exception with a message
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Failed to fetch subjects: $e');
     }
   }
 }

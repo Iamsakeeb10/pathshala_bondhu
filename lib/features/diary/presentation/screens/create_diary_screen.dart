@@ -322,6 +322,10 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildFormHeader(),
+                        if (provider.errorMessage != null) ...[
+                          SizedBox(height: 16.h),
+                          _buildErrorMessage(provider.errorMessage!),
+                        ],
                         SizedBox(height: 24.h),
                         _buildFormCard(
                           title: 'Basic Information',
@@ -342,12 +346,26 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                               label: 'Subject',
                               value: _selectedSubject,
                               items: provider.subjects,
-                              hint: 'Choose Subject',
+                              hint: provider.subjects.isEmpty
+                                  ? 'No subjects available'
+                                  : 'Choose Subject',
                               icon: Icons.book_outlined,
-                              onChanged: (val) =>
-                                  setState(() => _selectedSubject = val),
+                              onChanged: provider.subjects.isEmpty
+                                  ? null
+                                  : (val) => setState(() => _selectedSubject = val),
                               itemLabel: (item) => item.name,
                             ),
+                            if (provider.subjects.isEmpty && !provider.isLoading) ...[
+                              SizedBox(height: 8.h),
+                              Text(
+                                'No subjects found. Please ensure your routines have subjects assigned.',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: AppColors.warning,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
                             SizedBox(height: 16.h),
                             _buildDropdown<TeacherAcademicSession>(
                               label: 'Academic Session',
@@ -519,6 +537,40 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
     );
   }
 
+  Widget _buildErrorMessage(String message) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: AppColors.error.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.error.withOpacity(0.3),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            color: AppColors.error,
+            size: 20.sp,
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: AppColors.error,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFormCard({
     required String title,
     required IconData icon,
@@ -580,7 +632,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
     required List<T> items,
     required String hint,
     required IconData icon,
-    required Function(T?) onChanged,
+    Function(T?)? onChanged,
     required String Function(T) itemLabel,
   }) {
     return Column(
@@ -616,12 +668,16 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: onChanged == null
+                  ? Theme.of(context).cardColor.withOpacity(0.5)
+                  : Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.borderDark
-                    : AppColors.grey200.withOpacity(0.6),
+                color: onChanged == null
+                    ? AppColors.grey300
+                    : Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.borderDark
+                        : AppColors.grey200.withOpacity(0.6),
                 width: 1.2,
               ),
             ),
@@ -631,7 +687,9 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                 hint: Text(
                   hint,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
+                    color: onChanged == null
+                        ? AppColors.grey400
+                        : Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                   ),
@@ -639,7 +697,7 @@ class _CreateDiaryScreenState extends State<CreateDiaryScreen> {
                 isExpanded: true,
                 icon: Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.grey600,
+                  color: onChanged == null ? AppColors.grey400 : AppColors.grey600,
                   size: 24.sp,
                 ),
                 items: items.map((T item) {
