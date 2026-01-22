@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Reusable custom button widget
-/// Supports loading state, outlined variant, and custom colors
+/// Supports loading state, outlined variant, custom colors, and border radius
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -13,6 +13,7 @@ class CustomButton extends StatelessWidget {
   final IconData? icon;
   final double? width;
   final double? height;
+  final BorderRadius? borderRadius; // ✅ NEW
 
   const CustomButton({
     super.key,
@@ -25,6 +26,7 @@ class CustomButton extends StatelessWidget {
     this.icon,
     this.width,
     this.height,
+    this.borderRadius, // ✅ NEW
   });
 
   @override
@@ -39,9 +41,12 @@ class CustomButton extends StatelessWidget {
   Widget _buildElevatedButton() {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
-      style: backgroundColor != null
-          ? ElevatedButton.styleFrom(backgroundColor: backgroundColor)
-          : null,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius ?? BorderRadius.circular(8.r),
+        ),
+      ),
       child: _buildChild(),
     );
   }
@@ -49,6 +54,11 @@ class CustomButton extends StatelessWidget {
   Widget _buildOutlinedButton() {
     return OutlinedButton(
       onPressed: isLoading ? null : onPressed,
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius ?? BorderRadius.circular(8.r),
+        ),
+      ),
       child: _buildChild(),
     );
   }
@@ -69,9 +79,16 @@ class CustomButton extends StatelessWidget {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 20.sp),
+          Icon(icon, size: 20.sp, color: textColor),
           SizedBox(width: 8.w),
-          Text(text),
+          Text(
+            text,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       );
     }

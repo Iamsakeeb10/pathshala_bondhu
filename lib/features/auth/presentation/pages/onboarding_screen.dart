@@ -89,12 +89,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     fontSize: 30.sp, // slightly larger for emphasis
                     fontWeight:
                         FontWeight.w800, // bolder weight for modern look
-                    color: const Color.fromARGB(
-                      255,
-                      201,
-                      113,
-                      65,
-                    ), // new color: dark variant of primary
+                    color: AppColors
+                        .textPrimary, // Better contrast for primary text
                     height: 1.3, // tighter line height
                     letterSpacing: 0.5, // subtle spacing for readability
                   ),
@@ -108,7 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
-                    color: const Color.fromARGB(255, 239, 159, 93),
+                    color: AppColors.primaryDark, // Better UX with primary dark
                   ),
                 ),
 
@@ -120,7 +116,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: TextStyle(
                     fontSize: 15.sp,
                     height: 1.6,
-                    color: AppColors.textSecondary,
+                    color: AppColors
+                        .textSecondary, // Good contrast for secondary text
                   ),
                 ),
 
@@ -153,10 +150,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                 const Spacer(),
 
-                // Get Started button
-                CustomButton(
-                  text: localizations.translate('get_started'),
-                  onPressed: _completeOnboarding,
+                // Get Started button with glowing animation
+                _GlowingButton(
+                  child: CustomButton(
+                    borderRadius: BorderRadius.circular(25.r),
+                    text: localizations.translate('get_started'),
+                    onPressed: _completeOnboarding,
+                  ),
                 ),
 
                 SizedBox(height: 24.h),
@@ -185,11 +185,104 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.w600,
-              color: const Color.fromARGB(255, 203, 161, 60),
+              color: AppColors.primaryDark, // Better UX with consistent color
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Widget that wraps a button with an infinite horizontal glowing animation effect
+class _GlowingButton extends StatefulWidget {
+  final Widget child;
+
+  const _GlowingButton({required this.child});
+
+  @override
+  State<_GlowingButton> createState() => _GlowingButtonState();
+}
+
+class _GlowingButtonState extends State<_GlowingButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(
+        milliseconds: 2500,
+      ), // Slightly slower for better visibility
+      vsync: this,
+    )..repeat();
+
+    _animation =
+        Tween<double>(
+          begin: -1.0,
+          end: 2.0, // Extend range for better coverage
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeInOut, // Smoother curve
+          ),
+        );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final buttonWidth = constraints.maxWidth;
+        return Stack(
+          children: [
+            // The actual button
+            widget.child,
+
+            // Shimmer effect overlay - positioned on top
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25.r),
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(_animation.value * buttonWidth, 0),
+                      child: Container(
+                        width: buttonWidth * 0.1,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Colors.white.withOpacity(0.0),
+                              Colors.white.withOpacity(0.3),
+                              Colors.white.withOpacity(0.6),
+                              Colors.white.withOpacity(0.8),
+                              Colors.white.withOpacity(0.6),
+                              Colors.white.withOpacity(0.3),
+                              Colors.white.withOpacity(0.0),
+                            ],
+                            stops: const [0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
