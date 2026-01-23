@@ -7,7 +7,7 @@ import '../../../core/network/token_storage.dart';
 import '../models/user_activity_model.dart';
 
 class ActivityService {
-  static const String baseUrl = 'https://chat.whiteorbit.top';
+  static const String baseUrl = 'https://sys-chatting.whiteorbit.top';
   static const String source = 'school_sass';
 
   /// Get user activity status
@@ -21,7 +21,9 @@ class ActivityService {
 
       debugPrint('📊 Fetching activity for user $userId');
 
-      final url = Uri.parse('$baseUrl/api/activity/user/$userId?source=$source');
+      final url = Uri.parse(
+        '$baseUrl/api/activity/user/$userId?source=$source',
+      );
       final response = await http.get(
         url,
         headers: {
@@ -66,7 +68,9 @@ class ActivityService {
 
       debugPrint('🔄 Updating activity for user $userId: isActive=$isActive');
 
-      final url = Uri.parse('$baseUrl/api/activity/user/$userId/active?source=$source');
+      final url = Uri.parse(
+        '$baseUrl/api/activity/user/$userId/active?source=$source',
+      );
       final response = await http.put(
         url,
         headers: {
@@ -100,22 +104,31 @@ class ActivityService {
 
   /// Get message history via REST API
   /// GET /api/messages
-  Future<Map<String, dynamic>?> getMessages(int currentUserId, int otherUserId, {int page = 1, int limit = 20}) async {
+  Future<Map<String, dynamic>?> getMessages(
+    int currentUserId,
+    int otherUserId, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     try {
       final token = await TokenStorage.getToken();
       if (token == null) {
         throw Exception('No authentication token found');
       }
 
-      debugPrint('📜 Fetching messages via REST: user=$currentUserId, other=$otherUserId, page=$page');
+      debugPrint(
+        '📜 Fetching messages via REST: user=$currentUserId, other=$otherUserId, page=$page',
+      );
 
-      final uri = Uri.parse('$baseUrl/api/messages').replace(queryParameters: {
-        'user_id': currentUserId.toString(),
-        'other_user_id': otherUserId.toString(),
-        'page': page.toString(),
-        'limit': limit.toString(),
-        'source': source,
-      });
+      final uri = Uri.parse('$baseUrl/api/messages').replace(
+        queryParameters: {
+          'user_id': currentUserId.toString(),
+          'other_user_id': otherUserId.toString(),
+          'page': page.toString(),
+          'limit': limit.toString(),
+          'source': source,
+        },
+      );
 
       final response = await http.get(
         uri,
@@ -133,7 +146,9 @@ class ActivityService {
 
         if (data is Map<String, dynamic>) {
           if (data['success'] == true) {
-            debugPrint('✅ REST: Loaded response (Page ${data['current_page']}/${data['total_pages']})');
+            debugPrint(
+              '✅ REST: Loaded response (Page ${data['current_page']}/${data['total_pages']})',
+            );
             return data;
           } else {
             debugPrint('⚠️ REST: API returned success=false');
@@ -164,7 +179,9 @@ class ActivityService {
 
       debugPrint('👁️ Marking messages as seen from user $otherUserId');
 
-      final url = Uri.parse('$baseUrl/api/activity/messages/seen?source=$source');
+      final url = Uri.parse(
+        '$baseUrl/api/activity/messages/seen?source=$source',
+      );
       final response = await http.post(
         url,
         headers: {

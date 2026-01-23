@@ -7,7 +7,7 @@ import '../../../core/network/token_storage.dart';
 import '../models/conversation_model.dart';
 
 class ConversationsService {
-  static const String baseUrl = 'https://chat.whiteorbit.top';
+  static const String baseUrl = 'https://sys-chatting.whiteorbit.top';
   static const String source = 'school_sass';
 
   /// Fetch all messages for a user and group them into conversations
@@ -134,12 +134,15 @@ class ConversationsService {
 
         if (success) {
           final messages = data['messages'] as List<dynamic>? ?? [];
-          debugPrint('✅ Received ${messages.length} messages for new conversation');
+          debugPrint(
+            '✅ Received ${messages.length} messages for new conversation',
+          );
 
           if (messages.isEmpty) return null;
 
-          final messageList =
-              messages.map((m) => m as Map<String, dynamic>).toList();
+          final messageList = messages
+              .map((m) => m as Map<String, dynamic>)
+              .toList();
 
           // Sort messages by date (oldest first)
           messageList.sort((a, b) {

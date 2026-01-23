@@ -9,7 +9,7 @@ import '../models/chat_user_model.dart';
 
 /// Service to fetch user information by user ID for chat screens
 class UserLookupService {
-  static const String baseUrl = 'https://whiteorbit.top/api/v1'; // Reverted
+  static const String baseUrl = 'http://pathshalabondhu.top/api/v1'; // Reverted
   static const String _cacheKeyPrefix = 'user_cache_';
   // ignore: unused_field
   static const Duration _cacheDuration = Duration(days: 7);
@@ -109,22 +109,24 @@ class UserLookupService {
 
       // Use whiteorbit.top with source=school_sass as requested
       final url = Uri.parse('$baseUrl/user/$userId');
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            url,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
-        
+
         // Check parsing: data['data']['user'] matched Jibon Bondhu
         dynamic userData;
         if (data.containsKey('data') && data['data'] is Map) {
           userData = (data['data'] as Map)['user'];
-        } 
+        }
         if (userData == null && data.containsKey('user')) {
           userData = data['user'];
         }

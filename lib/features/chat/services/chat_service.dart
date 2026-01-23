@@ -3,7 +3,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatService {
   // Configuration
-  static const String baseUrl = 'https://chat.whiteorbit.top';
+  static const String baseUrl = 'https://sys-chatting.whiteorbit.top';
   static const String source = 'school_sass';
 
   // Socket instance
@@ -59,10 +59,7 @@ class ChatService {
             .setReconnectionAttempts(5)
             .setReconnectionDelay(1000)
             .setReconnectionDelayMax(5000)
-            .setAuth({
-              'token': _token,
-              'source': source,
-            })
+            .setAuth({'token': _token, 'source': source})
             .build(),
       );
 
@@ -118,7 +115,7 @@ class ChatService {
 
     _socket!.on('receive_message', (data) {
       try {
-        debugPrint('📨 Received message: $data');
+        debugPrint('📨 FULL PAYLOAD (receive_message): $data');
         if (data is Map<String, dynamic>) {
           onMessageReceived?.call(data);
         } else {
@@ -132,7 +129,7 @@ class ChatService {
 
     _socket!.on('message_history', (data) {
       try {
-        debugPrint('📚 Received message history: $data');
+        debugPrint('📚 FULL PAYLOAD (message_history): $data');
         if (data is Map<String, dynamic>) {
           final success = data['success'] as bool? ?? false;
           if (success) {
@@ -163,7 +160,7 @@ class ChatService {
 
     _socket!.on('messages_seen', (data) {
       try {
-        debugPrint('👁️ Messages seen event: $data');
+        debugPrint('👁️ FULL PAYLOAD (messages_seen): $data');
         if (data is Map<String, dynamic>) {
           onMessagesSeen?.call(data);
         }
@@ -174,7 +171,7 @@ class ChatService {
 
     _socket!.on('user_typing', (data) {
       try {
-        debugPrint('⌨️ User typing event: $data');
+        debugPrint('⌨️ FULL PAYLOAD (user_typing): $data');
         if (data is Map<String, dynamic>) {
           onUserTyping?.call(data);
         }
@@ -185,7 +182,7 @@ class ChatService {
 
     _socket!.on('user_active', (data) {
       try {
-        debugPrint('🟢 User active event: $data');
+        debugPrint('🟢 FULL PAYLOAD (user_active): $data');
         if (data is Map<String, dynamic>) {
           onUserActive?.call(data);
         }
@@ -196,7 +193,7 @@ class ChatService {
 
     _socket!.on('mark_seen_success', (data) {
       try {
-        debugPrint('✅ Mark seen success: $data');
+        debugPrint('✅ FULL PAYLOAD (mark_seen_success): $data');
         if (data is Map<String, dynamic>) {
           onMarkSeenSuccess?.call(data);
         }
@@ -234,7 +231,12 @@ class ChatService {
   }
 
   /// Request message history with another user
-  void getMessageHistory(int otherUserId, {int limit = 20, int? page, int? beforeId}) {
+  void getMessageHistory(
+    int otherUserId, {
+    int limit = 20,
+    int? page,
+    int? beforeId,
+  }) {
     if (_socket == null || !isConnected) {
       debugPrint('❌ Cannot get message history: not connected');
       onError?.call('Not connected to server');
