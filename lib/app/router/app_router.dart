@@ -7,6 +7,8 @@ import '../../features/auth/presentation/pages/login_screen.dart';
 import '../../features/auth/presentation/pages/onboarding_screen.dart';
 import '../../features/auth/presentation/pages/splash_screen.dart';
 import '../../features/books/ui/books_screen.dart';
+import '../../features/chat/screens/chat_background_selection_screen.dart';
+import '../../features/chat/screens/conversations_screen.dart';
 import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
 import '../../features/diary/data/models/teacher_diary_model.dart';
 import '../../features/diary/presentation/screens/create_diary_screen.dart';
@@ -15,16 +17,15 @@ import '../../features/diary/presentation/screens/teacher_diary_details_screen.d
 import '../../features/diary/presentation/screens/teacher_diary_list_screen.dart';
 import '../../features/exams/ui/exam_routine_screen.dart';
 import '../../features/fees/ui/fees_screen.dart';
+import '../../features/notifications/screens/notification_screen.dart';
 import '../../features/profile/presentation/pages/change_password_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
 import '../../features/profile/presentation/pages/profile_details_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
+import '../../features/results/ui/result_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
 import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
-import '../../features/notifications/screens/notification_screen.dart';
-import '../../features/chat/screens/conversations_screen.dart';
-import '../../features/chat/screens/chat_background_selection_screen.dart';
 import 'root_navigator_key.dart';
 
 /// Centralized routing configuration using GoRouter
@@ -136,6 +137,13 @@ class AppRouter {
         path: '/fees',
         name: 'fees',
         builder: (context, state) => const FeesScreen(),
+      ),
+
+      // Results Screen
+      GoRoute(
+        path: '/results',
+        name: 'results',
+        builder: (context, state) => const ResultScreen(),
       ),
 
       // Teacher Attendance Screen

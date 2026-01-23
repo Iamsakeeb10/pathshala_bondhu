@@ -90,6 +90,7 @@ class AppLocalizations {
       'exam_routine': 'Exam Routine',
       'attendance': 'Attendance',
       'fees': 'Fees',
+      'result': 'Result',
 
       // Dashboard
       'dashboard': 'Dashboard',
@@ -245,7 +246,7 @@ class AppLocalizations {
       "no_messages_yet": "No Messages Yet",
       "start_conversation_with_teachers_parents":
           "Start a conversation with teachers\nand parents",
-      "no_results_found": "No results found",
+      "no_search_results": "No results found",
       "try_searching_different_name": "Try searching with a different name",
       "refresh": "Refresh",
       "no_messages_yet_chat": "No messages yet",
@@ -257,6 +258,22 @@ class AppLocalizations {
       "active_yesterday": "Active yesterday",
       "active_days_ago": "Active {days}d ago",
       "offline": "Offline",
+      // Result
+      'student_result': 'Student Result',
+      'exam_name': 'Exam Name',
+      'total_marks': 'Total Marks',
+      'obtained_marks': 'Obtained Marks',
+      'grade': 'Grade',
+      'position': 'Position',
+      'no_results_found': 'No Results Found',
+      'no_results_available': 'No exam results available for this student.',
+      'download_pdf': 'Download PDF',
+      'pdf_download_coming_soon': 'PDF download coming soon!',
+      'loading_results': 'Loading results...',
+      'error_loading_results': 'Error Loading Results',
+      'subject_wise_results': 'Subject-wise Results',
+      'exam_details': 'Exam Details',
+      'percentage': 'Percentage',
     },
     'bn': {
       // Auth
@@ -315,6 +332,7 @@ class AppLocalizations {
       'retry': 'পুনরায় চেষ্টা করুন',
       'save': 'সংরক্ষণ',
       'edit': 'সম্পাদনা',
+      'result': 'ফলাফল',
       'delete': 'মুছুন',
       'yes': 'হ্যাঁ',
       'no': 'না',
@@ -484,7 +502,7 @@ class AppLocalizations {
       "no_messages_yet": "এখনও কোন বার্তা নেই",
       "start_conversation_with_teachers_parents":
           "শিক্ষক এবং অভিভাবকদের সাথে\nকথোপকথন শুরু করুন",
-      "no_results_found": "কোন ফলাফল পাওয়া যায়নি",
+      "no_search_results": "কোন ফলাফল পাওয়া যায়নি",
       "try_searching_different_name": "একটি ভিন্ন নাম দিয়ে অনুসন্ধান করুন",
       "refresh": "রিফ্রেশ",
       "no_messages_yet_chat": "এখনও কোন বার্তা নেই",
@@ -496,6 +514,24 @@ class AppLocalizations {
       "active_yesterday": "গতকাল সক্রিয়",
       "active_days_ago": "{days} দিন আগে সক্রিয়",
       "offline": "অফলাইন",
+
+      // Result
+      'student_result': 'শিক্ষার্থীর ফলাফল',
+      'exam_name': 'পরীক্ষার নাম',
+      'total_marks': 'মোট নম্বর',
+      'obtained_marks': 'প্রাপ্ত নম্বর',
+      'grade': 'গ্রেড',
+      'position': 'অবস্থান',
+      'no_results_found': 'কোন ফলাফল পাওয়া যায়নি',
+      'no_results_available':
+          'এই শিক্ষার্থীর জন্য কোন পরীক্ষার ফলাফল উপলব্ধ নেই।',
+      'download_pdf': 'পিডিএফ ডাউনলোড করুন',
+      'pdf_download_coming_soon': 'পিডিএফ ডাউনলোড শীঘ্রই আসছে!',
+      'loading_results': 'ফলাফল লোড হচ্ছে...',
+      'error_loading_results': 'ফলাফল লোড করতে ত্রুটি',
+      'subject_wise_results': 'বিষয়ভিত্তিক ফলাফল',
+      'exam_details': 'পরীক্ষার বিবরণ',
+      'percentage': 'শতাংশ',
     },
   };
 

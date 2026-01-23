@@ -439,7 +439,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
               ),
               SizedBox(height: 16.h),
               Text(
-                t?.translate('no_results_found') ?? 'No results found',
+                t?.translate('no_search_results') ?? 'No results found',
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,

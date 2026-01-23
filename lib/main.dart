@@ -32,6 +32,7 @@ import 'features/fees/provider/fees_provider.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/parents/provider/parents_provider.dart';
 import 'features/profile/providers/profile_provider.dart';
+import 'features/results/provider/result_provider.dart';
 import 'features/routines/provider/routine_provider.dart';
 import 'features/routines/provider/teacher_routine_provider.dart';
 import 'features/students/provider/student_provider.dart';
@@ -80,11 +81,16 @@ void main() async {
           final notifType = payload.data?['type'] as String?;
           if (notifType == 'new_message') {
             try {
-              final conversationsProvider = context.read<ConversationsProvider>();
+              final conversationsProvider = context
+                  .read<ConversationsProvider>();
               TokenStorage.getUserId().then((userIdStr) {
-                final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+                final userId = userIdStr != null
+                    ? int.tryParse(userIdStr)
+                    : null;
                 if (userId != null) {
-                  print('💬 Syncing conversations for new message (Notification Tap)...');
+                  print(
+                    '💬 Syncing conversations for new message (Notification Tap)...',
+                  );
                   conversationsProvider.fetchConversations(userId);
                 }
               });
@@ -117,6 +123,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ExamRoutineProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceProvider()),
         ChangeNotifierProvider(create: (_) => FeesProvider()),
+        ChangeNotifierProvider(create: (_) => ResultProvider()),
         ChangeNotifierProvider(create: (_) => TeacherAttendanceProvider()),
         ChangeNotifierProvider(create: (_) => TeacherRoutineProvider()),
         ChangeNotifierProvider(create: (_) => TeacherDiaryProvider()),

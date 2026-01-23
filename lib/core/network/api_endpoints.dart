@@ -7,7 +7,7 @@ class ApiEndpoints {
   static const String baseUrl = 'http://pathshalabondhu.top/api/v1';
 
   // ========== Authentication Endpoints ==========
-  
+
   /// Teacher login endpoint
   /// POST: { "email": "string", "password": "string" }
   static const String teacherLogin = '/teacher/login';
@@ -35,13 +35,13 @@ class ApiEndpoints {
   static const String teacherProfileUpdate = '/teacher/profile';
 
   // ========== Parent Endpoints ==========
-  
+
   /// Get parent's students list
   /// GET with Bearer token
   static const String parentStudents = '/parent/students';
 
   // ========== Category Endpoints ==========
-  
+
   /// Get book list for all students
   /// GET with Bearer token
   static const String bookList = '/booklist';
@@ -64,8 +64,13 @@ class ApiEndpoints {
   /// Body: { "year": "string" }
   static const String studentFees = '/student/fees/monthly';
 
+  /// Get student results for all children
+  /// GET with Bearer token
+  /// No query params needed - returns all children's results
+  static const String studentResults = '/student/result';
+
   // ========== Teacher Attendance Endpoints ==========
-  
+
   /// Get academic sessions for teacher
   /// GET
   static const String teacherAcademicSessions = '/teacher/academic-sessions';
@@ -88,12 +93,13 @@ class ApiEndpoints {
   /// Get diaries (GET) or Create diary (POST)
   /// GET/POST
   static const String teacherDiaries = '/teacher/diaries';
+
   /// Get student diaries with date filter
   /// GET (with body): { "date": "YYYY-MM-DD" }
   static const String studentDiaries = '/student/diaries';
 
   // ========== Notification Endpoints ==========
-  
+
   /// Get all notifications (paginated)
   /// GET with Bearer token
   /// Query params: per_page, type

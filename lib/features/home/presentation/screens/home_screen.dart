@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../features/chat/providers/conversations_provider.dart';
 import '../../../../features/notifications/providers/notification_provider.dart';
 import '../../../../features/students/provider/student_provider.dart';
-import '../../../../features/chat/providers/conversations_provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/modern_premium_slider.dart';
@@ -177,6 +177,12 @@ class _HomeScreenState extends State<HomeScreen> {
         'color': const Color(0xFF3B82F6),
         'route': '/fees',
       },
+      {
+        'icon': Icons.emoji_events_outlined,
+        'label': localizations.translate('result'),
+        'color': const Color(0xFFEC4899),
+        'route': '/results',
+      },
     ];
   }
 
@@ -185,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final authProvider = context.read<AuthProvider>();
     final localizations = AppLocalizations.of(context)!;
     final categories = _getCategories(context);
-    
+
     if (authProvider.isTeacher) {
       return categories
           .where(
@@ -197,8 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
           )
           .toList();
     }
-    // For parents, show everything? Or should we hide Diary?
-    // User didn't specify for parents. Leaving as is (shows all).
+    // For parents, show everything (Result is parent-only by default in the list)
     return categories;
   }
 
@@ -256,7 +261,9 @@ class _HomeScreenState extends State<HomeScreen> {
         if (studentProvider.isLoading) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(localizations.translate('loading_student_information')),
+              content: Text(
+                localizations.translate('loading_student_information'),
+              ),
               duration: const Duration(seconds: 1),
             ),
           );
@@ -329,7 +336,9 @@ class _HomeScreenState extends State<HomeScreen> {
       if (studentProvider.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(localizations.translate('loading_student_information')),
+            content: Text(
+              localizations.translate('loading_student_information'),
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -413,7 +422,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                  color:
+                      Theme.of(context).textTheme.titleLarge?.color ??
+                      AppColors.textPrimary,
                   letterSpacing: 0.3,
                 ),
               ),
@@ -427,7 +438,9 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w400,
-                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    AppColors.textSecondary,
               ),
             ),
           ),
@@ -515,7 +528,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Name - Bold and prominent
                   Builder(
                     builder: (context) {
-                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
                       return Text(
                         userName,
                         style: TextStyle(
@@ -526,7 +540,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           letterSpacing: 0.5,
                           shadows: [
                             Shadow(
-                              color: Colors.black.withOpacity(isDark ? 0.3 : 0.15),
+                              color: Colors.black.withOpacity(
+                                isDark ? 0.3 : 0.15,
+                              ),
                               offset: Offset(0, 2.h),
                               blurRadius: 8.r,
                             ),
@@ -642,8 +658,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         top: -6.h,
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: conversationsProvider.totalUnreadCount > 99 ? 4.w : 5.w,
-                            vertical: conversationsProvider.totalUnreadCount > 99 ? 2.h : 3.h,
+                            horizontal:
+                                conversationsProvider.totalUnreadCount > 99
+                                ? 4.w
+                                : 5.w,
+                            vertical:
+                                conversationsProvider.totalUnreadCount > 99
+                                ? 2.h
+                                : 3.h,
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.error,
@@ -663,7 +685,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : '${conversationsProvider.totalUnreadCount}',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: conversationsProvider.totalUnreadCount > 99 ? 8.sp : 9.sp,
+                              fontSize:
+                                  conversationsProvider.totalUnreadCount > 99
+                                  ? 8.sp
+                                  : 9.sp,
                               fontWeight: FontWeight.bold,
                               height: 1.0,
                             ),
@@ -874,7 +899,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 11.5.sp,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
+                    color:
+                        Theme.of(context).textTheme.titleMedium?.color ??
+                        AppColors.textPrimary,
                     height: 1.3,
                     letterSpacing: 0.1,
                   ),
