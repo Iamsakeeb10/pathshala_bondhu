@@ -72,6 +72,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
         ],
       ),
       child: SafeArea(
+        top: false,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

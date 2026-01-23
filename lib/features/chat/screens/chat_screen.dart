@@ -56,7 +56,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       debugPrint('📱 App resumed - ensuring chat connection...');
       // Use the robust checkConnection which handles reconnection if needed
-     _chatProvider.checkConnection();
+      _chatProvider.checkConnection();
     }
   }
 
@@ -80,7 +80,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       // Get current user ID from TokenStorage (returns String?, parse to int)
       final userIdStr = await TokenStorage.getUserId();
       _currentUserId = userIdStr != null ? int.tryParse(userIdStr) : null;
-      
+
       if (_currentUserId == null) {
         if (mounted) _showError('User not authenticated');
         _isInitialized = false;
@@ -141,9 +141,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      backgroundColor: isDark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       body: Column(
-              children: [
+        children: [
           buildChatAppBar(context),
           Expanded(
             child: Consumer<ChatProvider>(
@@ -171,10 +173,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           Consumer<ChatBackgroundProvider>(
                             builder: (context, bgProvider, _) {
                               return Container(
-                                decoration: bgProvider.getBackgroundDecoration(),
+                                decoration: bgProvider
+                                    .getBackgroundDecoration(),
                                 child: Builder(
                                   builder: (context) {
-                                    if (chatProvider.isLoadingMessages && chatProvider.messages.isEmpty) {
+                                    if (chatProvider.isLoadingMessages &&
+                                        chatProvider.messages.isEmpty) {
                                       return const ChatShimmer();
                                     }
 
@@ -223,8 +227,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                               style: theme.textTheme.bodyMedium
                                                   ?.copyWith(
                                                     color: isDark
-                                                        ? AppColors.textDarkSecondary
-                                                        : AppColors.textSecondary,
+                                                        ? AppColors
+                                                              .textDarkSecondary
+                                                        : AppColors
+                                                              .textSecondary,
                                                   ),
                                               textAlign: TextAlign.center,
                                             ),
@@ -262,7 +268,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                           return const Center(
                                             child: Padding(
                                               padding: EdgeInsets.all(8.0),
-                      child:
+                                              child:
                                                   CircularProgressIndicator.adaptive(),
                                             ),
                                           );
@@ -272,7 +278,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                             chatProvider.messages[index];
                                         final isMine =
                                             _currentUserId != null &&
-                                            message.fromUserId == _currentUserId;
+                                            message.fromUserId ==
+                                                _currentUserId;
 
                                         bool isLastInGroup = false;
                                         if (index == 0) {
@@ -287,11 +294,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                           }
                                         }
 
-                                            return MessageBubble(
-                                              message: message,
-                                              isMe: isMine,
-                                              isLastInGroup: isLastInGroup,
-                                            );
+                                        return MessageBubble(
+                                          message: message,
+                                          isMe: isMine,
+                                          isLastInGroup: isLastInGroup,
+                                        );
                                       },
                                     );
                                   },
@@ -307,8 +314,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                             child: Consumer<ChatProvider>(
                               builder: (context, chatProvider, _) {
                                 return TypingIndicator(
-                                  userName: chatProvider.otherUserName ?? widget.otherUserName,
-                      isTyping: chatProvider.isOtherUserTyping,
+                                  userName:
+                                      chatProvider.otherUserName ??
+                                      widget.otherUserName,
+                                  isTyping: chatProvider.isOtherUserTyping,
                                 );
                               },
                             ),
@@ -326,7 +335,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           listen: false,
                         );
                         chatProvider.sendMessage(message);
-                        
+
                         // Update Conversations List Realtime (Optimistic)
                         Provider.of<ConversationsProvider>(
                           context,
@@ -335,8 +344,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           widget.otherUserId,
                           message,
                           DateTime.now(),
-                          otherUserName: chatProvider.otherUserName ?? widget.otherUserName,
-                          otherUserImage: chatProvider.otherUserImage ?? widget.otherUserAvatar,
+                          otherUserName:
+                              chatProvider.otherUserName ??
+                              widget.otherUserName,
+                          otherUserImage:
+                              chatProvider.otherUserImage ??
+                              widget.otherUserAvatar,
                         );
                       },
                       onTyping: (isTyping) {
@@ -381,7 +394,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               height: 56.h,
               padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: Row(
-            children: [
+                children: [
                   // Back Button
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -397,45 +410,56 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
                   // User Avatar
                   Padding(
-                      padding: EdgeInsets.only(right: 12.w),
-                      child: Consumer<ChatProvider>(
-                        builder: (context, chatProvider, _) {
-                          final avatarUrl = chatProvider.otherUserImage ?? widget.otherUserAvatar;
-                          return CircleAvatar(
-                            radius: 20.r,
-                            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                            backgroundColor: Colors.white.withOpacity(0.2),
-                            child: avatarUrl == null 
-                    ? Text(
-                                    (chatProvider.otherUserName ?? widget.otherUserName).substring(0, 1).toUpperCase(),
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      )
-                    : null,
-                          );
-                        },
-                      ),
-              ),
+                    padding: EdgeInsets.only(right: 12.w),
+                    child: Consumer<ChatProvider>(
+                      builder: (context, chatProvider, _) {
+                        final avatarUrl =
+                            chatProvider.otherUserImage ??
+                            widget.otherUserAvatar;
+                        return CircleAvatar(
+                          radius: 20.r,
+                          backgroundImage: avatarUrl != null
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          child: avatarUrl == null
+                              ? Text(
+                                  (chatProvider.otherUserName ??
+                                          widget.otherUserName)
+                                      .substring(0, 1)
+                                      .toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : null,
+                        );
+                      },
+                    ),
+                  ),
 
                   SizedBox(width: 8.w),
 
                   // User Name and Status
-              Expanded(
-                child: Column(
+                  Expanded(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Consumer<ChatProvider>(
                           builder: (context, chatProvider, _) {
                             return Text(
-                              chatProvider.otherUserName ?? widget.otherUserName,
-                      style: TextStyle(
+                              chatProvider.otherUserName ??
+                                  widget.otherUserName,
+                              style: TextStyle(
                                 color: Colors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
                                 letterSpacing: 0.2,
-                      ),
+                              ),
                               maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                              overflow: TextOverflow.ellipsis,
                             );
                           },
                         ),
@@ -481,10 +505,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   ),
 
                   SizedBox(width: 4.w),
-                  ],
-                ),
+                ],
               ),
-            ],
+            ),
+          ],
         ),
       ),
     );
@@ -553,8 +577,8 @@ class UserActivityStatus extends StatelessWidget {
         // Status text
         Text(
           isActive ? 'Active now' : _formatLastSeen(),
-            style: TextStyle(
-              fontSize: 12.sp,
+          style: TextStyle(
+            fontSize: 12.sp,
             color: Colors.white.withOpacity(0.85),
             fontWeight: FontWeight.w400,
             letterSpacing: 0.1,
@@ -649,7 +673,7 @@ class _MessageSeenIndicatorState extends State<MessageSeenIndicator>
               Icons.check_rounded,
               size: 16.sp,
               color: AppColors.textSecondary.withOpacity(0.4),
-          ),
+            ),
         ],
       ),
     );

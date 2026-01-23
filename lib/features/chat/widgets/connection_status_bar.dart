@@ -24,6 +24,7 @@ class ConnectionStatusBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       color: AppColors.warning.withOpacity(0.9),
       child: SafeArea(
+        top: false,
         bottom: false,
         child: Row(
           children: [
@@ -47,7 +48,10 @@ class ConnectionStatusBar extends StatelessWidget {
               GestureDetector(
                 onTap: onRetry,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 4.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12.r),
