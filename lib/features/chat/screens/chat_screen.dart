@@ -172,9 +172,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         children: [
                           Consumer<ChatBackgroundProvider>(
                             builder: (context, bgProvider, _) {
-                              return Container(
-                                decoration: bgProvider
-                                    .getBackgroundDecoration(),
+                              return bgProvider.buildBackground(
                                 child: Builder(
                                   builder: (context) {
                                     if (chatProvider.isLoadingMessages &&

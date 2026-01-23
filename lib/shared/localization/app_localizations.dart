@@ -226,6 +226,15 @@ class AppLocalizations {
       "no_students_found": "No students found. Please contact support.",
       "loading_student_information": "Loading student information...",
       "mark_all_read": "Mark all read",
+
+      // Chat Background
+      "chat_background": "Chat Background",
+      "colors": "Colors",
+      "gradients": "Gradients",
+      "patterns": "Patterns",
+      "custom": "Custom",
+      "take_photo": "Take Photo",
+      "choose_from_gallery": "Choose from Gallery",
     },
     'bn': {
       // Auth
@@ -432,6 +441,15 @@ class AppLocalizations {
       "no_students_found": "কোন ছাত্র পাওয়া যায়নি। অনুগ্রহ করে সহায়তা নিন।",
       "loading_student_information": "ছাত্র তথ্য লোড হচ্ছে...",
       "mark_all_read": "সব পড়া হিসাবে চিহ্নিত করুন",
+
+      // Chat Background
+      "chat_background": "চ্যাট ব্যাকগ্রাউন্ড",
+      "colors": "রং",
+      "gradients": "গ্রেডিয়েন্ট",
+      "patterns": "প্যাটার্ন",
+      "custom": "কাস্টম",
+      "take_photo": "ছবি তুলুন",
+      "choose_from_gallery": "গ্যালারি থেকে নির্বাচন করুন",
     },
   };
 
