@@ -14,10 +14,7 @@ class AppLocalizations {
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 
-  static const List<Locale> supportedLocales = [
-    Locale('en'),
-    Locale('bn'),
-  ];
+  static const List<Locale> supportedLocales = [Locale('en'), Locale('bn')];
 
   // Translation map
   static const Map<String, Map<String, String>> _localizedValues = {
@@ -40,7 +37,8 @@ class AppLocalizations {
       'get_started': 'Get Started',
       'welcome_to_pathshala_bondhu': 'Welcome to Pathshala Bondhu',
       'your_school_companion': 'Your School Companion',
-      'welcome_description': 'আপনার সন্তানের শিক্ষা জীবনের সেরা সঙ্গী। বই, রুটিন, পরীক্ষা, উপস্থিতি এবং ফি সব এক জায়গায়।',
+      'welcome_description':
+          'আপনার সন্তানের শিক্ষা জীবনের সেরা সঙ্গী। বই, রুটিন, পরীক্ষা, উপস্থিতি এবং ফি সব এক জায়গায়।',
 
       // Profile & Settings
       'full_name': 'Full Name',
@@ -64,7 +62,8 @@ class AppLocalizations {
       'app_version': 'App Version',
       'delete_account': 'Delete Account',
       'permanently_delete_account': 'Permanently delete your account',
-      'are_you_sure_delete': 'Are you sure you want to delete your account? This action cannot be undone.',
+      'are_you_sure_delete':
+          'Are you sure you want to delete your account? This action cannot be undone.',
 
       // Common
       'home': 'Home',
@@ -98,7 +97,8 @@ class AppLocalizations {
       'class_diary': 'Class Diary',
       'add_diary': 'Add Diary',
       'no_diaries_yet': 'No Diaries Yet',
-      'start_creating_diaries': 'Start creating class diaries by tapping\nthe "Add Diary" button below.',
+      'start_creating_diaries':
+          'Start creating class diaries by tapping\nthe "Add Diary" button below.',
 
       // Notifications
       'no_notifications_yet': 'No notifications yet',
@@ -141,12 +141,14 @@ class AppLocalizations {
       // Diary
       'diary_details': 'Diary Details',
       'delete_diary': 'Delete Diary',
-      'are_you_sure_delete_diary': 'Are you sure you want to delete this diary?',
+      'are_you_sure_delete_diary':
+          'Are you sure you want to delete this diary?',
       'diary_deleted_successfully': 'Diary deleted successfully',
       'loading_diary_details': 'Loading diary details...',
       'error_loading_details': 'Error Loading Details',
       'diary_not_found': 'Diary Not Found',
-      'diary_not_found_message': 'The diary you are looking for\ncould not be found.',
+      'diary_not_found_message':
+          'The diary you are looking for\ncould not be found.',
       'create_diary': 'Create Diary',
       'edit_diary': 'Edit Diary',
       'new_diary_entry': 'New Diary Entry',
@@ -173,7 +175,8 @@ class AppLocalizations {
       'publish_diary': 'Publish Diary',
       'update_diary': 'Update Diary',
       'loading_form_data': 'Loading form data...',
-      'please_select_class_session_subject': 'Please select Class, Session and Subject',
+      'please_select_class_session_subject':
+          'Please select Class, Session and Subject',
       'diary_created_successfully': 'Diary created successfully!',
       'diary_updated_successfully': 'Diary updated successfully!',
       'error_loading_diaries': 'Error Loading Diaries',
@@ -235,6 +238,25 @@ class AppLocalizations {
       "custom": "Custom",
       "take_photo": "Take Photo",
       "choose_from_gallery": "Choose from Gallery",
+
+      // Chat
+      "search_conversations": "Search conversations...",
+      "could_not_load_conversations": "We couldn't load your conversations",
+      "no_messages_yet": "No Messages Yet",
+      "start_conversation_with_teachers_parents":
+          "Start a conversation with teachers\nand parents",
+      "no_results_found": "No results found",
+      "try_searching_different_name": "Try searching with a different name",
+      "refresh": "Refresh",
+      "no_messages_yet_chat": "No messages yet",
+      "start_conversation_with": "Start the conversation with",
+      "active_now": "Active now",
+      "active_just_now": "Active just now",
+      "active_minutes_ago": "Active {minutes}m ago",
+      "active_hours_ago": "Active {hours}h ago",
+      "active_yesterday": "Active yesterday",
+      "active_days_ago": "Active {days}d ago",
+      "offline": "Offline",
     },
     'bn': {
       // Auth
@@ -255,7 +277,8 @@ class AppLocalizations {
       'get_started': 'শুরু করুন',
       'welcome_to_pathshala_bondhu': 'পাঠশালা বন্ধুতে স্বাগতম',
       'your_school_companion': 'আপনার স্কুল সঙ্গী',
-      'welcome_description': 'আপনার সন্তানের শিক্ষা জীবনের সেরা সঙ্গী। বই, রুটিন, পরীক্ষা, উপস্থিতি এবং ফি সব এক জায়গায়।',
+      'welcome_description':
+          'আপনার সন্তানের শিক্ষা জীবনের সেরা সঙ্গী। বই, রুটিন, পরীক্ষা, উপস্থিতি এবং ফি সব এক জায়গায়।',
 
       // Profile & Settings
       'full_name': 'পুরো নাম',
@@ -279,7 +302,8 @@ class AppLocalizations {
       'app_version': 'অ্যাপ সংস্করণ',
       'delete_account': 'অ্যাকাউন্ট মুছুন',
       'permanently_delete_account': 'আপনার অ্যাকাউন্ট স্থায়ীভাবে মুছুন',
-      'are_you_sure_delete': 'আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট মুছতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।',
+      'are_you_sure_delete':
+          'আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট মুছতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।',
 
       // Common
       'home': 'হোম',
@@ -313,7 +337,8 @@ class AppLocalizations {
       'class_diary': 'ক্লাস ডায়েরি',
       'add_diary': 'ডায়েরি যোগ করুন',
       'no_diaries_yet': 'এখনও কোন ডায়েরি নেই',
-      'start_creating_diaries': 'নিচে "ডায়েরি যোগ করুন" বোতামে ট্যাপ করে\nক্লাস ডায়েরি তৈরি শুরু করুন।',
+      'start_creating_diaries':
+          'নিচে "ডায়েরি যোগ করুন" বোতামে ট্যাপ করে\nক্লাস ডায়েরি তৈরি শুরু করুন।',
 
       // Notifications
       'no_notifications_yet': 'এখনও কোন নোটিফিকেশন নেই',
@@ -356,7 +381,8 @@ class AppLocalizations {
       // Diary
       'diary_details': 'ডায়েরি বিবরণ',
       'delete_diary': 'ডায়েরি মুছুন',
-      'are_you_sure_delete_diary': 'আপনি কি নিশ্চিত যে আপনি এই ডায়েরি মুছতে চান?',
+      'are_you_sure_delete_diary':
+          'আপনি কি নিশ্চিত যে আপনি এই ডায়েরি মুছতে চান?',
       'diary_deleted_successfully': 'ডায়েরি সফলভাবে মুছে ফেলা হয়েছে',
       'loading_diary_details': 'ডায়েরি বিবরণ লোড হচ্ছে...',
       'error_loading_details': 'বিবরণ লোড করতে ত্রুটি',
@@ -388,7 +414,8 @@ class AppLocalizations {
       'publish_diary': 'ডায়েরি প্রকাশ করুন',
       'update_diary': 'ডায়েরি আপডেট করুন',
       'loading_form_data': 'ফর্ম ডেটা লোড হচ্ছে...',
-      'please_select_class_session_subject': 'অনুগ্রহ করে ক্লাস, সেশন এবং বিষয় নির্বাচন করুন',
+      'please_select_class_session_subject':
+          'অনুগ্রহ করে ক্লাস, সেশন এবং বিষয় নির্বাচন করুন',
       'diary_created_successfully': 'ডায়েরি সফলভাবে তৈরি হয়েছে!',
       'diary_updated_successfully': 'ডায়েরি সফলভাবে আপডেট হয়েছে!',
       'error_loading_diaries': 'ডায়েরি লোড করতে ত্রুটি',
@@ -450,6 +477,25 @@ class AppLocalizations {
       "custom": "কাস্টম",
       "take_photo": "ছবি তুলুন",
       "choose_from_gallery": "গ্যালারি থেকে নির্বাচন করুন",
+
+      // Chat
+      "search_conversations": "কনভারসেশন খুঁজুন...",
+      "could_not_load_conversations": "আমরা আপনার কথোপকথন লোড করতে পারিনি",
+      "no_messages_yet": "এখনও কোন বার্তা নেই",
+      "start_conversation_with_teachers_parents":
+          "শিক্ষক এবং অভিভাবকদের সাথে\nকথোপকথন শুরু করুন",
+      "no_results_found": "কোন ফলাফল পাওয়া যায়নি",
+      "try_searching_different_name": "একটি ভিন্ন নাম দিয়ে অনুসন্ধান করুন",
+      "refresh": "রিফ্রেশ",
+      "no_messages_yet_chat": "এখনও কোন বার্তা নেই",
+      "start_conversation_with": "এর সাথে কথোপকথন শুরু করুন",
+      "active_now": "এখন সক্রিয়",
+      "active_just_now": "এখনই সক্রিয়",
+      "active_minutes_ago": "{minutes} মিনিট আগে সক্রিয়",
+      "active_hours_ago": "{hours} ঘন্টা আগে সক্রিয়",
+      "active_yesterday": "গতকাল সক্রিয়",
+      "active_days_ago": "{days} দিন আগে সক্রিয়",
+      "offline": "অফলাইন",
     },
   };
 
@@ -471,8 +517,9 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) {
-    return AppLocalizations.supportedLocales
-        .any((l) => l.languageCode == locale.languageCode);
+    return AppLocalizations.supportedLocales.any(
+      (l) => l.languageCode == locale.languageCode,
+    );
   }
 
   @override

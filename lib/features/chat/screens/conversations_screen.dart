@@ -90,7 +90,8 @@ class _ConversationsScreenState extends State<ConversationsScreen>
 
   Widget _buildSearchBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final t = AppLocalizations.of(context);
+
     return SizeTransition(
       sizeFactor: CurvedAnimation(
         parent: _searchAnimationController,
@@ -108,73 +109,24 @@ class _ConversationsScreenState extends State<ConversationsScreen>
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(8.r),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary.withOpacity(0.1),
-                    AppColors.primaryDark.withOpacity(0.1),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Icon(Icons.search, color: AppColors.primary, size: 20.sp),
-            ),
-            SizedBox(width: 12.w),
-
-            // Search Input
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                autofocus: _isSearchVisible, // ✅ Only focus when visible
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 14.sp, 
-                  color: isDark ? AppColors.textDark : AppColors.textPrimary,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search conversations...',
-                  hintStyle: TextStyle(
-                    fontSize: 15.sp,
-                    color: AppColors.textSecondary.withOpacity(0.6),
-                  ),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onChanged: (value) {
-                  // Trim and normalize spacing
-                  setState(() {
-                    _searchQuery = value.trim().toLowerCase();
-                  });
-                },
-              ),
-            ),
-
-            // Clear button (only visible when text exists)
-            if (_searchController.text.isNotEmpty)
-              InkWell(
-                onTap: () {
-                  _searchController.clear();
-                  setState(() {
-                    _searchQuery = '';
-                  });
-                  FocusScope.of(context).unfocus(); // optional: close keyboard
-                },
-                borderRadius: BorderRadius.circular(20.r),
-                child: Padding(
-                  padding: EdgeInsets.all(4.w),
-                  child: Icon(
-                    Icons.clear,
-                    size: 16.sp,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-          ],
+        child: _ConversationSearchField(
+          controller: _searchController,
+          hint:
+              t?.translate('search_conversations') ?? 'Search conversations...',
+          isDark: isDark,
+          onChanged: (value) {
+            setState(() {
+              _searchQuery = value.trim().toLowerCase();
+            });
+          },
+          onClear: () {
+            _searchController.clear();
+            setState(() {
+              _searchQuery = '';
+            });
+            FocusScope.of(context).unfocus();
+          },
+          hasText: _searchQuery.isNotEmpty,
         ),
       ),
     );
@@ -272,7 +224,9 @@ class _ConversationsScreenState extends State<ConversationsScreen>
         }
       },
       child: Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.backgroundLight,
 
         // ... rest of the scaffold
         appBar: PreferredSize(
@@ -280,35 +234,35 @@ class _ConversationsScreenState extends State<ConversationsScreen>
           child: CustomAppBar(
             showBackButton: true,
             title: t?.translate('messages') ?? 'Messages',
-        actions: [
-            Transform.translate(
-              offset: Offset(0.w, 0), // push right by 16.w
-              child: Row(
-                children: [
-                  IconAction(
-                    icon: _isSearchVisible ? Icons.close : Icons.search,
-                    onTap: _toggleSearch,
-                  ),
-                  SizedBox(width: 8.w),
-                  IconAction(
-                    icon: Icons.more_vert,
-                    onTap: () {
-                      // Show menu
-                      _showMenuOptions(
-                        context,
-                        authProvider,
-                        conversationsProvider,
-              );
-            },
-          ),
-        ],
+            actions: [
+              Transform.translate(
+                offset: Offset(0.w, 0), // push right by 16.w
+                child: Row(
+                  children: [
+                    IconAction(
+                      icon: _isSearchVisible ? Icons.close : Icons.search,
+                      onTap: _toggleSearch,
+                    ),
+                    SizedBox(width: 8.w),
+                    IconAction(
+                      icon: Icons.more_vert,
+                      onTap: () {
+                        // Show menu
+                        _showMenuOptions(
+                          context,
+                          authProvider,
+                          conversationsProvider,
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
           ),
-      ),
-      body: Column(
-        children: [
+        ),
+        body: Column(
+          children: [
             // Animated search bar
             _buildSearchBar(),
 
@@ -336,14 +290,15 @@ class _ConversationsScreenState extends State<ConversationsScreen>
     ConversationsProvider conversationsProvider,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final t = AppLocalizations.of(context);
+
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 32.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          Container(
+            Container(
               padding: EdgeInsets.all(24.r),
               decoration: BoxDecoration(
                 color: AppColors.error.withOpacity(0.1),
@@ -357,7 +312,8 @@ class _ConversationsScreenState extends State<ConversationsScreen>
             ),
             SizedBox(height: 24.h),
             Text(
-              'Oops! Something went wrong',
+              t?.translate('oops_something_went_wrong') ??
+                  'Oops! Something went wrong',
               style: TextStyle(
                 fontSize: 20.sp,
                 fontWeight: FontWeight.w700,
@@ -366,18 +322,18 @@ class _ConversationsScreenState extends State<ConversationsScreen>
             ),
             SizedBox(height: 12.h),
             Text(
-              'We couldn\'t load your conversations',
-              style: TextStyle(
-                fontSize: 14.sp, 
-                color: AppColors.textSecondary,
-              ),
+              t?.translate('could_not_load_conversations') ??
+                  'We couldn\'t load your conversations',
+              style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 32.h),
             ElevatedButton(
-                        onPressed: () {
+              onPressed: () {
                 final userIdStr = authProvider.currentUser?.id;
-                final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+                final userId = userIdStr != null
+                    ? int.tryParse(userIdStr)
+                    : null;
                 if (userId != null) {
                   conversationsProvider.refresh(userId);
                 }
@@ -392,7 +348,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                 elevation: 0,
               ),
               child: Text(
-                'Try Again',
+                t?.translate('try_again') ?? 'Try Again',
                 style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
               ),
             ),
@@ -404,7 +360,8 @@ class _ConversationsScreenState extends State<ConversationsScreen>
 
   Widget _buildEmptyState() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final t = AppLocalizations.of(context);
+
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 40.w),
@@ -432,7 +389,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
             ),
             SizedBox(height: 32.h),
             Text(
-              'No Messages Yet',
+              t?.translate('no_messages_yet') ?? 'No Messages Yet',
               style: TextStyle(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.w700,
@@ -441,7 +398,8 @@ class _ConversationsScreenState extends State<ConversationsScreen>
             ),
             SizedBox(height: 12.h),
             Text(
-              'Start a conversation with teachers\nand parents',
+              t?.translate('start_conversation_with_teachers_parents') ??
+                  'Start a conversation with teachers\nand parents',
               style: TextStyle(
                 fontSize: 15.sp,
                 color: AppColors.textSecondary,
@@ -466,7 +424,8 @@ class _ConversationsScreenState extends State<ConversationsScreen>
     // Show empty state if search returns no results
     if (filteredConversations.isEmpty && _searchQuery.isNotEmpty) {
       final isDark = Theme.of(context).brightness == Brightness.dark;
-      
+      final t = AppLocalizations.of(context);
+
       return Center(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 40.w),
@@ -480,7 +439,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
               ),
               SizedBox(height: 16.h),
               Text(
-                'No results found',
+                t?.translate('no_results_found') ?? 'No results found',
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -489,7 +448,8 @@ class _ConversationsScreenState extends State<ConversationsScreen>
               ),
               SizedBox(height: 8.h),
               Text(
-                'Try searching with a different name',
+                t?.translate('try_searching_different_name') ??
+                    'Try searching with a different name',
                 style: TextStyle(
                   fontSize: 14.sp,
                   color: AppColors.textSecondary,
@@ -499,9 +459,9 @@ class _ConversationsScreenState extends State<ConversationsScreen>
           ),
         ),
       );
-                }
+    }
 
-                return RefreshIndicator(
+    return RefreshIndicator(
       onRefresh: () async {
         final userIdStr = authProvider.currentUser?.id;
         final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
@@ -509,12 +469,12 @@ class _ConversationsScreenState extends State<ConversationsScreen>
           await conversationsProvider.refresh(userId);
         }
       },
-                  color: AppColors.primary,
-                  child: ListView.builder(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
+      color: AppColors.primary,
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(vertical: 8.h),
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: filteredConversations.length,
-                    itemBuilder: (context, index) {
+        itemBuilder: (context, index) {
           final conversation = filteredConversations[index];
 
           return FadeTransition(
@@ -544,10 +504,10 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                     ),
                   ),
               child: _buildConversationItem(conversation),
-                  ),
-                );
-              },
             ),
+          );
+        },
+      ),
     );
   }
 
@@ -572,33 +532,36 @@ class _ConversationsScreenState extends State<ConversationsScreen>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatScreen(
-              otherUserId: conversation.userId,
-              otherUserName: conversation.userName,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChatScreen(
+                  otherUserId: conversation.userId,
+                  otherUserName: conversation.userName,
                   otherUserAvatar: conversation.userImage,
-            ),
-          ),
-        );
-      },
+                ),
+              ),
+            );
+          },
           borderRadius: BorderRadius.circular(16.r),
           child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Row(
-          children: [
-                // Avatar with gradient border for unread and active indicator
-            Stack(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            child: Row(
               children: [
+                // Avatar with gradient border for unread and active indicator
+                Stack(
+                  children: [
                     Container(
                       padding: EdgeInsets.all(hasUnread ? 3.r : 0),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: hasUnread
                             ? LinearGradient(
-                                colors: [AppColors.primary, AppColors.primaryDark],
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.primaryDark,
+                                ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               )
@@ -609,40 +572,40 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                         backgroundColor: AppColors.primary,
                         backgroundImage: conversation.userImage != null
                             ? NetworkImage(conversation.userImage!)
-                      : null,
+                            : null,
                         child: conversation.userImage == null
-                      ? Text(
-                          conversation.userName.isNotEmpty
+                            ? Text(
+                                conversation.userName.isNotEmpty
                                     ? conversation.userName
                                           .substring(0, 1)
                                           .toUpperCase()
-                              : '?',
-                          style: TextStyle(
+                                    : '?',
+                                style: TextStyle(
                                   color: Colors.white,
-                            fontSize: 20.sp,
+                                  fontSize: 20.sp,
                                   fontWeight: FontWeight.w600,
-                          ),
-                        )
-                      : null,
-                ),
+                                ),
+                              )
+                            : null,
+                      ),
                     ),
                     // Online indicator - show when user is online
-                if (conversation.isOnline)
-                  Positioned(
+                    if (conversation.isOnline)
+                      Positioned(
                         right: hasUnread ? 5.r : 2.r,
                         bottom: hasUnread ? 5.r : 2.r,
-                    child: Container(
+                        child: Container(
                           width: 14.r,
                           height: 14.r,
-                      decoration: BoxDecoration(
+                          decoration: BoxDecoration(
                             // Use a brighter green when avatar is default (green bg)
                             color: hasImage
                                 ? const Color(0xFF31A24C)
                                 : const Color(
                                     0xFF00E676,
                                   ), // Brighter green for contrast
-                        shape: BoxShape.circle,
-                        border: Border.all(
+                            shape: BoxShape.circle,
+                            border: Border.all(
                               color: Colors.white,
                               width: 2.5.r,
                             ),
@@ -653,21 +616,21 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                                 spreadRadius: 1,
                               ),
                             ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-              ],
-            ),
-            SizedBox(width: 12.w),
+                  ],
+                ),
+                SizedBox(width: 12.w),
 
                 // Message info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
                           Flexible(
                             child: conversation.userName.startsWith('User ')
                                 ? Container(
@@ -679,97 +642,104 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                                     ),
                                   )
                                 : Text(
-                          conversation.userName,
-                          style: TextStyle(
+                                    conversation.userName,
+                                    style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight: hasUnread
                                           ? FontWeight.w700
                                           : FontWeight.w600,
-                                      color: isDark ? AppColors.textDark : AppColors.textPrimary,
+                                      color: isDark
+                                          ? AppColors.textDark
+                                          : AppColors.textPrimary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
                           SizedBox(width: 8.w),
-                        Text(
+                          Text(
                             _formatMessageTime(conversation.lastMessageTime),
-                          style: TextStyle(
-                            fontSize: 12.sp,
+                            style: TextStyle(
+                              fontSize: 12.sp,
                               fontWeight: hasUnread
                                   ? FontWeight.w600
                                   : FontWeight.w500,
                               color: hasUnread
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
+                                  ? AppColors.primary
+                                  : AppColors.textSecondary,
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
+                        ],
+                      ),
                       SizedBox(height: 6.h),
-                  Row(
-                    children: [
+                      Row(
+                        children: [
                           // Seen indicator for sent messages
                           if (conversation.lastMessageSentByMe) ...[
                             Icon(
-                            conversation.lastMessageSeen
+                              conversation.lastMessageSeen
                                   ? Icons.visibility
-                                : Icons.done,
+                                  : Icons.done,
                               size: 16.r,
-                            color: conversation.lastMessageSeen
+                              color: conversation.lastMessageSeen
                                   ? AppColors.primaryDark
                                   : AppColors.textSecondary,
-                          ),
+                            ),
                             SizedBox(width: 4.w),
                           ],
-                      Expanded(
-                        child: Text(
+                          Expanded(
+                            child: Text(
                               conversation.lastMessage ?? 'No messages',
-                          style: TextStyle(
+                              style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: hasUnread
                                     ? FontWeight.w600
                                     : FontWeight.w400,
                                 color: hasUnread
-                                    ? (isDark ? AppColors.textDark : AppColors.textPrimary)
-                                : AppColors.textSecondary,
-                          ),
+                                    ? (isDark
+                                          ? AppColors.textDark
+                                          : AppColors.textPrimary)
+                                    : AppColors.textSecondary,
+                              ),
                               maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                          if (hasUnread) ...[
-                            SizedBox(width: 8.w),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                                vertical: 4.h,
-                          ),
-                          decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [AppColors.primary, AppColors.primaryDark],
-                                ),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Text(
-                            conversation.unreadCount > 99
-                                ? '99+'
-                                : conversation.unreadCount.toString(),
-                            style: TextStyle(
-                                  color: Colors.white,
-                              fontSize: 11.sp,
-                                  fontWeight: FontWeight.w700,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
+                          if (hasUnread) ...[
+                            SizedBox(width: 8.w),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.primary,
+                                    AppColors.primaryDark,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Text(
+                                conversation.unreadCount > 99
+                                    ? '99+'
+                                    : conversation.unreadCount.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
                           ],
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
         ),
       ),
     );
@@ -780,6 +750,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
     AuthProvider authProvider,
     ConversationsProvider conversationsProvider,
   ) {
+    final t = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -787,16 +758,18 @@ class _ConversationsScreenState extends State<ConversationsScreen>
       ),
       builder: (context) => Container(
         padding: EdgeInsets.symmetric(vertical: 20.h),
-      child: Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
-        children: [
+          children: [
             ListTile(
               leading: const Icon(Icons.refresh, color: AppColors.primary),
-              title: const Text('Refresh'),
+              title: Text(t?.translate('refresh') ?? 'Refresh'),
               onTap: () {
                 Navigator.pop(context);
                 final userIdStr = authProvider.currentUser?.id;
-                final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+                final userId = userIdStr != null
+                    ? int.tryParse(userIdStr)
+                    : null;
                 if (userId != null) {
                   conversationsProvider.refresh(userId);
                 }
@@ -804,6 +777,116 @@ class _ConversationsScreenState extends State<ConversationsScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ============================================
+// Inline Search Field Widget for Conversations
+// ============================================
+class _ConversationSearchField extends StatefulWidget {
+  final TextEditingController controller;
+  final String hint;
+  final bool isDark;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+  final bool hasText;
+
+  const _ConversationSearchField({
+    required this.controller,
+    required this.hint,
+    required this.isDark,
+    required this.onChanged,
+    required this.onClear,
+    required this.hasText,
+  });
+
+  @override
+  State<_ConversationSearchField> createState() =>
+      _ConversationSearchFieldState();
+}
+
+class _ConversationSearchFieldState extends State<_ConversationSearchField> {
+  late FocusNode _focusNode;
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.isDark ? AppColors.grey800 : AppColors.grey100,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: _isFocused ? AppColors.primary : Colors.transparent,
+          width: _isFocused ? 2 : 0,
+        ),
+      ),
+      child: TextField(
+        controller: widget.controller,
+        focusNode: _focusNode,
+        autofocus: false,
+        style: TextStyle(
+          fontSize: 15.sp,
+          color: widget.isDark ? AppColors.textDark : AppColors.textPrimary,
+          fontWeight: FontWeight.w400,
+        ),
+        decoration: InputDecoration(
+          hintText: widget.hint,
+          hintStyle: TextStyle(
+            fontSize: 15.sp,
+            color: AppColors.textSecondary.withOpacity(0.6),
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Padding(
+            padding: EdgeInsets.all(12.w),
+            child: Icon(
+              Icons.search,
+              color: _isFocused ? AppColors.primary : AppColors.textSecondary,
+              size: 20.sp,
+            ),
+          ),
+          suffixIcon: widget.hasText
+              ? InkWell(
+                  onTap: widget.onClear,
+                  borderRadius: BorderRadius.circular(20.r),
+                  child: Padding(
+                    padding: EdgeInsets.all(8.w),
+                    child: Icon(
+                      Icons.clear,
+                      size: 18.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                )
+              : null,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 14.h,
+          ),
+          isDense: true,
+        ),
+        onChanged: widget.onChanged,
       ),
     );
   }

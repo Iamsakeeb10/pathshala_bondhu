@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/network/token_storage.dart';
+import '../../../shared/localization/app_localizations.dart';
 import '../../../shared/utils/app_colors.dart';
 import '../providers/chat_background_provider.dart';
 import '../providers/chat_provider.dart';
@@ -209,28 +210,56 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                               ),
                                             ),
                                             SizedBox(height: 24.h),
-                                            Text(
-                                              'No messages yet',
-                                              style: theme.textTheme.titleMedium
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.w700,
-                                                    color: isDark
-                                                        ? AppColors.textDark
-                                                        : AppColors.textPrimary,
-                                                  ),
+                                            Builder(
+                                              builder: (context) {
+                                                final t = AppLocalizations.of(
+                                                  context,
+                                                );
+                                                return Text(
+                                                  t?.translate(
+                                                        'no_messages_yet_chat',
+                                                      ) ??
+                                                      'No messages yet',
+                                                  style: theme
+                                                      .textTheme
+                                                      .titleMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color: isDark
+                                                            ? AppColors.textDark
+                                                            : AppColors
+                                                                  .textPrimary,
+                                                      ),
+                                                );
+                                              },
                                             ),
                                             SizedBox(height: 8.h),
-                                            Text(
-                                              'Start the conversation with ${widget.otherUserName}!',
-                                              style: theme.textTheme.bodyMedium
-                                                  ?.copyWith(
-                                                    color: isDark
-                                                        ? AppColors
-                                                              .textDarkSecondary
-                                                        : AppColors
-                                                              .textSecondary,
-                                                  ),
-                                              textAlign: TextAlign.center,
+                                            Builder(
+                                              builder: (context) {
+                                                final t = AppLocalizations.of(
+                                                  context,
+                                                );
+                                                final startText =
+                                                    t?.translate(
+                                                      'start_conversation_with',
+                                                    ) ??
+                                                    'Start the conversation with';
+                                                return Text(
+                                                  '$startText ${widget.otherUserName}!',
+                                                  style: theme
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        color: isDark
+                                                            ? AppColors
+                                                                  .textDarkSecondary
+                                                            : AppColors
+                                                                  .textSecondary,
+                                                      ),
+                                                  textAlign: TextAlign.center,
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),
@@ -527,24 +556,35 @@ class UserActivityStatus extends StatelessWidget {
     required this.lastSeen,
   });
 
-  String _formatLastSeen() {
-    if (lastSeen == null) return 'Offline';
+  String _formatLastSeen(BuildContext context) {
+    final t = AppLocalizations.of(context);
+
+    if (lastSeen == null) {
+      return t?.translate('offline') ?? 'Offline';
+    }
 
     final now = DateTime.now();
     final difference = now.difference(lastSeen!);
 
     if (difference.inMinutes < 1) {
-      return 'Active just now';
+      return t?.translate('active_just_now') ?? 'Active just now';
     } else if (difference.inMinutes < 60) {
-      return 'Active ${difference.inMinutes}m ago';
+      final minutes = difference.inMinutes;
+      final text =
+          t?.translate('active_minutes_ago') ?? 'Active {minutes}m ago';
+      return text.replaceAll('{minutes}', minutes.toString());
     } else if (difference.inHours < 24) {
-      return 'Active ${difference.inHours}h ago';
+      final hours = difference.inHours;
+      final text = t?.translate('active_hours_ago') ?? 'Active {hours}h ago';
+      return text.replaceAll('{hours}', hours.toString());
     } else if (difference.inDays == 1) {
-      return 'Active yesterday';
+      return t?.translate('active_yesterday') ?? 'Active yesterday';
     } else if (difference.inDays < 7) {
-      return 'Active ${difference.inDays}d ago';
+      final days = difference.inDays;
+      final text = t?.translate('active_days_ago') ?? 'Active {days}d ago';
+      return text.replaceAll('{days}', days.toString());
     } else {
-      return 'Offline';
+      return t?.translate('offline') ?? 'Offline';
     }
   }
 
@@ -573,15 +613,22 @@ class UserActivityStatus extends StatelessWidget {
         ),
         SizedBox(width: 5.w),
         // Status text
-        Text(
-          isActive ? 'Active now' : _formatLastSeen(),
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: Colors.white.withOpacity(0.85),
-            fontWeight: FontWeight.w400,
-            letterSpacing: 0.1,
-            height: 1.2,
-          ),
+        Builder(
+          builder: (context) {
+            final t = AppLocalizations.of(context);
+            return Text(
+              isActive
+                  ? (t?.translate('active_now') ?? 'Active now')
+                  : _formatLastSeen(context),
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: Colors.white.withOpacity(0.85),
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.1,
+                height: 1.2,
+              ),
+            );
+          },
         ),
       ],
     );
