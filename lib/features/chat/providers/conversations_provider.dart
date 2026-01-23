@@ -30,13 +30,10 @@ class ConversationsProvider extends ChangeNotifier {
   String? get error => _error;
   bool get hasConversations => _conversations.isNotEmpty;
   bool get isSocketConnected => _isSocketConnected;
-  
+
   /// Get total unread count across all conversations
   int get totalUnreadCount {
-    return _conversations.fold<int>(
-      0,
-      (sum, conv) => sum + conv.unreadCount,
-    );
+    return _conversations.fold<int>(0, (sum, conv) => sum + conv.unreadCount);
   }
 
   /// Initialize socket for real-time updates
@@ -108,22 +105,22 @@ class ConversationsProvider extends ChangeNotifier {
   /// Soft reset for app updates
   Future<void> softReset() async {
     debugPrint('🔄 executing ConversationsProvider softReset()');
-    
+
     // Disconnect socket
     _chatService?.dispose();
     _chatService = null;
     _isSocketConnected = false;
-    
+
     // Clear lists
     _conversations = [];
     _locallyReadConversations.clear();
-    
+
     // Reset state
     _isLoading = false;
     _error = null;
-    // We do NOT clear _currentUserId here because we want to be able to reconnect 
+    // We do NOT clear _currentUserId here because we want to be able to reconnect
     // easily if fetchConversations is called shortly after.
-    
+
     notifyListeners();
   }
 
@@ -197,29 +194,35 @@ class ConversationsProvider extends ChangeNotifier {
       final toUserId = int.tryParse(data['to_user_id'].toString());
       final message = data['message'] as String?;
 
+      debugPrint(
+        '📨 RT Message: from=$fromUserId, to=$toUserId, currentUser=$_currentUserId',
+      );
+
       if (fromUserId == null || message == null) return;
 
       // Determine the other user ID (the one we're chatting with)
       final otherUserId = fromUserId == _currentUserId ? toUserId : fromUserId;
       if (otherUserId == null) return;
 
+      debugPrint('👤 Conversation will be with userId=$otherUserId');
+
       // START REFINE: Better handling of messages
       final isSentByMe = fromUserId == _currentUserId;
-      
+
       // Update local state
       updateLastMessage(
-        otherUserId, 
-        message, 
-        DateTime.now(), 
+        otherUserId,
+        message,
+        DateTime.now(),
         isSentByMe: isSentByMe,
-        isSeen: false
+        isSeen: false,
       );
-      
+
       // If it's a new conversation (not in list), fetch it
       final index = _conversations.indexWhere((c) => c.userId == otherUserId);
       if (index == -1) {
-         debugPrint('🆕 RT: New conversation with $otherUserId detected');
-         _fetchAndAddNewConversation(otherUserId);
+        debugPrint('🆕 RT: New conversation with $otherUserId detected');
+        _fetchAndAddNewConversation(otherUserId);
       }
     } catch (e) {
       debugPrint('❌ Error handling new message RT: $e');
@@ -266,24 +269,24 @@ class ConversationsProvider extends ChangeNotifier {
       debugPrint('💬 Updated last message for user $otherUserId');
       notifyListeners();
     } else {
-       // Create new conversation optimistically if user details are provided
-       if (otherUserName != null) {
-          debugPrint('🆕 Creating new optimistic conversation for $otherUserId');
-          final newConversation = Conversation(
-            userId: otherUserId,
-            userName: otherUserName,
-            userImage: otherUserImage,
-            lastMessage: message,
-            lastMessageTime: time,
-            unreadCount: 0, // Sent by me, so 0 unread
-            lastMessageSentByMe: isSentByMe,
-            lastMessageSeen: isSeen,
-            isOnline: false, // Don't know yet
-          );
-          
-          _conversations.insert(0, newConversation);
-          notifyListeners();
-       }
+      // Create new conversation optimistically if user details are provided
+      if (otherUserName != null) {
+        debugPrint('🆕 Creating new optimistic conversation for $otherUserId');
+        final newConversation = Conversation(
+          userId: otherUserId,
+          userName: otherUserName,
+          userImage: otherUserImage,
+          lastMessage: message,
+          lastMessageTime: time,
+          unreadCount: 0, // Sent by me, so 0 unread
+          lastMessageSentByMe: isSentByMe,
+          lastMessageSeen: isSeen,
+          isOnline: false, // Don't know yet
+        );
+
+        _conversations.insert(0, newConversation);
+        notifyListeners();
+      }
     }
   }
 
@@ -400,12 +403,29 @@ class ConversationsProvider extends ChangeNotifier {
 
     // Get unique user IDs
     final userIds = _conversations.map((c) => c.userId).toSet().toList();
-    debugPrint('🔍 Fetching details for ${userIds.length} users');
+    debugPrint('🔍 Fetching details for ${userIds.length} users: $userIds');
+
+    // Debug: Show each conversation's user ID
+    for (var conv in _conversations) {
+      debugPrint(
+        '  📋 Conversation userId: ${conv.userId}, current userName: ${conv.userName}',
+      );
+    }
 
     // Fetch all users
     final users = await _userLookupService.getUsersByIds(userIds);
 
-    debugPrint('🟨  Users ---- $users');
+    debugPrint('🟨 Users fetched: $users');
+
+    // Debug: Show what was fetched for each user ID
+    for (var userId in userIds) {
+      final user = users[userId];
+      if (user != null) {
+        debugPrint('  ✅ User $userId: ${user.name} (avatar: ${user.imageUrl})');
+      } else {
+        debugPrint('  ❌ User $userId: NOT FOUND');
+      }
+    }
 
     // Update conversations with user details
     _conversations = _conversations.map((conversation) {

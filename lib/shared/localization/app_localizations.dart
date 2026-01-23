@@ -19,6 +19,7 @@ class AppLocalizations {
   // Translation map
   static const Map<String, Map<String, String>> _localizedValues = {
     'en': {
+      'messages': 'Messaages',
       // Auth
       'signup': 'Sign Up',
       'email': 'Email',
@@ -276,6 +277,7 @@ class AppLocalizations {
       'percentage': 'Percentage',
     },
     'bn': {
+      'messages': 'বার্তা',
       // Auth
       'signup': 'নিবন্ধন করুন',
       'email': 'ইমেইল',

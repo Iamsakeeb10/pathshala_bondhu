@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/network/token_storage.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
@@ -271,24 +272,43 @@ class _ParentsScreenState extends State<ParentsScreen> {
         }
         return false;
       },
-      child: ListView.builder(
-        padding: EdgeInsets.all(16.w),
-        itemCount: provider.parents.length + (provider.isLoadingMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          // Show loading indicator at the end
-          if (index == provider.parents.length) {
-            return Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-              ),
-            );
-          }
+      child: FutureBuilder<String?>(
+        future: TokenStorage.getUserId(),
+        builder: (context, snapshot) {
+          final currentUserId = snapshot.data != null
+              ? int.tryParse(snapshot.data!)
+              : null;
 
-          final parent = provider.parents[index];
-          return _buildParentCard(parent);
+          // Filter out current user from the list
+          final filteredParents = currentUserId != null
+              ? provider.parents
+                    .where((p) => (p.userId ?? p.id) != currentUserId)
+                    .toList()
+              : provider.parents;
+
+          return ListView.builder(
+            padding: EdgeInsets.all(16.w),
+            itemCount:
+                filteredParents.length + (provider.isLoadingMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              // Show loading indicator at the end
+              if (index == filteredParents.length) {
+                return Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              final parent = filteredParents[index];
+              return _buildParentCard(parent);
+            },
+          );
         },
       ),
     );
@@ -339,11 +359,20 @@ class _ParentsScreenState extends State<ParentsScreen> {
       actionIcon: Icons.chat_bubble_outline_rounded,
       actionTooltip: 'Chat with ${parent.fatherName}',
       onActionTap: () {
+        debugPrint('🎯 ========== INITIATING CHAT (PARENT) ==========');
+        debugPrint('🎯 Parent Name: ${parent.fatherName}');
+        debugPrint('🎯 ParentListModel.id (parent record ID): ${parent.id}');
+        debugPrint(
+          '🎯 ParentListModel.userId (user ID from API): ${parent.userId}',
+        );
+        debugPrint('🎯 Currently using for chat: ${parent.id}');
+        debugPrint('🎯 Should use: ${parent.userId ?? parent.id}');
+        debugPrint('🎯 ===============================================');
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => ChatScreen(
-              otherUserId: parent.id,
+              otherUserId: parent.userId ?? parent.id,
               otherUserName: parent.fatherName,
               otherUserAvatar: null,
             ),

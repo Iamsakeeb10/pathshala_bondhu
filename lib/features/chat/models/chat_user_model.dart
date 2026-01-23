@@ -4,17 +4,18 @@ class ChatUser {
   final String name;
   final String? imageUrl;
 
-  ChatUser({
-    required this.id,
-    required this.name,
-    this.imageUrl,
-  });
+  ChatUser({required this.id, required this.name, this.imageUrl});
 
   factory ChatUser.fromJson(Map<String, dynamic> json) {
     // 1. Try to get image from flat 'image_url' (Cache format)
     String? imageUrl = json['image_url'] as String?;
 
-    // 2. If null, try to extract from 'images' array (API format)
+    // 2. Try to get from 'avatar' field (User details API format)
+    if (imageUrl == null) {
+      imageUrl = json['avatar'] as String?;
+    }
+
+    // 3. If null, try to extract from 'images' array (API format)
     if (imageUrl == null) {
       final images = json['images'] as List<dynamic>?;
       if (images != null && images.isNotEmpty) {
@@ -35,10 +36,6 @@ class ChatUser {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'image_url': imageUrl,
-    };
+    return {'id': id, 'name': name, 'image_url': imageUrl};
   }
 }

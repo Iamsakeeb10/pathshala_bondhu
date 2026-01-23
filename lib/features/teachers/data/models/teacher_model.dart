@@ -1,5 +1,5 @@
 /// Teacher model matching the API response structure
-/// 
+///
 /// API: GET /api/v1/teachers?page=1&per_page=25
 class TeacherListModel {
   final int id;
@@ -37,12 +37,14 @@ class TeacherListModel {
 /// Teacher details (nested object in response)
 class TeacherDetails {
   final int id;
+  final String? userId;
   final String? department;
   final String? specialization;
   final String? bio;
 
   TeacherDetails({
     required this.id,
+    this.userId,
     this.department,
     this.specialization,
     this.bio,
@@ -51,6 +53,7 @@ class TeacherDetails {
   factory TeacherDetails.fromJson(Map<String, dynamic> json) {
     return TeacherDetails(
       id: json['id'] as int,
+      userId: json['user_id']?.toString(),
       department: json['department'] as String?,
       specialization: json['specialization'] as String?,
       bio: json['bio'] as String?,
@@ -144,7 +147,8 @@ class TeachersListResponse {
   factory TeachersListResponse.fromJson(Map<String, dynamic> json) {
     return TeachersListResponse(
       success: json['success'] as bool? ?? true,
-      teachers: (json['data'] as List<dynamic>?)
+      teachers:
+          (json['data'] as List<dynamic>?)
               ?.map((e) => TeacherListModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

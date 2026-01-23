@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/network/token_storage.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -295,26 +296,42 @@ class _TeachersScreenState extends State<TeachersScreen> {
         }
         return false;
       },
-      child: ListView.builder(
-        padding: EdgeInsets.all(16.w),
-        itemCount:
-            teachers.length +
-            (provider.isLoadingMore && _searchQuery.isEmpty ? 1 : 0),
-        itemBuilder: (context, index) {
-          // Show loading indicator at the end
-          if (index == teachers.length) {
-            return Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-              ),
-            );
-          }
+      child: FutureBuilder<String?>(
+        future: TokenStorage.getUserId(),
+        builder: (context, snapshot) {
+          final currentUserId = snapshot.data != null
+              ? int.tryParse(snapshot.data!)
+              : null;
 
-          final teacher = teachers[index];
-          return _buildTeacherCard(teacher);
+          // Filter out current user from the list
+          final filteredTeachers = currentUserId != null
+              ? teachers.where((t) => t.id != currentUserId).toList()
+              : teachers;
+
+          return ListView.builder(
+            padding: EdgeInsets.all(16.w),
+            itemCount:
+                filteredTeachers.length +
+                (provider.isLoadingMore && _searchQuery.isEmpty ? 1 : 0),
+            itemBuilder: (context, index) {
+              // Show loading indicator at the end
+              if (index == filteredTeachers.length) {
+                return Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              final teacher = filteredTeachers[index];
+              return _buildTeacherCard(teacher);
+            },
+          );
         },
       ),
     );
@@ -353,6 +370,16 @@ class _TeachersScreenState extends State<TeachersScreen> {
       actionIcon: Icons.chat_bubble_outline_rounded,
       actionTooltip: 'Chat with ${teacher.name}',
       onActionTap: () {
+        debugPrint('🎯 ========== INITIATING CHAT ==========');
+        debugPrint('🎯 Teacher Name: ${teacher.name}');
+        debugPrint('🎯 TeacherListModel.id (should be user ID): ${teacher.id}');
+        debugPrint('🎯 Teacher.id (teacher record ID): ${teacher.teacher?.id}');
+        debugPrint(
+          '🎯 Teacher.userId (from nested object): ${teacher.teacher?.userId}',
+        );
+        debugPrint('🎯 Avatar: ${teacher.avatar}');
+        debugPrint('🎯 Using ID for chat: ${teacher.id}');
+        debugPrint('🎯 =====================================');
         Navigator.push(
           context,
           MaterialPageRoute(
