@@ -21,9 +21,7 @@ class ActivityService {
 
       debugPrint('📊 Fetching activity for user $userId');
 
-      final url = Uri.parse(
-        '$baseUrl/api/activity/user/$userId?source=$source',
-      );
+      final url = Uri.parse('$baseUrl/api/activity/user/$userId');
       final response = await http.get(
         url,
         headers: {
@@ -68,9 +66,7 @@ class ActivityService {
 
       debugPrint('🔄 Updating activity for user $userId: isActive=$isActive');
 
-      final url = Uri.parse(
-        '$baseUrl/api/activity/user/$userId/active?source=$source',
-      );
+      final url = Uri.parse('$baseUrl/api/activity/user/$userId/active');
       final response = await http.put(
         url,
         headers: {
@@ -104,31 +100,22 @@ class ActivityService {
 
   /// Get message history via REST API
   /// GET /api/messages
-  Future<Map<String, dynamic>?> getMessages(
-    int currentUserId,
-    int otherUserId, {
-    int page = 1,
-    int limit = 20,
-  }) async {
+  Future<Map<String, dynamic>?> getMessages(int currentUserId, int otherUserId, {int page = 1, int limit = 20}) async {
     try {
       final token = await TokenStorage.getToken();
       if (token == null) {
         throw Exception('No authentication token found');
       }
 
-      debugPrint(
-        '📜 Fetching messages via REST: user=$currentUserId, other=$otherUserId, page=$page',
-      );
+      debugPrint('📜 Fetching messages via REST: user=$currentUserId, other=$otherUserId, page=$page');
 
-      final uri = Uri.parse('$baseUrl/api/messages').replace(
-        queryParameters: {
-          'user_id': currentUserId.toString(),
-          'other_user_id': otherUserId.toString(),
-          'page': page.toString(),
-          'limit': limit.toString(),
-          'source': source,
-        },
-      );
+      final uri = Uri.parse('$baseUrl/api/messages').replace(queryParameters: {
+        'user_id': currentUserId.toString(),
+        'other_user_id': otherUserId.toString(),
+        'page': page.toString(),
+        'limit': limit.toString(),
+        'source': source,
+      });
 
       final response = await http.get(
         uri,
@@ -143,20 +130,18 @@ class ActivityService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
+        
         if (data is Map<String, dynamic>) {
           if (data['success'] == true) {
-            debugPrint(
-              '✅ REST: Loaded response (Page ${data['current_page']}/${data['total_pages']})',
-            );
-            return data;
+             debugPrint('✅ REST: Loaded response (Page ${data['current_page']}/${data['total_pages']})');
+             return data;
           } else {
-            debugPrint('⚠️ REST: API returned success=false');
-            return null;
+             debugPrint('⚠️ REST: API returned success=false');
+             return null;
           }
         } else {
-          debugPrint('⚠️ Unexpected REST response format');
-          return null;
+           debugPrint('⚠️ Unexpected REST response format');
+           return null;
         }
       } else {
         debugPrint('⚠️ REST: Failed to load messages: ${response.body}');
@@ -179,9 +164,7 @@ class ActivityService {
 
       debugPrint('👁️ Marking messages as seen from user $otherUserId');
 
-      final url = Uri.parse(
-        '$baseUrl/api/activity/messages/seen?source=$source',
-      );
+      final url = Uri.parse('$baseUrl/api/activity/messages/seen');
       final response = await http.post(
         url,
         headers: {

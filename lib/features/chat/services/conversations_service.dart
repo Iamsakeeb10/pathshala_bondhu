@@ -63,6 +63,7 @@ class ConversationsService {
 
           // Convert to Conversation objects
           final conversations = conversationMap.entries.map((entry) {
+            final otherUserId = entry.key;
             final messages = entry.value;
 
             // Sort messages by date (oldest first)
@@ -134,15 +135,12 @@ class ConversationsService {
 
         if (success) {
           final messages = data['messages'] as List<dynamic>? ?? [];
-          debugPrint(
-            '✅ Received ${messages.length} messages for new conversation',
-          );
+          debugPrint('✅ Received ${messages.length} messages for new conversation');
 
           if (messages.isEmpty) return null;
 
-          final messageList = messages
-              .map((m) => m as Map<String, dynamic>)
-              .toList();
+          final messageList =
+              messages.map((m) => m as Map<String, dynamic>).toList();
 
           // Sort messages by date (oldest first)
           messageList.sort((a, b) {

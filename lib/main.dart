@@ -14,6 +14,7 @@ import 'app/theme/app_theme.dart';
 import 'app/theme/providers/auth_provider.dart';
 import 'app/theme/providers/theme_provider.dart';
 // 🔹 Network connectivity imports
+import 'core/network/token_storage.dart';
 import 'core/services/connectivity_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/widgets/no_internet_overlay.dart';
@@ -74,6 +75,23 @@ void main() async {
         final context = rootNavigatorKey.currentContext;
         if (context != null) {
           context.read<NotificationProvider>().fetchUnreadCount();
+
+          // ✅ Sync conversations for new_message notifications
+          final notifType = payload.data?['type'] as String?;
+          if (notifType == 'new_message') {
+            try {
+              final conversationsProvider = context.read<ConversationsProvider>();
+              TokenStorage.getUserId().then((userIdStr) {
+                final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+                if (userId != null) {
+                  print('💬 Syncing conversations for new message (Notification Tap)...');
+                  conversationsProvider.fetchConversations(userId);
+                }
+              });
+            } catch (e) {
+              print('⚠️ Error syncing conversations on notification tap: $e');
+            }
+          }
         }
       });
     },

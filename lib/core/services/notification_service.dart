@@ -10,6 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/router/root_navigator_key.dart';
+import '../../core/network/token_storage.dart';
+import '../../features/chat/providers/conversations_provider.dart';
 import '../../features/notifications/providers/notification_provider.dart';
 
 @pragma('vm:entry-point')
@@ -295,6 +297,23 @@ class NotificationService {
     final context = rootNavigatorKey.currentContext;
     if (context != null) {
       context.read<NotificationProvider>().fetchUnreadCount();
+
+      final notifType = message.data['type'] as String?;
+
+      // ✅ Refresh conversations for new message (Realtime Sync)
+      if (notifType == 'new_message') {
+        try {
+          final conversationsProvider = context.read<ConversationsProvider>();
+          final userIdStr = await TokenStorage.getUserId();
+          final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+          if (userId != null) {
+            print('💬 Syncing conversations for new message (Foreground)...');
+            conversationsProvider.fetchConversations(userId);
+          }
+        } catch (e) {
+          print('⚠️ Error syncing conversations in foreground: $e');
+        }
+      }
     }
   }
 
@@ -308,6 +327,24 @@ class NotificationService {
     if (context != null) {
       // Fetch updated unread count
       context.read<NotificationProvider>().fetchUnreadCount();
+
+      final notifType = message.data['type'] as String?;
+
+      // ✅ Refresh conversations for new message (Realtime Sync)
+      if (notifType == 'new_message') {
+        try {
+          final conversationsProvider = context.read<ConversationsProvider>();
+          TokenStorage.getUserId().then((userIdStr) {
+            final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+            if (userId != null) {
+              print('💬 Syncing conversations for new message (Background/Terminated)...');
+              conversationsProvider.fetchConversations(userId);
+            }
+          });
+        } catch (e) {
+          print('⚠️ Error syncing conversations in background: $e');
+        }
+      }
     }
 
     final route = message.data['route'] as String?;

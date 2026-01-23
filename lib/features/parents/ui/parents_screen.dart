@@ -345,7 +345,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
             builder: (_) => ChatScreen(
               otherUserId: parent.id,
               otherUserName: parent.fatherName,
-              otherUserImage: null,
+              otherUserAvatar: null,
             ),
           ),
         );
@@ -536,7 +536,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
                     builder: (_) => ChatScreen(
                       otherUserId: parent.id,
                       otherUserName: parent.fatherName,
-                      otherUserImage: null,
+                      otherUserAvatar: null,
                     ),
                   ),
                 );

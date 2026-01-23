@@ -359,7 +359,7 @@ class _TeachersScreenState extends State<TeachersScreen> {
             builder: (_) => ChatScreen(
               otherUserId: teacher.id,
               otherUserName: teacher.name,
-              otherUserImage: teacher.avatar,
+              otherUserAvatar: teacher.avatar,
             ),
           ),
         );
@@ -427,7 +427,7 @@ class _TeachersScreenState extends State<TeachersScreen> {
                     builder: (_) => ChatScreen(
                       otherUserId: teacher.id,
                       otherUserName: teacher.name,
-                      otherUserImage: teacher.avatar,
+                      otherUserAvatar: teacher.avatar,
                     ),
                   ),
                 );

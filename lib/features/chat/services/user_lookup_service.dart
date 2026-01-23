@@ -9,20 +9,19 @@ import '../models/chat_user_model.dart';
 
 /// Service to fetch user information by user ID for chat screens
 class UserLookupService {
-  static const String baseUrl = 'http://pathshalabondhu.top/api/v1'; // Reverted
+  static const String baseUrl = 'http://pathshalabondhu.top/api/v1';
   static const String _cacheKeyPrefix = 'user_cache_';
-  // ignore: unused_field
-  static const Duration _cacheDuration = Duration(days: 7);
+  // static const Duration _cacheDuration = Duration(days: 7); // Cache validity (kept for future use)
 
   // Memory cache
   final Map<int, ChatUser> _memoryCache = {};
-
+  
   // Track ongoing requests to prevent duplicates
   final Map<int, Future<ChatUser?>> _ongoingRequests = {};
 
   /// Initialize service and load cache
   Future<void> init() async {
-    // Preload frequent users if needed
+    // We can preload frequent users here if needed, or rely on lazy loading
   }
 
   /// Get user info by ID
@@ -31,7 +30,7 @@ class UserLookupService {
     if (!forceRefresh && _memoryCache.containsKey(userId)) {
       return _memoryCache[userId];
     }
-
+    
     // 2. Check overlap (deduplication)
     if (_ongoingRequests.containsKey(userId)) {
       return _ongoingRequests[userId];
@@ -49,7 +48,7 @@ class UserLookupService {
     // 4. Fetch from API
     final future = _fetchFromApi(userId);
     _ongoingRequests[userId] = future;
-
+    
     try {
       final user = await future;
       if (user != null) {
@@ -86,8 +85,9 @@ class UserLookupService {
     if (idsToFetch.isEmpty) return results;
 
     // 2. Fetch missing (Parallel)
+    // Note: If backend supports batch, replace this with batch call
     debugPrint('🔍 Fetching ${idsToFetch.length} missing users from API');
-
+    
     final futures = idsToFetch.map((id) => getUserById(id, forceRefresh: true));
     final fetchedUsers = await Future.wait(futures);
 
@@ -107,37 +107,28 @@ class UserLookupService {
 
       debugPrint('🔍 API Call: Fetching user $userId');
 
-      // Use whiteorbit.top with source=school_sass as requested
       final url = Uri.parse('$baseUrl/user/$userId');
-      final response = await http
-          .get(
-            url,
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Accept': 'application/json',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
-
-        // Check parsing: data['data']['user'] matched Jibon Bondhu
-        dynamic userData;
-        if (data.containsKey('data') && data['data'] is Map) {
-          userData = (data['data'] as Map)['user'];
-        }
-        if (userData == null && data.containsKey('user')) {
-          userData = data['user'];
-        }
-
-        if (userData != null) {
-          final user = ChatUser.fromJson(userData);
-          debugPrint('✅ Fetched: ${user.name} ($userId)');
-          return user;
+        if (data['success'] == true && data['data'] != null) {
+          final userData = data['data']['user'];
+          if (userData != null) {
+            final user = ChatUser.fromJson(userData);
+            debugPrint('✅ Fetched: ${user.name} ($userId)');
+            return user;
+          }
         }
       } else if (response.statusCode == 404) {
-        debugPrint('❌ User $userId not found (404)');
+         // Optionally cache 404s to prevent retry?
+         debugPrint('❌ User $userId not found (404)');
       }
     } catch (e) {
       debugPrint('❌ Error fetching user $userId: $e');
@@ -162,9 +153,13 @@ class UserLookupService {
       final prefs = await SharedPreferences.getInstance();
       final key = '$_cacheKeyPrefix$userId';
       final jsonStr = prefs.getString(key);
-
+      
       if (jsonStr != null) {
         final data = jsonDecode(jsonStr);
+        // Optional: Check cache expiry
+        // final cachedAt = DateTime.parse(data['cached_at']);
+        // if (DateTime.now().difference(cachedAt) > _cacheDuration) return null;
+        
         return ChatUser.fromJson(data);
       }
     } catch (_) {}
@@ -173,5 +168,6 @@ class UserLookupService {
 
   void clearCache() {
     _memoryCache.clear();
+    // Clear disk cache if needed
   }
 }

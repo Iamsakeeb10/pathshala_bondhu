@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../app/theme/providers/auth_provider.dart';
+import '../../../shared/localization/app_localizations.dart';
 import '../../../shared/utils/app_colors.dart';
-import '../models/conversation_model.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../providers/conversations_provider.dart';
 import '../widgets/conversations_shimmer.dart';
 import 'chat_screen.dart';
@@ -17,310 +20,380 @@ class ConversationsScreen extends StatefulWidget {
 }
 
 class _ConversationsScreenState extends State<ConversationsScreen>
-    with WidgetsBindingObserver {
-  final TextEditingController _searchController = TextEditingController();
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  late AnimationController _animationController;
+  late AnimationController _searchAnimationController;
+  late TextEditingController _searchController;
+
+  bool _isSearchVisible = false;
   String _searchQuery = '';
+  bool _initialLoadTriggered = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addObserver(this); // Add observer
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _searchAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _searchController = TextEditingController();
 
-    // Initialize provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ConversationsProvider>().initialize();
+      // Animation trigger
+      _animationController.forward();
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      debugPrint('📱 App resumed - checking conversations connection...');
+      Provider.of<ConversationsProvider>(
+        context,
+        listen: false,
+      ).checkConnection();
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _animationController.dispose();
+    _searchAnimationController.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final provider = context.read<ConversationsProvider>();
-    if (state == AppLifecycleState.paused) {
-      provider.pause();
-    } else if (state == AppLifecycleState.resumed) {
-      provider.resume();
-    }
+  void _toggleSearch() {
+    setState(() {
+      _isSearchVisible = !_isSearchVisible;
+
+      if (_isSearchVisible) {
+        _searchAnimationController.forward();
+        // Delay focus to avoid animation conflict
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        });
+      } else {
+        _searchAnimationController.reverse();
+        _searchController.clear();
+        _searchQuery = '';
+        FocusScope.of(context).unfocus(); // close keyboard
+      }
+    });
   }
 
-  List<Conversation> _getFilteredConversations(List<Conversation> conversations) {
-    if (_searchQuery.isEmpty) return conversations;
-
-    return conversations.where((c) {
-      return c.userName.toLowerCase().contains(_searchQuery.toLowerCase());
-    }).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildSearchBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-      appBar: AppBar(
-        title: const Text('Messages'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
-        actions: [
-          Consumer<ConversationsProvider>(
-            builder: (context, provider, _) {
-              return Padding(
-                padding: EdgeInsets.only(right: 8.w),
-                child: Icon(
-                  provider.isConnected ? Icons.cloud_done : Icons.cloud_off,
-                  color: provider.isConnected
-                      ? AppColors.success
-                      : AppColors.grey400,
-                  size: 20.sp,
-                ),
-              );
-            },
-          ),
-        ],
+    
+    return SizeTransition(
+      sizeFactor: CurvedAnimation(
+        parent: _searchAnimationController,
+        curve: Curves.easeInOut,
       ),
-      body: Column(
-        children: [
-          // Search bar
-          Container(
-            padding: EdgeInsets.all(12.w),
-            color: isDark ? AppColors.surfaceDark : Colors.white,
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) => setState(() => _searchQuery = value),
-              decoration: InputDecoration(
-                hintText: 'Search conversations...',
-                prefixIcon: Icon(Icons.search, color: AppColors.grey400),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(Icons.clear, color: AppColors.grey400),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: isDark ? AppColors.grey700 : AppColors.grey100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide.none,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              offset: Offset(0, 2.h),
+              blurRadius: 8.r,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.1),
+                    AppColors.primaryDark.withOpacity(0.1),
+                  ],
                 ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 12.h,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(Icons.search, color: AppColors.primary, size: 20.sp),
+            ),
+            SizedBox(width: 12.w),
+
+            // Search Input
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                autofocus: _isSearchVisible, // ✅ Only focus when visible
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 14.sp, 
+                  color: isDark ? AppColors.textDark : AppColors.textPrimary,
                 ),
+                decoration: InputDecoration(
+                  hintText: 'Search conversations...',
+                  hintStyle: TextStyle(
+                    fontSize: 15.sp,
+                    color: AppColors.textSecondary.withOpacity(0.6),
+                  ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                onChanged: (value) {
+                  // Trim and normalize spacing
+                  setState(() {
+                    _searchQuery = value.trim().toLowerCase();
+                  });
+                },
               ),
             ),
-          ),
 
-          // Conversations list
-          Expanded(
-            child: Consumer<ConversationsProvider>(
-              builder: (context, provider, _) {
-                if (provider.isLoading && provider.conversations.isEmpty) {
-                  return const ConversationsShimmer();
-                }
-
-                if (provider.error != null && provider.conversations.isEmpty) {
-                  return _buildErrorState(provider);
-                }
-
-                final conversations = _getFilteredConversations(provider.conversations);
-
-                if (conversations.isEmpty) {
-                  return _buildEmptyState();
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () => provider.fetchConversations(),
-                  color: AppColors.primary,
-                  child: ListView.builder(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    itemCount: conversations.length,
-                    itemBuilder: (context, index) {
-                      return _buildConversationItem(
-                        conversations[index],
-                        provider,
-                        isDark,
-                      );
-                    },
+            // Clear button (only visible when text exists)
+            if (_searchController.text.isNotEmpty)
+              InkWell(
+                onTap: () {
+                  _searchController.clear();
+                  setState(() {
+                    _searchQuery = '';
+                  });
+                  FocusScope.of(context).unfocus(); // optional: close keyboard
+                },
+                borderRadius: BorderRadius.circular(20.r),
+                child: Padding(
+                  padding: EdgeInsets.all(4.w),
+                  child: Icon(
+                    Icons.clear,
+                    size: 16.sp,
+                    color: AppColors.textSecondary,
                   ),
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildConversationItem(
-    Conversation conversation,
-    ConversationsProvider provider,
-    bool isDark,
-  ) {
-    final user = provider.getUserById(conversation.userId);
+  List<dynamic> _getFilteredConversations(List<dynamic> conversations) {
+    if (_searchQuery.isEmpty) {
+      return conversations;
+    }
 
-    return InkWell(
-      onTap: () {
-        provider.markAsRead(conversation.userId);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatScreen(
-              otherUserId: conversation.userId,
-              otherUserName: conversation.userName,
-              otherUserImage: user?.imageUrl,
-            ),
-          ),
-        );
+    // Normalize search query: remove extra spaces
+    final normalizedQuery = _searchQuery.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    if (normalizedQuery.isEmpty) {
+      return conversations;
+    }
+
+    return conversations.where((conversation) {
+      // Normalize username: trim and convert to lowercase, handle multiple spaces
+      final normalizedName = conversation.userName
+          .toLowerCase()
+          .trim()
+          .replaceAll(RegExp(r'\s+'), ' ');
+
+      // Search by:
+      // 1. Full name contains query
+      // 2. Any word in name starts with query (for partial matching)
+      return normalizedName.contains(normalizedQuery) ||
+          normalizedName
+              .split(' ')
+              .any((String word) => word.startsWith(normalizedQuery));
+    }).toList();
+  }
+
+  String _formatMessageTime(DateTime? time) {
+    if (time == null) return '';
+
+    final now = DateTime.now();
+    final difference = now.difference(time);
+
+    if (difference.inMinutes < 1) {
+      return 'now';
+    } else if (difference.inHours < 1) {
+      return '${difference.inMinutes}m';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d';
+    } else {
+      return DateFormat('MMM d').format(time);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final conversationsProvider = context.watch<ConversationsProvider>();
+    final authProvider = context.watch<AuthProvider>();
+    final t = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // ✅ State-driven Auto-Load Logic
+    // Fixes cold start from notification: triggers load once user is available
+    if (authProvider.currentUser != null && !_initialLoadTriggered) {
+      if (conversationsProvider.conversations.isEmpty &&
+          !conversationsProvider.isLoading &&
+          conversationsProvider.error == null) {
+        _initialLoadTriggered = true;
+        // Get user ID from TokenStorage (String? -> int)
+        final userIdStr = authProvider.currentUser?.id;
+        final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+
+        if (userId != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            debugPrint(
+              '🔔 Auto-fetching conversations for user $userId (Notification/Cold Start)',
+            );
+            Provider.of<ConversationsProvider>(
+              context,
+              listen: false,
+            ).fetchConversations(userId);
+          });
+        }
+      } else if (conversationsProvider.conversations.isNotEmpty ||
+          conversationsProvider.isLoading) {
+        // Data exists or is loading, mark as triggered to assume "handled"
+        _initialLoadTriggered = true;
+      }
+    }
+
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          context.go('/dashboard');
+        }
       },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Row(
-          children: [
-            // Avatar with online indicator
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 27.r,
-                  backgroundColor: AppColors.primary.withOpacity(0.2),
-                  backgroundImage: user?.imageUrl != null
-                      ? NetworkImage(user!.imageUrl!)
-                      : null,
-                  child: user?.imageUrl == null
-                      ? Text(
-                          conversation.userName.isNotEmpty
-                              ? conversation.userName[0].toUpperCase()
-                              : '?',
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        )
-                      : null,
-                ),
-                if (conversation.isOnline)
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 14.w,
-                      height: 14.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.success,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark ? AppColors.surfaceDark : Colors.white,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            SizedBox(width: 12.w),
+      child: Scaffold(
+      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
 
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        // ... rest of the scaffold
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.h),
+          child: CustomAppBar(
+            showBackButton: true,
+            title: t?.translate('messages') ?? 'Messages',
+        actions: [
+            Transform.translate(
+              offset: Offset(0.w, 0), // push right by 16.w
+              child: Row(
                 children: [
-                  // Name and time
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          conversation.userName,
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            fontWeight: conversation.unreadCount > 0
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                            color: isDark ? Colors.white : AppColors.textPrimary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (conversation.lastMessageTime != null)
-                        Text(
-                          _formatTime(conversation.lastMessageTime!),
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: conversation.unreadCount > 0
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                    ],
+                  IconAction(
+                    icon: _isSearchVisible ? Icons.close : Icons.search,
+                    onTap: _toggleSearch,
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(width: 8.w),
+                  IconAction(
+                    icon: Icons.more_vert,
+                    onTap: () {
+                      // Show menu
+                      _showMenuOptions(
+                        context,
+                        authProvider,
+                        conversationsProvider,
+              );
+            },
+          ),
+        ],
+              ),
+            ),
+          ],
+          ),
+      ),
+      body: Column(
+        children: [
+            // Animated search bar
+            _buildSearchBar(),
 
-                  // Last message and unread badge
-                  Row(
-                    children: [
-                      if (conversation.lastMessageSentByMe)
-                        Padding(
-                          padding: EdgeInsets.only(right: 4.w),
-                          child: Icon(
-                            conversation.lastMessageSeen
-                                ? Icons.done_all
-                                : Icons.done,
-                            size: 14.sp,
-                            color: conversation.lastMessageSeen
-                                ? Colors.blue
-                                : AppColors.grey400,
-                          ),
-                        ),
-                      Expanded(
-                        child: Text(
-                          conversation.lastMessage ?? 'No messages yet',
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: conversation.unreadCount > 0
-                                ? (isDark ? Colors.white70 : AppColors.textPrimary)
-                                : AppColors.textSecondary,
-                            fontWeight: conversation.unreadCount > 0
-                                ? FontWeight.w500
-                                : FontWeight.normal,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ),
-                      if (conversation.unreadCount > 0)
-                        Container(
-                          margin: EdgeInsets.only(left: 8.w),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 2.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Text(
-                            conversation.unreadCount > 99
-                                ? '99+'
-                                : conversation.unreadCount.toString(),
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
+            // Main content
+            Expanded(
+              child: conversationsProvider.isLoading
+                  ? const ConversationsShimmer()
+                  : conversationsProvider.error != null
+                  ? _buildErrorState(authProvider, conversationsProvider)
+                  : conversationsProvider.conversations.isEmpty
+                  ? _buildEmptyState()
+                  : _buildConversationsList(
+                      conversationsProvider,
+                      authProvider,
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(
+    AuthProvider authProvider,
+    ConversationsProvider conversationsProvider,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+          Container(
+              padding: EdgeInsets.all(24.r),
+              decoration: BoxDecoration(
+                color: AppColors.error.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 64.sp,
+                color: AppColors.error,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            Text(
+              'Oops! Something went wrong',
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.textDark : AppColors.textPrimary,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              'We couldn\'t load your conversations',
+              style: TextStyle(
+                fontSize: 14.sp, 
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 32.h),
+            ElevatedButton(
+                        onPressed: () {
+                final userIdStr = authProvider.currentUser?.id;
+                final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+                if (userId != null) {
+                  conversationsProvider.refresh(userId);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 14.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Try Again',
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -330,85 +403,408 @@ class _ConversationsScreenState extends State<ConversationsScreen>
   }
 
   Widget _buildEmptyState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.chat_bubble_outline_rounded,
-            size: 80.sp,
-            color: AppColors.grey300,
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            _searchQuery.isNotEmpty
-                ? 'No conversations found'
-                : 'No messages yet',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 40.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(32.r),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.1),
+                    AppColors.primaryDark.withOpacity(0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.chat_bubble_outline_rounded,
+                size: 80.sp,
+                color: AppColors.primary,
+              ),
             ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            _searchQuery.isNotEmpty
-                ? 'Try a different search term'
-                : 'Start a conversation with a teacher or parent',
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: AppColors.grey400,
+            SizedBox(height: 32.h),
+            Text(
+              'No Messages Yet',
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.textDark : AppColors.textPrimary,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            SizedBox(height: 12.h),
+            Text(
+              'Start a conversation with teachers\nand parents',
+              style: TextStyle(
+                fontSize: 15.sp,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildErrorState(ConversationsProvider provider) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline_rounded,
-            size: 60.sp,
-            color: AppColors.error,
+  Widget _buildConversationsList(
+    ConversationsProvider conversationsProvider,
+    AuthProvider authProvider,
+  ) {
+    final filteredConversations = _getFilteredConversations(
+      conversationsProvider.conversations,
+    );
+
+    // Show empty state if search returns no results
+    if (filteredConversations.isEmpty && _searchQuery.isNotEmpty) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.search_off,
+                size: 64.sp,
+                color: AppColors.textSecondary.withOpacity(0.3),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'No results found',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.textDark : AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                'Try searching with a different name',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 16.h),
-          Text(
-            'Failed to load conversations',
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+        ),
+      );
+                }
+
+                return RefreshIndicator(
+      onRefresh: () async {
+        final userIdStr = authProvider.currentUser?.id;
+        final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+        if (userId != null) {
+          await conversationsProvider.refresh(userId);
+        }
+      },
+                  color: AppColors.primary,
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: filteredConversations.length,
+                    itemBuilder: (context, index) {
+          final conversation = filteredConversations[index];
+
+          return FadeTransition(
+            opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(
+                parent: _animationController,
+                curve: Interval(
+                  (index * 0.1).clamp(0.0, 1.0),
+                  ((index + 1) * 0.1).clamp(0.0, 1.0),
+                  curve: Curves.easeOut,
+                ),
+              ),
             ),
-          ),
-          SizedBox(height: 16.h),
-          ElevatedButton.icon(
-            onPressed: () => provider.fetchConversations(),
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            child: SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0.3, 0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: _animationController,
+                      curve: Interval(
+                        (index * 0.1).clamp(0.0, 1.0),
+                        ((index + 1) * 0.1).clamp(0.0, 1.0),
+                        curve: Curves.easeOut,
+                      ),
+                    ),
+                  ),
+              child: _buildConversationItem(conversation),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildConversationItem(conversation) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasUnread = conversation.unreadCount > 0;
+    final hasImage = conversation.userImage != null;
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            offset: Offset(0, 2.h),
+            blurRadius: 8.r,
           ),
         ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatScreen(
+              otherUserId: conversation.userId,
+              otherUserName: conversation.userName,
+                  otherUserAvatar: conversation.userImage,
+            ),
+          ),
+        );
+      },
+          borderRadius: BorderRadius.circular(16.r),
+          child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: [
+                // Avatar with gradient border for unread and active indicator
+            Stack(
+              children: [
+                    Container(
+                      padding: EdgeInsets.all(hasUnread ? 3.r : 0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: hasUnread
+                            ? LinearGradient(
+                                colors: [AppColors.primary, AppColors.primaryDark],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                            : null,
+                      ),
+                      child: CircleAvatar(
+                        radius: 28.r,
+                        backgroundColor: AppColors.primary,
+                        backgroundImage: conversation.userImage != null
+                            ? NetworkImage(conversation.userImage!)
+                      : null,
+                        child: conversation.userImage == null
+                      ? Text(
+                          conversation.userName.isNotEmpty
+                                    ? conversation.userName
+                                          .substring(0, 1)
+                                          .toUpperCase()
+                              : '?',
+                          style: TextStyle(
+                                  color: Colors.white,
+                            fontSize: 20.sp,
+                                  fontWeight: FontWeight.w600,
+                          ),
+                        )
+                      : null,
+                ),
+                    ),
+                    // Online indicator - show when user is online
+                if (conversation.isOnline)
+                  Positioned(
+                        right: hasUnread ? 5.r : 2.r,
+                        bottom: hasUnread ? 5.r : 2.r,
+                    child: Container(
+                          width: 14.r,
+                          height: 14.r,
+                      decoration: BoxDecoration(
+                            // Use a brighter green when avatar is default (green bg)
+                            color: hasImage
+                                ? const Color(0xFF31A24C)
+                                : const Color(
+                                    0xFF00E676,
+                                  ), // Brighter green for contrast
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                              color: Colors.white,
+                              width: 2.5.r,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF31A24C).withOpacity(0.4),
+                                blurRadius: 4.r,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            SizedBox(width: 12.w),
+
+                // Message info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                          Flexible(
+                            child: conversation.userName.startsWith('User ')
+                                ? Container(
+                                    height: 16.h,
+                                    width: 100.w,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(4.r),
+                                    ),
+                                  )
+                                : Text(
+                          conversation.userName,
+                          style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: hasUnread
+                                          ? FontWeight.w700
+                                          : FontWeight.w600,
+                                      color: isDark ? AppColors.textDark : AppColors.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                          SizedBox(width: 8.w),
+                        Text(
+                            _formatMessageTime(conversation.lastMessageTime),
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                              fontWeight: hasUnread
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                              color: hasUnread
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                    ],
+                  ),
+                      SizedBox(height: 6.h),
+                  Row(
+                    children: [
+                          // Seen indicator for sent messages
+                          if (conversation.lastMessageSentByMe) ...[
+                            Icon(
+                            conversation.lastMessageSeen
+                                  ? Icons.visibility
+                                : Icons.done,
+                              size: 16.r,
+                            color: conversation.lastMessageSeen
+                                  ? AppColors.primaryDark
+                                  : AppColors.textSecondary,
+                          ),
+                            SizedBox(width: 4.w),
+                          ],
+                      Expanded(
+                        child: Text(
+                              conversation.lastMessage ?? 'No messages',
+                          style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: hasUnread
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: hasUnread
+                                    ? (isDark ? AppColors.textDark : AppColors.textPrimary)
+                                : AppColors.textSecondary,
+                          ),
+                              maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                          if (hasUnread) ...[
+                            SizedBox(width: 8.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                                vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [AppColors.primary, AppColors.primaryDark],
+                                ),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Text(
+                            conversation.unreadCount > 99
+                                ? '99+'
+                                : conversation.unreadCount.toString(),
+                            style: TextStyle(
+                                  color: Colors.white,
+                              fontSize: 11.sp,
+                                  fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                          ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+        ),
       ),
     );
   }
 
-  String _formatTime(DateTime dateTime) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-
-    if (messageDate == today) {
-      return DateFormat('h:mm a').format(dateTime);
-    } else if (messageDate == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday';
-    } else if (now.difference(dateTime).inDays < 7) {
-      return DateFormat('EEE').format(dateTime);
-    } else {
-      return DateFormat('MMM d').format(dateTime);
-    }
+  void _showMenuOptions(
+    BuildContext context,
+    AuthProvider authProvider,
+    ConversationsProvider conversationsProvider,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (context) => Container(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+        children: [
+            ListTile(
+              leading: const Icon(Icons.refresh, color: AppColors.primary),
+              title: const Text('Refresh'),
+              onTap: () {
+                Navigator.pop(context);
+                final userIdStr = authProvider.currentUser?.id;
+                final userId = userIdStr != null ? int.tryParse(userIdStr) : null;
+                if (userId != null) {
+                  conversationsProvider.refresh(userId);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

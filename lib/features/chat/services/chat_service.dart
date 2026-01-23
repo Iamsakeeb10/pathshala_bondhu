@@ -13,7 +13,7 @@ class ChatService {
   final String? _token;
   final int? _userId;
 
-  // Callbacks
+  // Callbacks - matching your test pattern
   Function(bool)? onConnectionStatusChanged;
   Function(String)? onError;
   Function(Map<String, dynamic>)? onMessageReceived;
@@ -26,10 +26,10 @@ class ChatService {
   // State
   bool get isConnected => _socket?.connected ?? false;
 
-  // Constructor
+  // Constructor - matching your test pattern
   ChatService({String? token, int? userId}) : _token = token, _userId = userId;
 
-  /// Connect to the Socket.IO server
+  /// Connect to the Socket.IO server - NO parameters like your test
   void connect() {
     if (_token == null || _userId == null) {
       debugPrint('❌ Cannot connect: token or userId not provided');
@@ -50,21 +50,27 @@ class ChatService {
       onConnectionStatusChanged?.call(false);
 
       // Create socket with authentication
+      // API expects ONLY token and source in auth (user_id extracted from token)
       _socket = IO.io(
         baseUrl,
         IO.OptionBuilder()
             .setTransports(['websocket', 'polling'])
             .enableAutoConnect()
-            .enableForceNew()
+            .enableForceNew() // Fix: Force new connection instance to avoid stale auth
             .setReconnectionAttempts(5)
             .setReconnectionDelay(1000)
             .setReconnectionDelayMax(5000)
-            .setAuth({'token': _token, 'source': source})
+            .setAuth({
+              'token': _token, // Raw Sanctum token
+              'source': source, // App identifier: 'school_sass'
+            })
             .build(),
       );
 
       _setupListeners();
 
+      // Explicitly connect the socket
+      // enableAutoConnect() is not reliable after socket disposal/recreation
       _socket!.connect();
 
       debugPrint('✅ Socket initialized and connecting...');
@@ -79,11 +85,13 @@ class ChatService {
   void _setupListeners() {
     if (_socket == null) return;
 
+    // Connection successful
     _socket!.onConnect((_) {
       debugPrint('✅ Connected to chat service');
       onConnectionStatusChanged?.call(true);
     });
 
+    // Connection error
     _socket!.onConnectError((data) {
       debugPrint('❌ Connection error: $data');
       final errorMsg = data is Map
@@ -93,29 +101,34 @@ class ChatService {
       onConnectionStatusChanged?.call(false);
     });
 
+    // Disconnection
     _socket!.onDisconnect((_) {
       debugPrint('🔌 Disconnected from chat service');
       onConnectionStatusChanged?.call(false);
     });
 
+    // Reconnection attempt
     _socket!.on('reconnect_attempt', (attempt) {
       debugPrint('🔄 Reconnection attempt: $attempt');
     });
 
+    // Reconnection success
     _socket!.on('reconnect', (attempt) {
       debugPrint('✅ Reconnected after $attempt attempts');
       onConnectionStatusChanged?.call(true);
     });
 
+    // Reconnection failed
     _socket!.on('reconnect_failed', (_) {
       debugPrint('❌ Reconnection failed');
       onError?.call('Failed to reconnect to server');
       onConnectionStatusChanged?.call(false);
     });
 
+    // Receive message
     _socket!.on('receive_message', (data) {
       try {
-        debugPrint('📨 FULL PAYLOAD (receive_message): $data');
+        debugPrint('📨 Received message: $data');
         if (data is Map<String, dynamic>) {
           onMessageReceived?.call(data);
         } else {
@@ -127,9 +140,10 @@ class ChatService {
       }
     });
 
+    // Message history response
     _socket!.on('message_history', (data) {
       try {
-        debugPrint('📚 FULL PAYLOAD (message_history): $data');
+        debugPrint('📚 Received message history: $data');
         if (data is Map<String, dynamic>) {
           final success = data['success'] as bool? ?? false;
           if (success) {
@@ -150,6 +164,7 @@ class ChatService {
       }
     });
 
+    // Error from server
     _socket!.on('error', (data) {
       debugPrint('❌ Server error: $data');
       final errorMessage = data is Map
@@ -158,9 +173,10 @@ class ChatService {
       onError?.call(errorMessage);
     });
 
+    // Messages seen event
     _socket!.on('messages_seen', (data) {
       try {
-        debugPrint('👁️ FULL PAYLOAD (messages_seen): $data');
+        debugPrint('👁️ Messages seen event: $data');
         if (data is Map<String, dynamic>) {
           onMessagesSeen?.call(data);
         }
@@ -169,9 +185,10 @@ class ChatService {
       }
     });
 
+    // User typing event
     _socket!.on('user_typing', (data) {
       try {
-        debugPrint('⌨️ FULL PAYLOAD (user_typing): $data');
+        debugPrint('⌨️ User typing event: $data');
         if (data is Map<String, dynamic>) {
           onUserTyping?.call(data);
         }
@@ -180,9 +197,10 @@ class ChatService {
       }
     });
 
+    // User active event
     _socket!.on('user_active', (data) {
       try {
-        debugPrint('🟢 FULL PAYLOAD (user_active): $data');
+        debugPrint('🟢 User active event: $data');
         if (data is Map<String, dynamic>) {
           onUserActive?.call(data);
         }
@@ -191,9 +209,10 @@ class ChatService {
       }
     });
 
+    // Mark seen success event
     _socket!.on('mark_seen_success', (data) {
       try {
-        debugPrint('✅ FULL PAYLOAD (mark_seen_success): $data');
+        debugPrint('✅ Mark seen success: $data');
         if (data is Map<String, dynamic>) {
           onMarkSeenSuccess?.call(data);
         }
@@ -231,12 +250,7 @@ class ChatService {
   }
 
   /// Request message history with another user
-  void getMessageHistory(
-    int otherUserId, {
-    int limit = 20,
-    int? page,
-    int? beforeId,
-  }) {
+  void getMessageHistory(int otherUserId, {int limit = 20, int? page, int? beforeId}) {
     if (_socket == null || !isConnected) {
       debugPrint('❌ Cannot get message history: not connected');
       onError?.call('Not connected to server');
@@ -252,6 +266,10 @@ class ChatService {
       if (page != null) {
         data['page'] = page;
       }
+      // Keep before_id for backward compatibility if needed, or remove if causing issues.
+      // Based on logs, it's ignored, so safe to remove or keep. 
+      // User logs showed it sending `before: 263` and getting duplicate latest.
+      // Let's rely on page.
 
       _socket!.emit('get_message_history', data);
     } catch (e) {
@@ -281,7 +299,7 @@ class ChatService {
   void sendTyping(int toUserId, bool isTyping) {
     if (_socket == null || !isConnected) {
       debugPrint('❌ Cannot send typing: not connected');
-      return;
+      return; // Silent fail for typing indicators
     }
 
     try {
