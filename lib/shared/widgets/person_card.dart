@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -193,12 +194,6 @@ class PersonCard extends StatelessWidget {
               ),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: accentColor.withOpacity(0.2), width: 2),
-        image: hasAvatar
-            ? DecorationImage(
-                image: NetworkImage(avatarUrl!),
-                fit: BoxFit.cover,
-              )
-            : null,
         boxShadow: [
           BoxShadow(
             color: accentColor.withOpacity(0.15),
@@ -208,7 +203,57 @@ class PersonCard extends StatelessWidget {
         ],
       ),
       child: hasAvatar
-          ? null
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(14.r),
+              child: CachedNetworkImage(
+                imageUrl: avatarUrl!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        accentColor.withOpacity(0.25),
+                        accentColor.withOpacity(0.12),
+                      ],
+                    ),
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                      ),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        accentColor.withOpacity(0.25),
+                        accentColor.withOpacity(0.12),
+                      ],
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      title.isNotEmpty ? title[0].toUpperCase() : '?',
+                      style: TextStyle(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: accentColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
           : Center(
               child: Text(
                 title.isNotEmpty ? title[0].toUpperCase() : '?',

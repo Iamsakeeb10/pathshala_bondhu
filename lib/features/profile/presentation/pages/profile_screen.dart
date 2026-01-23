@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -140,11 +141,45 @@ class ProfileScreen extends StatelessWidget {
                                     radius: 50.r,
                                     backgroundColor: AppColors.primary
                                         .withOpacity(0.15),
-                                    backgroundImage: ImageUrlHelper.resolveAvatarUrl(user?.avatarUrl).isNotEmpty
-                                        ? NetworkImage(ImageUrlHelper.resolveAvatarUrl(user?.avatarUrl))
-                                        : null,
-                                    child: ImageUrlHelper.resolveAvatarUrl(user?.avatarUrl).isEmpty
-                                        ? Text(
+                                    child:
+                                        ImageUrlHelper.resolveAvatarUrl(
+                                          user?.avatarUrl,
+                                        ).isNotEmpty
+                                        ? ClipOval(
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  ImageUrlHelper.resolveAvatarUrl(
+                                                    user?.avatarUrl,
+                                                  ),
+                                              fit: BoxFit.cover,
+                                              width: 100.r,
+                                              height: 100.r,
+                                              placeholder: (context, url) => Center(
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                        Color
+                                                      >(AppColors.primary),
+                                                ),
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) => Text(
+                                                    (user?.name.isNotEmpty ??
+                                                            false)
+                                                        ? user!.name[0]
+                                                              .toUpperCase()
+                                                        : '?',
+                                                    style: TextStyle(
+                                                      fontSize: 36.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: AppColors.primary,
+                                                    ),
+                                                  ),
+                                            ),
+                                          )
+                                        : Text(
                                             (user?.name.isNotEmpty ?? false)
                                                 ? user!.name[0].toUpperCase()
                                                 : '?',
@@ -153,8 +188,7 @@ class ProfileScreen extends StatelessWidget {
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.primary,
                                             ),
-                                          )
-                                        : null,
+                                          ),
                                   ),
                                 ),
                               ),

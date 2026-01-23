@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -340,19 +341,39 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                   child: CircleAvatar(
                     radius: 60.r,
                     backgroundColor: AppColors.primary.withOpacity(0.1),
-                    backgroundImage: ImageUrlHelper.resolveAvatarUrl(avatar).isNotEmpty
-                        ? NetworkImage(ImageUrlHelper.resolveAvatarUrl(avatar))
-                        : null,
-                    child: ImageUrlHelper.resolveAvatarUrl(avatar).isEmpty
-                        ? Text(
+                    child: ImageUrlHelper.resolveAvatarUrl(avatar).isNotEmpty
+                        ? ClipOval(
+                            child: CachedNetworkImage(
+                              imageUrl: ImageUrlHelper.resolveAvatarUrl(avatar),
+                              fit: BoxFit.cover,
+                              width: 120.r,
+                              height: 120.r,
+                              placeholder: (context, url) => Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Text(
+                                name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                style: TextStyle(
+                                  fontSize: 44.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Text(
                             name.isNotEmpty ? name[0].toUpperCase() : '?',
                             style: TextStyle(
                               fontSize: 44.sp,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
                             ),
-                          )
-                        : null,
+                          ),
                   ),
                 ),
               ),

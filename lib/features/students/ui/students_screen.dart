@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/utils/image_url_helper.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
@@ -145,13 +147,49 @@ class _StudentsScreenState extends State<StudentsScreen> {
                         ),
                         borderRadius: BorderRadius.circular(14.r),
                       ),
-                      child: Center(
-                        child: Icon(
-                          Icons.person,
-                          size: 32.sp,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child:
+                          student.user != null && student.user!.avatar != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(14.r),
+                              child: CachedNetworkImage(
+                                imageUrl: ImageUrlHelper.resolveAvatarUrl(
+                                  student.user!.avatar,
+                                ),
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Text(
+                                    student.user?.name.isNotEmpty == true
+                                        ? student.user!.name[0].toUpperCase()
+                                        : 'S',
+                                    style: TextStyle(
+                                      fontSize: 24.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                student.user?.name.isNotEmpty == true
+                                    ? student.user!.name[0].toUpperCase()
+                                    : 'S',
+                                style: TextStyle(
+                                  fontSize: 24.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                     ),
                     SizedBox(width: 14.w),
 
@@ -161,11 +199,16 @@ class _StudentsScreenState extends State<StudentsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Student ID: ${student.studentId}',
+                            student.user?.name ??
+                                'Student ${student.studentId}',
                             style: TextStyle(
                               fontSize: 17.sp,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.titleLarge?.color ??
+                                  AppColors.textPrimary,
                             ),
                           ),
                           SizedBox(height: 4.h),
@@ -238,7 +281,9 @@ class _StudentsScreenState extends State<StudentsScreen> {
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
-              color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ??
+                  AppColors.textSecondary,
             ),
           ),
         ],
