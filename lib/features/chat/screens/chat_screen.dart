@@ -226,10 +226,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                                       ?.copyWith(
                                                         fontWeight:
                                                             FontWeight.w700,
-                                                        color: isDark
-                                                            ? AppColors.textDark
-                                                            : AppColors
-                                                                  .textPrimary,
+                                                        color: AppColors
+                                                            .backgroundLight
+                                                            .withOpacity(0.8),
                                                       ),
                                                 );
                                               },
@@ -251,11 +250,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                                       .textTheme
                                                       .bodyMedium
                                                       ?.copyWith(
-                                                        color: isDark
-                                                            ? AppColors
-                                                                  .textDarkSecondary
-                                                            : AppColors
-                                                                  .textSecondary,
+                                                        color: AppColors
+                                                            .surfaceLight
+                                                            .withOpacity(0.7),
                                                       ),
                                                   textAlign: TextAlign.center,
                                                 );

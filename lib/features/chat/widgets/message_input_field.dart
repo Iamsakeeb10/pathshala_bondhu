@@ -61,15 +61,11 @@ class _MessageInputFieldState extends State<MessageInputField> {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+      decoration: const BoxDecoration(
+        color: Color(0xFF111827), // input container
+        border: Border(
+          top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.05)),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -80,8 +76,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
               child: Container(
                 constraints: BoxConstraints(maxHeight: 120.h),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.grey700 : AppColors.grey100,
-                  borderRadius: BorderRadius.circular(24.r),
+                  color: const Color(0xFF1F2937),
+                  borderRadius: BorderRadius.circular(100.r),
                 ),
                 child: TextField(
                   controller: _controller,
@@ -92,15 +88,32 @@ class _MessageInputFieldState extends State<MessageInputField> {
                   textCapitalization: TextCapitalization.sentences,
                   style: TextStyle(
                     fontSize: 15.sp,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: Colors.white.withOpacity(0.95),
                   ),
                   decoration: InputDecoration(
                     hintText: 'Type a message...',
                     hintStyle: TextStyle(
                       fontSize: 15.sp,
-                      color: AppColors.grey400,
+                      color: isDark
+                          ? Colors.white.withOpacity(0.45)
+                          : AppColors.backgroundDark.withOpacity(0.45),
                     ),
-                    border: InputBorder.none,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100.r),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100.r),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100.r),
+                      borderSide: BorderSide.none,
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100.r),
+                      borderSide: BorderSide.none,
+                    ),
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: 16.w,
                       vertical: 10.h,
@@ -111,22 +124,21 @@ class _MessageInputFieldState extends State<MessageInputField> {
               ),
             ),
             SizedBox(width: 8.w),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              child: GestureDetector(
-                onTap: widget.enabled && _hasText ? _sendMessage : null,
-                child: Container(
-                  width: 44.w,
-                  height: 44.w,
-                  decoration: BoxDecoration(
-                    color: _hasText ? AppColors.primary : AppColors.grey300,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.send_rounded,
-                    color: _hasText ? AppColors.textPrimary : AppColors.grey500,
-                    size: 22.sp,
-                  ),
+            GestureDetector(
+              onTap: widget.enabled && _hasText ? _sendMessage : null,
+              child: Container(
+                width: 44.w,
+                height: 44.w,
+                decoration: BoxDecoration(
+                  color: _hasText ? AppColors.primary : const Color(0xFF374151),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.send_rounded,
+                  size: 22.sp,
+                  color: _hasText
+                      ? Colors.white
+                      : Colors.white.withOpacity(0.4),
                 ),
               ),
             ),

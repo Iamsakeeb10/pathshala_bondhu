@@ -519,7 +519,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: isDark ? AppColors.borderDark : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
@@ -663,9 +663,13 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                               fontWeight: hasUnread
                                   ? FontWeight.w600
                                   : FontWeight.w500,
-                              color: hasUnread
+                              color: isDark
+                                  ? AppColors
+                                        .backgroundLight // 👈 dark mode override
+                                  : hasUnread
                                   ? AppColors.primary
-                                  : AppColors.textSecondary,
+                                  : AppColors
+                                        .textSecondary, // 👈 keep your current logic
                             ),
                           ),
                         ],
@@ -680,9 +684,13 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                                   ? Icons.visibility
                                   : Icons.done,
                               size: 16.r,
-                              color: conversation.lastMessageSeen
+                              color: isDark
+                                  ? AppColors
+                                        .backgroundLight // 👈 dark mode override
+                                  : conversation.lastMessageSeen
                                   ? AppColors.primaryDark
-                                  : AppColors.textSecondary,
+                                  : AppColors
+                                        .textSecondary, // 👈 existing logic
                             ),
                             SizedBox(width: 4.w),
                           ],
@@ -694,11 +702,13 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                                 fontWeight: hasUnread
                                     ? FontWeight.w600
                                     : FontWeight.w400,
-                                color: hasUnread
-                                    ? (isDark
-                                          ? AppColors.textDark
-                                          : AppColors.textPrimary)
-                                    : AppColors.textSecondary,
+                                color: isDark
+                                    ? AppColors
+                                          .backgroundLight // 👈 dark mode override
+                                    : hasUnread
+                                    ? AppColors.textPrimary
+                                    : AppColors
+                                          .textSecondary, // 👈 existing logic
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -852,7 +862,9 @@ class _ConversationSearchFieldState extends State<_ConversationSearchField> {
           hintText: widget.hint,
           hintStyle: TextStyle(
             fontSize: 15.sp,
-            color: AppColors.textSecondary.withOpacity(0.6),
+            color: widget.isDark
+                ? AppColors.backgroundLight
+                : AppColors.textSecondary.withOpacity(0.6),
             fontWeight: FontWeight.w400,
           ),
           prefixIcon: Padding(
@@ -877,9 +889,22 @@ class _ConversationSearchFieldState extends State<_ConversationSearchField> {
                   ),
                 )
               : null,
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
           contentPadding: EdgeInsets.symmetric(
             horizontal: 16.w,
             vertical: 14.h,
