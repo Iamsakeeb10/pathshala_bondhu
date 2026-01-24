@@ -373,22 +373,22 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with floating slider
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                _buildTopSection(sliderHeight),
-                // Floating slider positioned half inside, half outside
-                Positioned(
-                  left: 24.w,
-                  right: 24.w,
-                  bottom: -(sliderHeight / 2),
+            // Header section
+            _buildTopSection(sliderHeight),
+            // Floating slider with constrained layout height
+            SizedBox(
+              height: sliderHeight / 2,
+              child: OverflowBox(
+                minHeight: sliderHeight,
+                maxHeight: sliderHeight,
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: _buildSlider(sliderHeight),
                 ),
-              ],
+              ),
             ),
-            // Add spacing equal to half the slider height plus margin
-            SizedBox(height: (sliderHeight / 2) + 24.h),
+            SizedBox(height: 16.h),
             _buildSectionTitle(context),
             SizedBox(height: 16.h),
             _buildCategoriesSection(context),
