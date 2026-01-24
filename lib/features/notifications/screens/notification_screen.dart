@@ -39,30 +39,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
       // Auto-mark after 5 seconds (only once per screen-open)
       Future.delayed(const Duration(seconds: 5), () async {
-            if (mounted && !_autoMarked) {
-              _autoMarked = true;
+        if (mounted && !_autoMarked) {
+          _autoMarked = true;
 
-              try {
-                await provider.markAllAsRead();
+          try {
+            await provider.markAllAsRead();
 
-                if (mounted) {
-                  final localizations = AppLocalizations.of(context)!;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(localizations.translate('all_notifications_marked_read')),
-                      backgroundColor: AppColors.primary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                }
-              } catch (_) {
-                // ignore errors to keep experience smooth
-              }
+            if (mounted) {
+              final localizations = AppLocalizations.of(context)!;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    localizations.translate('all_notifications_marked_read'),
+                  ),
+                  backgroundColor: AppColors.primary,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
             }
+          } catch (_) {
+            // ignore errors to keep experience smooth
+          }
+        }
       });
     });
   }
@@ -87,7 +89,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(localizations.translate('all_notifications_marked_read')),
+            content: Text(
+              localizations.translate('all_notifications_marked_read'),
+            ),
             backgroundColor: AppColors.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -101,7 +105,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${localizations.translate('error')}: ${e.toString()}'),
+            content: Text(
+              '${localizations.translate('error')}: ${e.toString()}',
+            ),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -118,9 +124,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     List<NotificationModel> notifications,
     BuildContext context,
   ) {
+    // Get current local time
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
+    final nowLocal = DateTime(now.year, now.month, now.day);
+    final yesterdayLocal = nowLocal.subtract(const Duration(days: 1));
 
     final localizations = AppLocalizations.of(context)!;
     final Map<String, List<NotificationModel>> grouped = {
@@ -131,17 +138,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
     };
 
     for (var notification in notifications) {
-      final date = DateTime(
-        notification.createdAt.year,
-        notification.createdAt.month,
-        notification.createdAt.day,
+      // Convert notification time to local timezone
+      final notificationLocal = notification.createdAt.toLocal();
+      final notificationDate = DateTime(
+        notificationLocal.year,
+        notificationLocal.month,
+        notificationLocal.day,
       );
 
-      if (date == today) {
+      // Compare dates in local timezone
+      if (notificationDate == nowLocal) {
         grouped[localizations.translate('today')]!.add(notification);
-      } else if (date == yesterday) {
+      } else if (notificationDate == yesterdayLocal) {
         grouped[localizations.translate('yesterday')]!.add(notification);
-      } else if (now.difference(notification.createdAt).inDays < 7) {
+      } else if (nowLocal.difference(notificationDate).inDays < 7) {
         grouped[localizations.translate('this_week')]!.add(notification);
       } else {
         grouped[localizations.translate('earlier')]!.add(notification);
@@ -230,7 +240,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ),
                             SizedBox(height: 20.h),
                             Text(
-                              localizations.translate('oops_something_went_wrong'),
+                              localizations.translate(
+                                'oops_something_went_wrong',
+                              ),
                               style: TextStyle(
                                 fontSize: 18.sp,
                                 color: AppColors.textPrimary,
@@ -504,8 +516,8 @@ class _NotificationCard extends StatelessWidget {
         border: Border.all(
           color: notification.isRead
               ? (Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.borderDark
-                  : AppColors.grey200.withOpacity(0.6))
+                    ? AppColors.borderDark
+                    : AppColors.grey200.withOpacity(0.6))
               : color.withOpacity(0.15),
           width: 1.w,
         ),
@@ -620,8 +632,12 @@ class _NotificationCard extends StatelessWidget {
                           letterSpacing: -0.1,
                         ),
                         maxLines: 2,
-                        expandText: AppLocalizations.of(context)!.translate('read_more'),
-                        collapseText: AppLocalizations.of(context)!.translate('show_less'),
+                        expandText: AppLocalizations.of(
+                          context,
+                        )!.translate('read_more'),
+                        collapseText: AppLocalizations.of(
+                          context,
+                        )!.translate('show_less'),
                         linkColor: AppColors.primary,
                         linkStyle: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -686,7 +702,9 @@ class _NotificationCard extends StatelessWidget {
                                     ),
                                     SizedBox(width: 4.w),
                                     Text(
-                                      AppLocalizations.of(context)!.translate('mark_as_read'),
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.translate('mark_as_read'),
                                       style: TextStyle(
                                         fontSize: 11.sp,
                                         color: color,
