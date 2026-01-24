@@ -51,7 +51,7 @@ class LogoutService {
 
       // 2. Reset all feature providers
       if (context.mounted) {
-        _resetAllProviders(context);
+        await _resetAllProviders(context);
       }
 
       // 3. Reset auth provider state
@@ -78,7 +78,7 @@ class LogoutService {
   /// Resets all feature providers to their initial state.
   ///
   /// This prevents data leakage between different users.
-  static void _resetAllProviders(BuildContext context) {
+  static Future<void> _resetAllProviders(BuildContext context) async {
     try {
       // Student data (parent-specific)
       context.read<StudentProvider>().clearAll();
@@ -128,7 +128,7 @@ class LogoutService {
       context.read<ChatProvider>().softReset();
 
       // Clear user lookup cache to prevent showing old user data
-      UserLookupService().clearCache();
+      await UserLookupService().clearCache();
 
       debugPrint('✅ All providers reset successfully');
     } catch (e) {

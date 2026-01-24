@@ -402,7 +402,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                   'Start a conversation with teachers\nand parents',
               style: TextStyle(
                 fontSize: 15.sp,
-                color: AppColors.textSecondary,
+                color: AppColors.backgroundLight.withOpacity(0.8),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,

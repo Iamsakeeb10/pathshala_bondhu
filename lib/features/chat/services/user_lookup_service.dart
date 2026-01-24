@@ -13,6 +13,11 @@ class UserLookupService {
   static const String _cacheKeyPrefix = 'user_cache_';
   // static const Duration _cacheDuration = Duration(days: 7); // Cache validity (kept for future use)
 
+  // Singleton pattern
+  static final UserLookupService _instance = UserLookupService._internal();
+  factory UserLookupService() => _instance;
+  UserLookupService._internal();
+
   // Memory cache
   final Map<int, ChatUser> _memoryCache = {};
 
@@ -134,9 +139,14 @@ class UserLookupService {
         final data = json.decode(response.body) as Map<String, dynamic>;
         debugPrint('📦 Decoded JSON: $data');
 
-        if (data['success'] == true && data['user'] != null) {
+        if (data['success'] == true) {
           debugPrint('✅ Success field is true');
-          final userData = data['user'] as Map<String, dynamic>;
+
+          // API returns user data at root level, not nested under 'user' key
+          // Remove 'success' key before parsing
+          final userData = Map<String, dynamic>.from(data);
+          userData.remove('success');
+
           debugPrint('👤 User Data: $userData');
 
           final user = ChatUser.fromJson(userData);
@@ -145,9 +155,7 @@ class UserLookupService {
           );
           return user;
         } else {
-          debugPrint(
-            '⚠️ Success is false or user is null: success=${data['success']}, user=${data['user']}',
-          );
+          debugPrint('⚠️ Success is false: success=${data['success']}');
         }
       } else if (response.statusCode == 404) {
         debugPrint('❌ User $userId not found (404)');
@@ -193,8 +201,23 @@ class UserLookupService {
     return null;
   }
 
-  void clearCache() {
+  Future<void> clearCache() async {
     _memoryCache.clear();
-    // Clear disk cache if needed
+    _ongoingRequests.clear();
+
+    // Clear disk cache
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final keys = prefs.getKeys();
+      final cacheKeys = keys.where((key) => key.startsWith(_cacheKeyPrefix));
+
+      for (final key in cacheKeys) {
+        await prefs.remove(key);
+      }
+
+      debugPrint('✅ Cleared ${cacheKeys.length} user cache entries from disk');
+    } catch (e) {
+      debugPrint('⚠️ Error clearing disk cache: $e');
+    }
   }
 }

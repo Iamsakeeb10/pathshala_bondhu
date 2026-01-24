@@ -88,7 +88,9 @@ class _MessageInputFieldState extends State<MessageInputField> {
                   textCapitalization: TextCapitalization.sentences,
                   style: TextStyle(
                     fontSize: 15.sp,
-                    color: Colors.white.withOpacity(0.95),
+                    color: isDark
+                        ? AppColors.backgroundLight
+                        : AppColors.textPrimary.withOpacity(0.95),
                   ),
                   decoration: InputDecoration(
                     hintText: 'Type a message...',
