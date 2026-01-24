@@ -92,13 +92,33 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                MarkAttendanceTab(
-                  onSubmitted: () {
-                    // Switch to history tab after successful submission
-                    _tabController.animateTo(1);
+                RefreshIndicator(
+                  onRefresh: () async {
+                    await context.read<TeacherAttendanceProvider>().initializeAttendanceScreen(
+                      widget.classId,
+                      widget.sessionId,
+                    );
                   },
+                  color: AppColors.primary,
+                  child: MarkAttendanceTab(
+                    onSubmitted: () {
+                      // Switch to history tab after successful submission
+                      _tabController.animateTo(1);
+                    },
+                  ),
                 ),
-                const AttendanceHistoryTab(),
+                RefreshIndicator(
+                  onRefresh: () async {
+                    final provider = context.read<TeacherAttendanceProvider>();
+                    await provider.initializeAttendanceScreen(
+                      widget.classId,
+                      widget.sessionId,
+                    );
+                    await provider.fetchHistory(provider.selectedHistoryDate);
+                  },
+                  color: AppColors.primary,
+                  child: const AttendanceHistoryTab(),
+                ),
               ],
             ),
           ),

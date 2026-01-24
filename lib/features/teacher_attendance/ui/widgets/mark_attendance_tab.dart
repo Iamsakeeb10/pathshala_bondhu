@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -27,56 +28,74 @@ class MarkAttendanceTab extends StatelessWidget {
         }
 
         if (provider.errorMessage != null && provider.students.isEmpty) {
-          return Center(child: Text(provider.errorMessage!));
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Center(child: Text(provider.errorMessage!)),
+            ),
+          );
         }
 
         if (provider.isAlreadySubmitted) {
-          return Center(
-            child: Padding(
-              padding: EdgeInsets.all(32.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.check_circle_outline_rounded,
-                      size: 64.sp,
-                      color: AppColors.success,
-                    ),
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(20.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check_circle_outline_rounded,
+                          size: 64.sp,
+                          color: AppColors.success,
+                        ),
+                      ),
+                      SizedBox(height: 24.h),
+                      Text(
+                        'Attendance Already Submitted',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.titleLarge?.color ??
+                              AppColors.textPrimary,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Text(
+                        'Attendance for today has already been submitted.\nYou can view it in the History tab.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Theme.of(context).textTheme.bodyMedium?.color ??
+                              AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 24.h),
-                  Text(
-                    'Attendance Already Submitted',
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.titleLarge?.color ??
-                          AppColors.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    'Attendance for today has already been submitted.\nYou can view it in the History tab.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Theme.of(context).textTheme.bodyMedium?.color ??
-                          AppColors.textSecondary,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           );
         }
 
         if (provider.students.isEmpty) {
-          return const Center(child: Text('No students found for this class'));
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: const Center(child: Text('No students found for this class')),
+            ),
+          );
         }
 
         return Column(
@@ -136,6 +155,7 @@ class MarkAttendanceTab extends StatelessWidget {
             // Students List
             Expanded(
               child: ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.all(16.w),
                 itemCount: provider.students.length,
                 separatorBuilder: (c, i) => SizedBox(height: 12.h),
@@ -164,18 +184,55 @@ class MarkAttendanceTab extends StatelessWidget {
                         CircleAvatar(
                           radius: 20.r,
                           backgroundColor: AppColors.primaryLight,
-                          backgroundImage: ImageUrlHelper.resolveAvatarUrl(student.user.avatar).isNotEmpty
-                              ? NetworkImage(ImageUrlHelper.resolveAvatarUrl(student.user.avatar))
-                              : null,
-                          child: ImageUrlHelper.resolveAvatarUrl(student.user.avatar).isEmpty
-                              ? Text(
-                                  student.user.name.substring(0, 1),
+                          child: ImageUrlHelper.resolveAvatarUrl(student.user.avatar).isNotEmpty
+                              ? ClipOval(
+                                  child: CachedNetworkImage(
+                                    imageUrl: ImageUrlHelper.resolveAvatarUrl(student.user.avatar),
+                                    width: 40.w,
+                                    height: 40.w,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      width: 40.w,
+                                      height: 40.w,
+                                      color: AppColors.primaryLight,
+                                      child: Center(
+                                        child: SizedBox(
+                                          width: 16.w,
+                                          height: 16.w,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      width: 40.w,
+                                      height: 40.w,
+                                      color: AppColors.primaryLight,
+                                      child: Center(
+                                        child: Text(
+                                          student.user.name.substring(0, 1).toUpperCase(),
+                                          style: TextStyle(
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  student.user.name.substring(0, 1).toUpperCase(),
                                   style: TextStyle(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 16.sp,
                                   ),
-                                )
-                              : null,
+                                ),
                         ),
                         SizedBox(width: 12.w),
 

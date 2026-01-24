@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -86,20 +87,27 @@ class _AttendanceHistoryTabState extends State<AttendanceHistoryTab> {
                       child: LoadingShimmer.list(itemCount: 6),
                     )
                   : provider.historyRecords.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.event_busy, size: 48.sp, color: AppColors.grey300),
-                              SizedBox(height: 16.h),
-                              Text(
-                                'No attendance records found',
-                                style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.event_busy, size: 48.sp, color: AppColors.grey300),
+                                  SizedBox(height: 16.h),
+                                  Text(
+                                    'No attendance records found',
+                                    style: TextStyle(color: AppColors.textSecondary, fontSize: 16.sp),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         )
                       : ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(16.w),
                           itemCount: provider.historyRecords.length,
                           separatorBuilder: (c, i) => SizedBox(height: 12.h),
@@ -125,18 +133,55 @@ class _AttendanceHistoryTabState extends State<AttendanceHistoryTab> {
                                   CircleAvatar(
                                     radius: 20.r,
                                     backgroundColor: AppColors.primaryLight,
-                                    backgroundImage: ImageUrlHelper.resolveAvatarUrl(record.student.user.avatar).isNotEmpty
-                                        ? NetworkImage(ImageUrlHelper.resolveAvatarUrl(record.student.user.avatar))
-                                        : null,
-                                    child: ImageUrlHelper.resolveAvatarUrl(record.student.user.avatar).isEmpty
-                                        ? Text(
-                                            record.student.user.name.substring(0, 1),
+                                    child: ImageUrlHelper.resolveAvatarUrl(record.student.user.avatar).isNotEmpty
+                                        ? ClipOval(
+                                            child: CachedNetworkImage(
+                                              imageUrl: ImageUrlHelper.resolveAvatarUrl(record.student.user.avatar),
+                                              width: 40.w,
+                                              height: 40.w,
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) => Container(
+                                                width: 40.w,
+                                                height: 40.w,
+                                                color: AppColors.primaryLight,
+                                                child: Center(
+                                                  child: SizedBox(
+                                                    width: 16.w,
+                                                    height: 16.w,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                                        AppColors.primary,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              errorWidget: (context, url, error) => Container(
+                                                width: 40.w,
+                                                height: 40.w,
+                                                color: AppColors.primaryLight,
+                                                child: Center(
+                                                  child: Text(
+                                                    record.student.user.name.substring(0, 1).toUpperCase(),
+                                                    style: TextStyle(
+                                                      color: AppColors.primary,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16.sp,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : Text(
+                                            record.student.user.name.substring(0, 1).toUpperCase(),
                                             style: TextStyle(
                                               color: AppColors.primary,
                                               fontWeight: FontWeight.bold,
+                                              fontSize: 16.sp,
                                             ),
-                                          )
-                                        : null,
+                                          ),
                                   ),
                                   SizedBox(width: 12.w),
                                   Expanded(

@@ -122,13 +122,29 @@ class _ParentsScreenState extends State<ParentsScreen> {
                 return const SizedBox.shrink();
               }
 
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              final cardBackgroundColor = isDark
+                  ? AppColors.surfaceDark.withOpacity(0.4)
+                  : Colors.white.withOpacity(0.15);
+              final borderColor = isDark
+                  ? AppColors.borderDark.withOpacity(0.5)
+                  : Colors.white.withOpacity(0.2);
+              final iconContainerColor = isDark
+                  ? AppColors.student.withOpacity(0.2)
+                  : Colors.white.withOpacity(0.2);
+              final iconColor = isDark ? AppColors.student : Colors.white;
+              final textColor = isDark ? AppColors.textDark : Colors.white;
+              final subtitleColor = isDark
+                  ? AppColors.textDarkSecondary
+                  : Colors.white.withOpacity(0.85);
+
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: cardBackgroundColor,
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
+                    color: borderColor,
                     width: 1,
                   ),
                 ),
@@ -137,12 +153,12 @@ class _ParentsScreenState extends State<ParentsScreen> {
                     Container(
                       padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: iconContainerColor,
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Icon(
                         Icons.family_restroom_rounded,
-                        color: Colors.white,
+                        color: iconColor,
                         size: 20.sp,
                       ),
                     ),
@@ -155,14 +171,14 @@ class _ParentsScreenState extends State<ParentsScreen> {
                           style: TextStyle(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: textColor,
                           ),
                         ),
                         Text(
                           'Connected families',
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: Colors.white.withOpacity(0.85),
+                            color: subtitleColor,
                           ),
                         ),
                       ],

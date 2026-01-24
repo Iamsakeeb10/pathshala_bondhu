@@ -405,14 +405,32 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
             final englishDay = dayMap[day] ?? day;
             final routines = provider.getRoutinesForDay(englishDay);
             if (routines.isEmpty) {
-              return _buildEmptyState(day, context);
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await provider.fetchRoutines();
+                },
+                color: AppColors.primary,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: _buildEmptyState(day, context),
+                  ),
+                ),
+              );
             }
-            return ListView.builder(
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
-              itemCount: routines.length,
-              itemBuilder: (context, index) {
-                return _buildRoutineCard(routines[index], index, context);
+            return RefreshIndicator(
+              onRefresh: () async {
+                await provider.fetchRoutines();
               },
+              color: AppColors.primary,
+              child: ListView.builder(
+                padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 24.h),
+                itemCount: routines.length,
+                itemBuilder: (context, index) {
+                  return _buildRoutineCard(routines[index], index, context);
+                },
+              ),
             );
           }).toList(),
         );
