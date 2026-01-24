@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../auth/data/models/parent_models.dart';
 import '../../auth/data/models/teacher_models.dart';
 import '../../auth/data/services/auth_service.dart';
@@ -10,7 +11,7 @@ class ProfileProvider extends ChangeNotifier {
 
   ParentUser? _parentProfile;
   TeacherUserWithDetails? _teacherProfile;
-  
+
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -83,6 +84,15 @@ class ProfileProvider extends ChangeNotifier {
 
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  /// Clear all profile data (called on logout)
+  void clear() {
+    _parentProfile = null;
+    _teacherProfile = null;
+    _errorMessage = null;
+    _isLoading = false;
     notifyListeners();
   }
 }
