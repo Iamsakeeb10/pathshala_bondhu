@@ -218,10 +218,6 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
               builder: (context, provider, child) {
                 final today = DateFormat('EEEE').format(DateTime.now());
                 final routines = provider.getRoutinesForDay(today);
-                final currentClass = routines.firstWhere(
-                  (r) => _isCurrentClass(r),
-                  orElse: () => routines.first,
-                );
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
