@@ -13,7 +13,6 @@ import '../../../../features/notifications/providers/notification_provider.dart'
 import '../../../../features/students/provider/student_provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
-import '../../../../shared/widgets/modern_alert.dart';
 import '../../../../shared/widgets/modern_premium_slider.dart';
 import '../../../../shared/widgets/student_selection_bottom_sheet.dart';
 import '../../../teacher_attendance/ui/widgets/class_selection_bottom_sheet.dart';
@@ -56,28 +55,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final provider = context.read<NotificationPermissionProvider>();
 
-    // Check if we should show the initial prompt
+    // Check if we should show the initial prompt - directly show system permission dialog
     if (provider.shouldShowInitialPrompt()) {
       // Add a small delay to let the home screen load first
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (!mounted) return;
 
-      // Show the permission prompt dialog
-      final loc = AppLocalizations.of(context)!;
-
-      await ModernAlert.show(
-        context: context,
-        type: AlertType.info,
-        title: loc.translate('notification_prompt_title'),
-        message: loc.translate('notification_prompt_message'),
-        confirmText: loc.translate('allow'),
-        cancelText: loc.translate('maybe_later'),
-        onConfirm: () async {
-          // User wants to enable notifications
-          await provider.requestPermission();
-        },
-      );
+      // Directly request system permission without custom dialog
+      await provider.requestPermission();
     }
   }
 
