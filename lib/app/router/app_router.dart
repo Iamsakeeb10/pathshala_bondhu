@@ -21,6 +21,7 @@ import '../../features/notifications/screens/notification_screen.dart';
 import '../../features/profile/presentation/pages/change_password_screen.dart';
 import '../../features/profile/presentation/pages/contact_us_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
+import '../../features/profile/presentation/pages/notification_settings_screen.dart';
 import '../../features/profile/presentation/pages/privacy_policy_screen.dart';
 import '../../features/profile/presentation/pages/profile_details_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
@@ -100,6 +101,13 @@ class AppRouter {
             builder: (context, state) => const TermsConditionsScreen(),
           ),
         ],
+      ),
+
+      // Notification Settings Screen
+      GoRoute(
+        path: '/notification-settings',
+        name: 'notification-settings',
+        builder: (context, state) => const NotificationSettingsScreen(),
       ),
 
       // Profile Detail Routes (Nested under Dashboard -> Profile)

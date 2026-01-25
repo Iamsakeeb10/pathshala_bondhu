@@ -371,6 +371,43 @@ class AppLocalizations {
       'contact_for_terms': 'Contact for Questions',
       'contact_for_terms_desc':
           'If you have any questions about these Terms & Conditions, please contact us using the information provided in the Contact Us section.',
+
+      // Notification Permission
+      'notification_settings': 'Notification Settings',
+      'notification_settings_ios':
+          'For iOS, please manage notification settings through your device settings.',
+      'notifications_enabled': 'Notifications Enabled',
+      'notifications_enabled_desc':
+          'You will now receive important updates and alerts from Pathshala Bondhu.',
+      'enable_notifications': 'Enable Notifications',
+      'requesting_permission': 'Requesting...',
+      'permission_denied': 'Permission Denied',
+      'notification_permission_denied_desc':
+          'Notifications have been denied. You can try again or enable them from settings.',
+      'open_settings': 'Open Settings',
+      'enable_notifications_in_settings':
+          'Please enable notifications from your device settings to receive important updates.',
+      'notifications_active': 'Notifications Active',
+      'notifications_active_desc':
+          'You are all set to receive notifications from Pathshala Bondhu.',
+      'notifications_disabled': 'Notifications Disabled',
+      'notifications_disabled_desc':
+          'Enable notifications to stay updated with important information.',
+      'notifications_blocked': 'Notifications Blocked',
+      'notifications_blocked_desc':
+          'Notifications are blocked. Please enable them from your device settings.',
+      'notifications_setup': 'Set Up Notifications',
+      'notifications_setup_desc':
+          'Enable notifications to never miss important updates about your child\'s education.',
+      'why_notifications': 'Why Enable Notifications?',
+      'notifications_benefits':
+          'Stay informed about attendance, exam results, fee reminders, homework updates, and important announcements from teachers.',
+      'denial_count': 'Attempts',
+      'notification_prompt_title': 'Stay Updated',
+      'notification_prompt_message':
+          'Enable notifications to receive important updates about attendance, results, and announcements.',
+      'allow': 'Allow',
+      'maybe_later': 'Maybe Later',
     },
     'bn': {
       'account_actions': 'অ্যাকাউন্ট সম্পর্কিত কার্যক্রম',
@@ -725,6 +762,43 @@ class AppLocalizations {
       'contact_for_terms': 'প্রশ্নের জন্য যোগাযোগ',
       'contact_for_terms_desc':
           'এই শর্তাবলী সম্পর্কে কোনো প্রশ্ন থাকলে, যোগাযোগ করুন বিভাগে প্রদত্ত তথ্য ব্যবহার করে আমাদের সাথে যোগাযোগ করুন।',
+
+      // Notification Permission
+      'notification_settings': 'নোটিফিকেশন সেটিংস',
+      'notification_settings_ios':
+          'iOS এর জন্য, অনুগ্রহ করে আপনার ডিভাইস সেটিংস থেকে নোটিফিকেশন সেটিংস পরিচালনা করুন।',
+      'notifications_enabled': 'নোটিফিকেশন সক্রিয়',
+      'notifications_enabled_desc':
+          'আপনি এখন পাঠশালা বন্ধু থেকে গুরুত্বপূর্ণ আপডেট এবং সতর্কতা পাবেন।',
+      'enable_notifications': 'নোটিফিকেশন সক্রিয় করুন',
+      'requesting_permission': 'অনুরোধ করা হচ্ছে...',
+      'permission_denied': 'অনুমতি প্রত্যাখ্যান',
+      'notification_permission_denied_desc':
+          'নোটিফিকেশন প্রত্যাখ্যান করা হয়েছে। আপনি আবার চেষ্টা করতে পারেন বা সেটিংস থেকে সক্রিয় করতে পারেন।',
+      'open_settings': 'সেটিংস খুলুন',
+      'enable_notifications_in_settings':
+          'গুরুত্বপূর্ণ আপডেট পেতে অনুগ্রহ করে আপনার ডিভাইস সেটিংস থেকে নোটিফিকেশন সক্রিয় করুন।',
+      'notifications_active': 'নোটিফিকেশন সক্রিয়',
+      'notifications_active_desc':
+          'আপনি পাঠশালা বন্ধু থেকে নোটিফিকেশন পেতে প্রস্তুত।',
+      'notifications_disabled': 'নোটিফিকেশন নিষ্ক্রিয়',
+      'notifications_disabled_desc':
+          'গুরুত্বপূর্ণ তথ্য আপডেট থাকতে নোটিফিকেশন সক্রিয় করুন।',
+      'notifications_blocked': 'নোটিফিকেশন ব্লক',
+      'notifications_blocked_desc':
+          'নোটিফিকেশন ব্লক করা আছে। অনুগ্রহ করে আপনার ডিভাইস সেটিংস থেকে সক্রিয় করুন।',
+      'notifications_setup': 'নোটিফিকেশন সেটআপ',
+      'notifications_setup_desc':
+          'আপনার সন্তানের শিক্ষা সম্পর্কে গুরুত্বপূর্ণ আপডেট মিস না করতে নোটিফিকেশন সক্রিয় করুন।',
+      'why_notifications': 'কেন নোটিফিকেশন সক্রিয় করবেন?',
+      'notifications_benefits':
+          'উপস্থিতি, পরীক্ষার ফলাফল, ফি রিমাইন্ডার, হোমওয়ার্ক আপডেট এবং শিক্ষকদের গুরুত্বপূর্ণ ঘোষণা সম্পর্কে অবগত থাকুন।',
+      'denial_count': 'প্রচেষ্টা',
+      'notification_prompt_title': 'আপডেট থাকুন',
+      'notification_prompt_message':
+          'উপস্থিতি, ফলাফল এবং ঘোষণা সম্পর্কে গুরুত্বপূর্ণ আপডেট পেতে নোটিফিকেশন সক্রিয় করুন।',
+      'allow': 'অনুমতি দিন',
+      'maybe_later': 'পরে হবে',
     },
   };
 

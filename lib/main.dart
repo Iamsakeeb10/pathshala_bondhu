@@ -15,6 +15,8 @@ import 'app/theme/providers/auth_provider.dart';
 import 'app/theme/providers/theme_provider.dart';
 // 🔹 Network connectivity imports
 import 'core/network/token_storage.dart';
+// 🔹 Notification permission provider
+import 'core/providers/notification_permission_provider.dart';
 import 'core/services/connectivity_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/widgets/no_internet_overlay.dart';
@@ -106,10 +108,12 @@ void main() async {
   // Initialize theme and language providers with saved preferences
   final themeProvider = ThemeProvider();
   final languageProvider = LanguageProvider();
+  final notificationPermissionProvider = NotificationPermissionProvider();
 
   // Load saved preferences
   await themeProvider.initialize();
   await languageProvider.initialize();
+  await notificationPermissionProvider.initialize(prefs);
 
   runApp(
     MultiProvider(
@@ -117,6 +121,7 @@ void main() async {
         ChangeNotifierProvider.value(value: AuthProvider(prefs)),
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: languageProvider),
+        ChangeNotifierProvider.value(value: notificationPermissionProvider),
         ChangeNotifierProvider(create: (_) => StudentProvider()),
         ChangeNotifierProvider(create: (_) => BooksProvider()),
         ChangeNotifierProvider(create: (_) => RoutineProvider()),

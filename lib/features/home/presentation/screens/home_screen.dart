@@ -1,15 +1,19 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../core/providers/notification_permission_provider.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../features/chat/providers/conversations_provider.dart';
 import '../../../../features/notifications/providers/notification_provider.dart';
 import '../../../../features/students/provider/student_provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../../../shared/widgets/modern_premium_slider.dart';
 import '../../../../shared/widgets/student_selection_bottom_sheet.dart';
 import '../../../teacher_attendance/ui/widgets/class_selection_bottom_sheet.dart';
@@ -36,9 +40,45 @@ class _HomeScreenState extends State<HomeScreen> {
       // Fetch notification unread count
       context.read<NotificationProvider>().fetchUnreadCount();
 
-      // Request notification permission
-      NotificationService.requestPermission();
+      // Request notification permission (Android only via provider)
+      _checkAndRequestNotificationPermission();
     });
+  }
+
+  /// Check if we should show notification permission prompt
+  Future<void> _checkAndRequestNotificationPermission() async {
+    // Only for Android
+    if (!Platform.isAndroid) {
+      // For iOS, use the basic Firebase/notification service approach
+      NotificationService.requestPermission();
+      return;
+    }
+
+    final provider = context.read<NotificationPermissionProvider>();
+
+    // Check if we should show the initial prompt
+    if (provider.shouldShowInitialPrompt()) {
+      // Add a small delay to let the home screen load first
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (!mounted) return;
+
+      // Show the permission prompt dialog
+      final loc = AppLocalizations.of(context)!;
+
+      await ModernAlert.show(
+        context: context,
+        type: AlertType.info,
+        title: loc.translate('notification_prompt_title'),
+        message: loc.translate('notification_prompt_message'),
+        confirmText: loc.translate('allow'),
+        cancelText: loc.translate('maybe_later'),
+        onConfirm: () async {
+          // User wants to enable notifications
+          await provider.requestPermission();
+        },
+      );
+    }
   }
 
   /// Simple version with consistent greetings
