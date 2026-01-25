@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/providers/auth_provider.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../providers/profile_provider.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -47,27 +48,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       }
 
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Password changed successfully!'),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-          ),
-        );
         context.pop();
+        ModernAlert.show(
+          context: context,
+          type: AlertType.success,
+          title: 'Success',
+          message: 'Password updated successfully',
+          confirmText: 'OK',
+        );
       } else if (mounted && provider.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(provider.errorMessage!),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-          ),
+        ModernAlert.show(
+          context: context,
+          type: AlertType.error,
+          title: 'Error',
+          message: provider.errorMessage!,
+          confirmText: 'OK',
         );
       }
     }
@@ -183,7 +178,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                    color:
+                        Theme.of(context).textTheme.titleLarge?.color ??
+                        AppColors.textPrimary,
                   ),
                 ),
                 SizedBox(height: 4.h),
@@ -191,7 +188,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   'Create a strong password to keep your account secure.',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                    color:
+                        Theme.of(context).textTheme.bodySmall?.color ??
+                        AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                     height: 1.3,
                   ),
@@ -224,7 +223,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
+                color:
+                    Theme.of(context).textTheme.titleMedium?.color ??
+                    AppColors.textPrimary,
                 letterSpacing: 0.2,
               ),
             ),
@@ -247,19 +248,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             obscureText: obscure,
             validator:
                 validator ??
-                (v) => (v?.length ?? 0) < 6
-                    ? 'Minimum 6 characters required'
+                (v) => (v?.length ?? 0) < 8
+                    ? 'Minimum 8 characters required'
                     : null,
             style: TextStyle(
               fontSize: 15.sp,
-              color: Theme.of(context).textTheme.bodyLarge?.color ?? AppColors.textPrimary,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ??
+                  AppColors.textPrimary,
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
               counterText: '',
               hintText: 'Enter $label',
               hintStyle: TextStyle(
-                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey400,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    AppColors.grey400,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
               ),
@@ -344,7 +349,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
+              color:
+                  Theme.of(context).textTheme.titleMedium?.color ??
+                  AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 8.h),
@@ -372,7 +379,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               text,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey600,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    AppColors.grey600,
                 fontWeight: FontWeight.w500,
               ),
             ),

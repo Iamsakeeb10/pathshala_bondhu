@@ -315,7 +315,9 @@ class ChatBackgroundProvider with ChangeNotifier {
                   Icons.photo_library,
                   color: AppColors.primary,
                 ),
-                title: Text(t?.translate('choose_from_gallery') ?? 'Choose from Gallery'),
+                title: Text(
+                  t?.translate('choose_from_gallery') ?? 'Choose from Gallery',
+                ),
                 onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
               ),
               const SizedBox(height: 10),
@@ -454,7 +456,9 @@ class ChatBackgroundProvider with ChangeNotifier {
               fit: BoxFit.cover,
               repeat: ImageRepeat.noRepeat,
               colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.05), // Subtle overlay for readability
+                Colors.black.withOpacity(
+                  0.05,
+                ), // Subtle overlay for readability
                 BlendMode.darken,
               ),
             ),

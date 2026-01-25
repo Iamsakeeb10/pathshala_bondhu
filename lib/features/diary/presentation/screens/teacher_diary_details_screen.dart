@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../data/models/teacher_diary_model.dart';
 import '../../provider/teacher_diary_provider.dart';
 
@@ -55,76 +56,27 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
   }
 
   void _confirmDelete(BuildContext context) {
-    showDialog(
+    ModernAlert.show(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        title: Text(
-          'Delete Diary',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'Are you sure you want to delete this diary?',
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              try {
-                await context.read<TeacherDiaryProvider>().deleteDiary(
-                  _diary!.id,
-                );
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Diary deleted successfully'),
-                      backgroundColor: AppColors.success,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
-                  context.pop(); // Go back to list
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error: $e'),
-                      backgroundColor: AppColors.error,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text(
-              'Delete',
-              style: TextStyle(
-                color: AppColors.error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
+      type: AlertType.warning,
+      title: 'Delete Diary?',
+      message:
+          'Are you sure you want to delete this diary? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () async {
+        await context.read<TeacherDiaryProvider>().deleteDiary(widget.diaryId);
+        if (context.mounted) {
+          context.pop();
+          ModernAlert.show(
+            context: context,
+            type: AlertType.success,
+            title: 'Deleted',
+            message: 'Diary deleted successfully',
+            confirmText: 'OK',
+          );
+        }
+      },
     );
   }
 
@@ -219,7 +171,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
               'Loading diary details...',
               style: TextStyle(
                 fontSize: 14.sp,
-                color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -253,7 +207,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                  color:
+                      Theme.of(context).textTheme.titleLarge?.color ??
+                      AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 8.h),
@@ -262,7 +218,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                  color:
+                      Theme.of(context).textTheme.bodySmall?.color ??
+                      AppColors.textSecondary,
                 ),
               ),
               SizedBox(height: 24.h),
@@ -313,7 +271,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                  color:
+                      Theme.of(context).textTheme.titleLarge?.color ??
+                      AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 8.h),
@@ -322,7 +282,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                  color:
+                      Theme.of(context).textTheme.bodySmall?.color ??
+                      AppColors.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -386,7 +348,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 _formatDate(_diary!.diaryDate),
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary,
+                  color:
+                      Theme.of(context).textTheme.bodySmall?.color ??
+                      AppColors.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -398,7 +362,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+              color:
+                  Theme.of(context).textTheme.titleLarge?.color ??
+                  AppColors.textPrimary,
               letterSpacing: 0.1,
               height: 1.3,
             ),
@@ -451,7 +417,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                  color:
+                      Theme.of(context).textTheme.titleLarge?.color ??
+                      AppColors.textPrimary,
                 ),
               ),
             ],
@@ -467,7 +435,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
               _diary!.description ?? 'No description provided.',
               style: TextStyle(
                 fontSize: 14.sp,
-                color: Theme.of(context).textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                color:
+                    Theme.of(context).textTheme.bodyMedium?.color ??
+                    AppColors.textSecondary,
                 height: 1.6,
                 fontWeight: FontWeight.w500,
               ),
@@ -521,7 +491,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                  color:
+                      Theme.of(context).textTheme.titleLarge?.color ??
+                      AppColors.textPrimary,
                 ),
               ),
             ],
@@ -590,7 +562,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                    color:
+                        Theme.of(context).textTheme.bodySmall?.color ??
+                        AppColors.grey500,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -600,7 +574,9 @@ class _TeacherDiaryDetailsScreenState extends State<TeacherDiaryDetailsScreen> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).textTheme.titleMedium?.color ?? AppColors.textPrimary,
+                    color:
+                        Theme.of(context).textTheme.titleMedium?.color ??
+                        AppColors.textPrimary,
                   ),
                 ),
               ],

@@ -10,6 +10,7 @@ import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_button.dart';
 import '../../../../shared/widgets/custom_text_field.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -88,17 +89,12 @@ class _LoginScreenState extends State<LoginScreen>
     } else {
       // Show error message
       if (authProvider.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage!),
-            backgroundColor: Colors.red.shade600,
-            behavior: SnackBarBehavior.floating,
-            action: SnackBarAction(
-              label: 'Dismiss',
-              textColor: Colors.white,
-              onPressed: () {},
-            ),
-          ),
+        ModernAlert.show(
+          context: context,
+          type: AlertType.error,
+          title: 'লগইন ব্যর্থ',
+          message: authProvider.errorMessage!,
+          confirmText: 'ঠিক আছে',
         );
       }
     }

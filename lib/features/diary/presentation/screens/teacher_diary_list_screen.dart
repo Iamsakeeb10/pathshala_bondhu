@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../data/models/teacher_diary_model.dart';
 import '../../provider/teacher_diary_provider.dart';
 
@@ -55,8 +56,8 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
     return diaries.where((diary) {
       final titleLower = diary.title.toLowerCase();
       final queryLower = _searchQuery.toLowerCase();
-      final subject = diary.subject?.name?.toLowerCase() ?? '';
-      final className = diary.diaryClass?.name?.toLowerCase() ?? '';
+      final subject = diary.subject?.name.toLowerCase() ?? '';
+      final className = diary.diaryClass?.name.toLowerCase() ?? '';
 
       return titleLower.contains(queryLower) ||
           subject.contains(queryLower) ||
@@ -66,75 +67,25 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
 
   void _confirmDelete(BuildContext context, int id) {
     final localizations = AppLocalizations.of(context)!;
-    showDialog(
+    ModernAlert.show(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        title: Text(
-          localizations.translate('delete_diary'),
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          localizations.translate('are_you_sure_delete_diary'),
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              localizations.translate('cancel'),
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              try {
-                await context.read<TeacherDiaryProvider>().deleteDiary(id);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        localizations.translate('diary_deleted_successfully'),
-                      ),
-                      backgroundColor: AppColors.success,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${localizations.translate('error')}: $e'),
-                      backgroundColor: AppColors.error,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text(
-              localizations.translate('delete'),
-              style: TextStyle(
-                color: AppColors.error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
+      type: AlertType.warning,
+      title: localizations.translate('delete_diary'),
+      message: localizations.translate('delete_diary_confirmation'),
+      confirmText: localizations.translate('delete'),
+      cancelText: localizations.translate('cancel'),
+      onConfirm: () async {
+        await context.read<TeacherDiaryProvider>().deleteDiary(id);
+        if (context.mounted) {
+          ModernAlert.show(
+            context: context,
+            type: AlertType.success,
+            title: localizations.translate('success'),
+            message: localizations.translate('diary_deleted_successfully'),
+            confirmText: localizations.translate('ok'),
+          );
+        }
+      },
     );
   }
 

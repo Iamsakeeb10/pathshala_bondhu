@@ -45,7 +45,9 @@ class SettingsScreen extends StatelessWidget {
                     SizedBox(height: 12.h),
                     _buildLanguageCard(context, langProvider),
                     SizedBox(height: 24.h),
-                    _buildSectionHeader(localizations.translate('notifications')),
+                    _buildSectionHeader(
+                      localizations.translate('notifications'),
+                    ),
                     SizedBox(height: 12.h),
                     _buildNotificationCard(context, localizations),
                     SizedBox(height: 24.h),
@@ -85,7 +87,9 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                color:
+                    Theme.of(context).textTheme.titleLarge?.color ??
+                    AppColors.textPrimary,
                 letterSpacing: 0.3,
               ),
             ),
@@ -167,7 +171,9 @@ class SettingsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                          color:
+                              Theme.of(context).textTheme.titleLarge?.color ??
+                              AppColors.textPrimary,
                           letterSpacing: 0.1,
                         ),
                       ),
@@ -178,7 +184,9 @@ class SettingsScreen extends StatelessWidget {
                             : localizations.translate('light_theme_enabled'),
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.grey500,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -297,8 +305,14 @@ class SettingsScreen extends StatelessWidget {
                                     ? FontWeight.w600
                                     : FontWeight.w500,
                                 color: isSelected
-                                    ? (Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary)
-                                    : (Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textSecondary),
+                                    ? (Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.color ??
+                                          AppColors.textPrimary)
+                                    : (Theme.of(
+                                            context,
+                                          ).textTheme.bodySmall?.color ??
+                                          AppColors.textSecondary),
                                 letterSpacing: 0.1,
                               ),
                             ),
@@ -341,7 +355,10 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationCard(BuildContext context, AppLocalizations localizations) {
+  Widget _buildNotificationCard(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -435,7 +452,9 @@ class SettingsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                          color:
+                              Theme.of(context).textTheme.titleLarge?.color ??
+                              AppColors.textPrimary,
                           letterSpacing: 0.1,
                         ),
                       ),
@@ -444,7 +463,9 @@ class SettingsScreen extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.grey500,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -579,7 +600,9 @@ class SettingsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.titleLarge?.color ?? AppColors.textPrimary,
+                        color:
+                            Theme.of(context).textTheme.titleLarge?.color ??
+                            AppColors.textPrimary,
                         letterSpacing: 0.1,
                       ),
                     ),
@@ -589,7 +612,9 @@ class SettingsScreen extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.grey500,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -642,7 +667,9 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 content: Text(
-                  AppLocalizations.of(context)!.translate('are_you_sure_delete'),
+                  AppLocalizations.of(
+                    context,
+                  )!.translate('are_you_sure_delete'),
                   style: TextStyle(fontSize: 14.sp),
                 ),
                 actions: [
@@ -709,7 +736,9 @@ class SettingsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppLocalizations.of(context)!.translate('delete_account'),
+                        AppLocalizations.of(
+                          context,
+                        )!.translate('delete_account'),
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
@@ -719,10 +748,14 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 3.h),
                       Text(
-                        AppLocalizations.of(context)!.translate('permanently_delete_account'),
+                        AppLocalizations.of(
+                          context,
+                        )!.translate('permanently_delete_account'),
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Theme.of(context).textTheme.bodySmall?.color ?? AppColors.grey500,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.grey500,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

@@ -8,6 +8,7 @@ import '../../../../shared/utils/image_url_helper.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../../shared/widgets/custom_appbar.dart';
 import '../../auth/data/models/parent_models.dart';
 import '../provider/student_provider.dart';
@@ -140,12 +141,13 @@ class _StudentsScreenState extends State<StudentsScreen> {
         child: InkWell(
           onTap: () {
             provider.selectStudent(student);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${student.classInfo.name} selected'),
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 1),
-              ),
+            ModernAlert.show(
+              context: context,
+              type: AlertType.success,
+              title: 'Student Selected',
+              message:
+                  '${student.user?.name ?? 'Student'} from ${student.classInfo.name} has been selected',
+              confirmText: 'OK',
             );
           },
           borderRadius: BorderRadius.circular(16.r),

@@ -8,6 +8,7 @@ import '../../../shared/widgets/custom_appbar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_state.dart';
 import '../../../shared/widgets/loading_shimmer.dart';
+import '../../../shared/widgets/modern_alert.dart';
 import '../../students/provider/student_provider.dart';
 import '../data/models/result_models.dart';
 import '../provider/result_provider.dart';
@@ -226,25 +227,25 @@ class _ResultScreenState extends State<ResultScreen> {
             ...child.exams.map((exam) => _buildExamCard(exam, context)),
 
           // Download PDF Button
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => _handleDownloadPdf(context),
-                icon: const Icon(Icons.picture_as_pdf),
-                label: Text(localizations.translate('download_pdf')),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.all(16.w),
+          //   child: SizedBox(
+          //     width: double.infinity,
+          //     child: ElevatedButton.icon(
+          //       onPressed: () => _handleDownloadPdf(context),
+          //       icon: const Icon(Icons.picture_as_pdf),
+          //       label: Text(localizations.translate('download_pdf')),
+          //       style: ElevatedButton.styleFrom(
+          //         backgroundColor: AppColors.primary,
+          //         foregroundColor: Colors.white,
+          //         padding: EdgeInsets.symmetric(vertical: 14.h),
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(12.r),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -515,13 +516,12 @@ class _ResultScreenState extends State<ResultScreen> {
 
   void _handleDownloadPdf(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(localizations.translate('pdf_download_coming_soon')),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
+    ModernAlert.show(
+      context: context,
+      type: AlertType.info,
+      title: localizations.translate('coming_soon'),
+      message: localizations.translate('pdf_download_coming_soon'),
+      confirmText: localizations.translate('ok'),
     );
   }
 }
