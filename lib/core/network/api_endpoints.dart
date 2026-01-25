@@ -5,6 +5,8 @@ class ApiEndpoints {
 
   // Base URL
   static const String baseUrl = 'http://pathshalabondhu.top/api/v1';
+  // Base URL without v1 (for app update only)
+  static const String baseUrlWithoutV1 = 'http://pathshalabondhu.top/api';
 
   // ========== Authentication Endpoints ==========
 
@@ -144,5 +146,5 @@ class ApiEndpoints {
   /// Check for app updates
   /// POST with Bearer token
   /// Body: { "current_version_code": int, "platform": "android"|"ios", "current_version": string, "device_abi": string (optional) }
-  static const String checkAppUpdate = '$baseUrl/app/check-update';
+  static const String checkAppUpdate = '/app/check-update';
 }

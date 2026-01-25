@@ -10,8 +10,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../network/api_endpoints.dart';
 import '../../shared/utils/app_colors.dart';
+import '../network/api_endpoints.dart';
 
 class AppUpdateService {
   static const String _prefVersionKey = 'last_run_version_code';
@@ -112,8 +112,13 @@ class AppUpdateService {
       }
 
       // Make API request to check for updates using ApiEndpoints
+      final fullUrl =
+          '${ApiEndpoints.baseUrlWithoutV1}${ApiEndpoints.checkAppUpdate}';
+      print('🌐 Full API URL: $fullUrl');
+      print('📦 Request Body: ${jsonEncode(requestBody)}');
+
       final response = await http.post(
-        Uri.parse(ApiEndpoints.checkAppUpdate),
+        Uri.parse(fullUrl),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
