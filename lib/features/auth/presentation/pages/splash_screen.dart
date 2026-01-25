@@ -6,7 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../app/router/app_router.dart';
 import '../../../../app/theme/providers/auth_provider.dart';
+import '../../../../core/services/app_update_service.dart';
 import '../../../../shared/utils/app_colors.dart';
+import '../../../chat/providers/chat_provider.dart';
+import '../../../chat/providers/conversations_provider.dart';
 
 /// Professional splash screen with animations
 class SplashScreen extends StatefulWidget {
@@ -60,19 +63,74 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
+    try {
+      final AppUpdateService updateService = AppUpdateService();
+      final updateData = await updateService.checkForUpdate();
+
+      if (mounted &&
+          updateData != null &&
+          updateData['update_available'] == true) {
+        if (updateData['force_update'] == true) {
+          updateService.showUpdateDialog(
+            context: context,
+            updateInfo: updateData,
+            isForceUpdate: true,
+          );
+          return;
+        } else {
+          updateService.showUpdateDialog(
+            context: context,
+            updateInfo: updateData,
+            isForceUpdate: false,
+          );
+        }
+      }
+    } catch (e) {
+      // Error checking for update, continue with normal flow
+    }
+
+    if (!mounted) return;
+
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool(_hasSeenOnboardingKey) ?? false;
     final authProvider = context.read<AuthProvider>();
 
     if (authProvider.isAuthenticated) {
-      // User is logged in - go directly to dashboard
-      context.go(AppRouter.dashboard);
+      // === APP UPDATE / FRESH START CHECK ===
+      if (mounted) {
+        try {
+          final wasUpdated = await AppUpdateService()
+              .checkIfAppRecentlyUpdated();
+          if (wasUpdated) {
+            debugPrint(
+              '📢 App update detected in Splash! Triggering Chat Soft Reset...',
+            );
+
+            // Access providers safely
+            // We use read() because we are in a function, not build
+            context.read<ChatProvider>().softReset();
+            context.read<ConversationsProvider>().softReset();
+          }
+        } catch (e) {
+          debugPrint('⚠️ Error during update check/reset: $e');
+        }
+      }
+      // ======================================
+
+      if (mounted) {
+        // User is logged in - go directly to dashboard
+        context.go(AppRouter.dashboard);
+      }
     } else if (hasSeenOnboarding) {
-      // User has seen onboarding - go to login
-      context.go(AppRouter.login);
+      if (mounted) {
+        // User has seen onboarding - go to login
+        context.go(AppRouter.login);
+      }
     } else {
-      // First time user - show onboarding
-      context.go(AppRouter.onboarding);
+      if (mounted) {
+        // First time user - show onboarding
+        context.go(AppRouter.onboarding);
+      }
     }
   }
 

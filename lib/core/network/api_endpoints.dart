@@ -138,4 +138,11 @@ class ApiEndpoints {
   /// GET with Bearer token
   /// Query params: page, per_page, search
   static const String parents = '/parents';
+
+  // ========== App Update Endpoints ==========
+
+  /// Check for app updates
+  /// POST with Bearer token
+  /// Body: { "current_version_code": int, "platform": "android"|"ios", "current_version": string, "device_abi": string (optional) }
+  static const String checkAppUpdate = '$baseUrl/app/check-update';
 }
