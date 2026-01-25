@@ -296,7 +296,9 @@ class ProfileScreen extends StatelessWidget {
                   //   },
                   // ),
                   SizedBox(height: 24.h),
-                  _buildSectionHeader(localizations.translate('support')),
+                  _buildSectionHeader(
+                    localizations.translate('account_actions'),
+                  ),
                   // SizedBox(height: 12.h),
                   // _buildMenuItem(
                   //   context,

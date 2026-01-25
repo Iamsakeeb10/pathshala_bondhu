@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/providers/language_provider.dart';
@@ -55,7 +56,7 @@ class SettingsScreen extends StatelessWidget {
                     SizedBox(height: 12.h),
                     _buildAboutCard(context, localizations),
                     SizedBox(height: 24.h),
-                    _buildDeleteAccountCard(context),
+                    // _buildDeleteAccountCard(context),
                     SizedBox(height: 24.h),
                   ],
                 ),
@@ -388,18 +389,6 @@ class SettingsScreen extends StatelessWidget {
             value: true,
             isFirst: true,
           ),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: AppColors.grey200.withOpacity(0.5),
-          ),
-          _buildNotificationItem(
-            icon: Icons.email_rounded,
-            title: localizations.translate('email_notifications'),
-            subtitle: localizations.translate('receive_email_updates'),
-            value: true,
-            isLast: true,
-          ),
         ],
       ),
     );
@@ -527,10 +516,24 @@ class SettingsScreen extends StatelessWidget {
           ),
           _buildAboutItem(
             context,
+            icon: Icons.contact_support_rounded,
+            title: localizations.translate('contact_us'),
+            hasArrow: true,
+            onTap: () => context.push('/settings/contact-us'),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.borderDark
+                : AppColors.grey200.withOpacity(0.5),
+          ),
+          _buildAboutItem(
+            context,
             icon: Icons.privacy_tip_rounded,
             title: localizations.translate('privacy_policy'),
             hasArrow: true,
-            onTap: () {},
+            onTap: () => context.push('/settings/privacy-policy'),
           ),
           Divider(
             height: 1,
@@ -545,7 +548,7 @@ class SettingsScreen extends StatelessWidget {
             title: localizations.translate('terms_conditions'),
             hasArrow: true,
             isLast: true,
-            onTap: () {},
+            onTap: () => context.push('/settings/terms-conditions'),
           ),
         ],
       ),

@@ -19,9 +19,12 @@ import '../../features/exams/ui/exam_routine_screen.dart';
 import '../../features/fees/ui/fees_screen.dart';
 import '../../features/notifications/screens/notification_screen.dart';
 import '../../features/profile/presentation/pages/change_password_screen.dart';
+import '../../features/profile/presentation/pages/contact_us_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
+import '../../features/profile/presentation/pages/privacy_policy_screen.dart';
 import '../../features/profile/presentation/pages/profile_details_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
+import '../../features/profile/presentation/pages/terms_conditions_screen.dart';
 import '../../features/results/ui/result_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
@@ -80,7 +83,23 @@ class AppRouter {
         path: settings,
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
-        // Settings routes reverted as profile is handled separately now
+        routes: [
+          GoRoute(
+            path: 'contact-us',
+            name: 'contact-us',
+            builder: (context, state) => const ContactUsScreen(),
+          ),
+          GoRoute(
+            path: 'privacy-policy',
+            name: 'privacy-policy',
+            builder: (context, state) => const PrivacyPolicyScreen(),
+          ),
+          GoRoute(
+            path: 'terms-conditions',
+            name: 'terms-conditions',
+            builder: (context, state) => const TermsConditionsScreen(),
+          ),
+        ],
       ),
 
       // Profile Detail Routes (Nested under Dashboard -> Profile)

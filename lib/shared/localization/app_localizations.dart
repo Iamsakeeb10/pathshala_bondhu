@@ -19,6 +19,7 @@ class AppLocalizations {
   // Translation map
   static const Map<String, Map<String, String>> _localizedValues = {
     'en': {
+      'account_actions': 'Account Actions',
       'messages': 'Messaages',
       // Auth
       'signup': 'Sign Up',
@@ -41,15 +42,20 @@ class AppLocalizations {
       'welcome_description':
           'আপনার সন্তানের শিক্ষা জীবনের সেরা সঙ্গী। বই, রুটিন, পরীক্ষা, উপস্থিতি এবং ফি সব এক জায়গায়।',
       'onboarding_feature_1_title': 'Digital Attendance',
-      'onboarding_feature_1_desc': 'Quick digital marking with SMS/Push notifications',
+      'onboarding_feature_1_desc':
+          'Quick digital marking with SMS/Push notifications',
       'onboarding_feature_2_title': 'Exam & Results',
-      'onboarding_feature_2_desc': 'Multiple exams, auto GPA, marksheet & merit list',
+      'onboarding_feature_2_desc':
+          'Multiple exams, auto GPA, marksheet & merit list',
       'onboarding_feature_3_title': 'Fee Management',
-      'onboarding_feature_3_desc': 'Auto monthly generation, payment tracking & receipts',
+      'onboarding_feature_3_desc':
+          'Auto monthly generation, payment tracking & receipts',
       'onboarding_feature_4_title': 'Parent App',
-      'onboarding_feature_4_desc': 'Attendance, results, fees, homework & messages',
+      'onboarding_feature_4_desc':
+          'Attendance, results, fees, homework & messages',
       'onboarding_feature_5_title': 'Teacher Management',
-      'onboarding_feature_5_desc': 'Check-in/out, work hours, performance & salary data',
+      'onboarding_feature_5_desc':
+          'Check-in/out, work hours, performance & salary data',
       'onboarding_feature_6_title': 'Real-time Chat',
       'onboarding_feature_6_desc': 'Parents & teachers can chat in real-time',
       'onboarding_pricing': 'Only 20 Taka per student',
@@ -293,8 +299,81 @@ class AppLocalizations {
       'subject_wise_results': 'Subject-wise Results',
       'exam_details': 'Exam Details',
       'percentage': 'Percentage',
+
+      // Contact Us
+      'contact_us': 'Contact Us',
+      'get_in_touch': 'Get in Touch',
+      'contact_us_subtitle': 'We\'re here to help! Reach out to us anytime.',
+      'email_address': 'Email Address',
+      'phone_number': 'Phone Number',
+      'copy_email': 'Copy Email',
+      'copy_phone': 'Copy Phone',
+      'call': 'Call',
+      'send_email': 'Send Email',
+      'copied_to_clipboard': 'Copied to clipboard',
+      'support_email': 'Support Email',
+      'general_inquiries': 'General Inquiries',
+      'contact_number': 'Contact Number',
+      'whatsapp_number': 'WhatsApp Number',
+      'office_hours': 'Office Hours',
+      'sunday_thursday': 'Sunday - Thursday',
+      'available_time': '9:00 AM - 6:00 PM',
+
+      // Privacy Policy
+      'privacy_policy_title': 'Privacy Policy',
+      'last_updated': 'Last Updated',
+      'privacy_intro':
+          'Your privacy is important to us. This Privacy Policy explains how Pathshala Bondhu collects, uses, and protects your personal information.',
+      'information_collection': 'Information Collection',
+      'information_collection_desc':
+          'We collect information you provide directly to us, including name, email, phone number, and educational data. We also collect usage data to improve our services.',
+      'data_usage': 'How We Use Your Data',
+      'data_usage_desc':
+          'We use your information to provide educational services, communicate important updates, improve our platform, and ensure security of your account.',
+      'data_protection': 'Data Protection',
+      'data_protection_desc':
+          'We implement industry-standard security measures to protect your data. Your information is encrypted and stored securely on our servers.',
+      'third_party_sharing': 'Third-Party Sharing',
+      'third_party_sharing_desc':
+          'We do not sell your personal information. We may share data with service providers who help us operate our platform, but only to the extent necessary.',
+      'your_rights': 'Your Rights',
+      'your_rights_desc':
+          'You have the right to access, update, or delete your personal information. Contact us if you wish to exercise these rights.',
+      'policy_changes': 'Policy Changes',
+      'policy_changes_desc':
+          'We may update this policy from time to time. We will notify you of any significant changes via email or app notification.',
+
+      // Terms & Conditions
+      'terms_conditions_title': 'Terms & Conditions',
+      'terms_intro':
+          'By using Pathshala Bondhu, you agree to these terms and conditions. Please read them carefully.',
+      'acceptance_terms': 'Acceptance of Terms',
+      'acceptance_terms_desc':
+          'By accessing and using this application, you accept and agree to be bound by the terms and provision of this agreement.',
+      'user_responsibilities': 'User Responsibilities',
+      'user_responsibilities_desc':
+          'You are responsible for maintaining the confidentiality of your account credentials. You agree to use the platform only for lawful purposes.',
+      'service_description': 'Service Description',
+      'service_description_desc':
+          'Pathshala Bondhu provides educational management services including attendance tracking, fee management, exam results, and parent-teacher communication.',
+      'intellectual_property': 'Intellectual Property',
+      'intellectual_property_desc':
+          'All content, features, and functionality are owned by Pathshala Bondhu and protected by intellectual property laws.',
+      'limitation_liability': 'Limitation of Liability',
+      'limitation_liability_desc':
+          'Pathshala Bondhu shall not be liable for any indirect, incidental, special, consequential damages arising from your use of the service.',
+      'termination': 'Termination',
+      'termination_desc':
+          'We reserve the right to terminate or suspend your account at our discretion, without prior notice, for conduct that violates these terms.',
+      'governing_law': 'Governing Law',
+      'governing_law_desc':
+          'These terms shall be governed by and construed in accordance with the laws of Bangladesh.',
+      'contact_for_terms': 'Contact for Questions',
+      'contact_for_terms_desc':
+          'If you have any questions about these Terms & Conditions, please contact us using the information provided in the Contact Us section.',
     },
     'bn': {
+      'account_actions': 'অ্যাকাউন্ট সম্পর্কিত কার্যক্রম',
       'messages': 'বার্তা',
       // Auth
       'signup': 'নিবন্ধন করুন',
@@ -319,15 +398,18 @@ class AppLocalizations {
       'onboarding_feature_1_title': 'ডিজিটাল উপস্থিতি',
       'onboarding_feature_1_desc': 'দ্রুত ডিজিটাল মার্কিং, SMS/পুশ নোটিফিকেশন',
       'onboarding_feature_2_title': 'পরীক্ষা ও ফলাফল',
-      'onboarding_feature_2_desc': 'একাধিক পরীক্ষা, অটো GPA, মার্কশিট, মেধা তালিকা',
+      'onboarding_feature_2_desc':
+          'একাধিক পরীক্ষা, অটো GPA, মার্কশিট, মেধা তালিকা',
       'onboarding_feature_3_title': 'ফি ব্যবস্থাপনা',
       'onboarding_feature_3_desc': 'মাসিক অটো তৈরি, পেমেন্ট ট্র্যাক, রসিদ',
       'onboarding_feature_4_title': 'অভিভাবক অ্যাপ',
       'onboarding_feature_4_desc': 'উপস্থিতি, ফলাফল, ফি, হোমওয়ার্ক, মেসেজ',
       'onboarding_feature_5_title': 'শিক্ষক ব্যবস্থাপনা',
-      'onboarding_feature_5_desc': 'চেক-ইন/আউট, কাজের ঘণ্টা, পারফরম্যান্স, বেতন',
+      'onboarding_feature_5_desc':
+          'চেক-ইন/আউট, কাজের ঘণ্টা, পারফরম্যান্স, বেতন',
       'onboarding_feature_6_title': 'রিয়েল-টাইম চ্যাট',
-      'onboarding_feature_6_desc': 'অভিভাবক ও শিক্ষক রিয়েল-টাইমে চ্যাট করতে পারবেন',
+      'onboarding_feature_6_desc':
+          'অভিভাবক ও শিক্ষক রিয়েল-টাইমে চ্যাট করতে পারবেন',
       'onboarding_pricing': 'শুধুমাত্র ২০ টাকা প্রতি শিক্ষার্থী',
       'onboarding_contact': 'যোগাযোগ করুন',
       'onboarding_phone': 'ফোন ও WhatsApp',
@@ -570,6 +652,79 @@ class AppLocalizations {
       'subject_wise_results': 'বিষয়ভিত্তিক ফলাফল',
       'exam_details': 'পরীক্ষার বিবরণ',
       'percentage': 'শতাংশ',
+
+      // Contact Us
+      'contact_us': 'যোগাযোগ করুন',
+      'get_in_touch': 'যোগাযোগ করুন',
+      'contact_us_subtitle':
+          'আমরা সাহায্য করতে এখানে আছি! যেকোনো সময় আমাদের সাথে যোগাযোগ করুন।',
+      'email_address': 'ইমেইল ঠিকানা',
+      'phone_number': 'ফোন নম্বর',
+      'copy_email': 'ইমেইল কপি করুন',
+      'copy_phone': 'ফোন কপি করুন',
+      'call': 'কল করুন',
+      'send_email': 'ইমেইল পাঠান',
+      'copied_to_clipboard': 'ক্লিপবোর্ডে কপি হয়েছে',
+      'support_email': 'সাপোর্ট ইমেইল',
+      'general_inquiries': 'সাধারণ জিজ্ঞাসা',
+      'contact_number': 'যোগাযোগ নম্বর',
+      'whatsapp_number': 'হোয়াটসঅ্যাপ নম্বর',
+      'office_hours': 'অফিস সময়',
+      'sunday_thursday': 'রবিবার - বৃহস্পতিবার',
+      'available_time': 'সকাল ৯:০০ - সন্ধ্যা ৬:০০',
+
+      // Privacy Policy
+      'privacy_policy_title': 'গোপনীয়তা নীতি',
+      'last_updated': 'সর্বশেষ আপডেট',
+      'privacy_intro':
+          'আপনার গোপনীয়তা আমাদের কাছে গুরুত্বপূর্ণ। এই গোপনীয়তা নীতি ব্যাখ্যা করে কিভাবে পাঠশালা বন্ধু আপনার ব্যক্তিগত তথ্য সংগ্রহ, ব্যবহার এবং সুরক্ষা করে।',
+      'information_collection': 'তথ্য সংগ্রহ',
+      'information_collection_desc':
+          'আমরা আপনার প্রদত্ত তথ্য সংগ্রহ করি, যার মধ্যে নাম, ইমেইল, ফোন নম্বর এবং শিক্ষাগত তথ্য রয়েছে। আমরা আমাদের সেবা উন্নত করতে ব্যবহারের তথ্যও সংগ্রহ করি।',
+      'data_usage': 'আমরা আপনার তথ্য কিভাবে ব্যবহার করি',
+      'data_usage_desc':
+          'আমরা আপনার তথ্য শিক্ষামূলক সেবা প্রদান, গুরুত্বপূর্ণ আপডেট জানাতে, আমাদের প্ল্যাটফর্ম উন্নত করতে এবং আপনার অ্যাকাউন্টের নিরাপত্তা নিশ্চিত করতে ব্যবহার করি।',
+      'data_protection': 'তথ্য সুরক্ষা',
+      'data_protection_desc':
+          'আমরা আপনার তথ্য সুরক্ষার জন্য শিল্পমান নিরাপত্তা ব্যবস্থা প্রয়োগ করি। আপনার তথ্য এনক্রিপ্ট করা এবং আমাদের সার্ভারে নিরাপদে সংরক্ষিত।',
+      'third_party_sharing': 'তৃতীয় পক্ষের সাথে শেয়ারিং',
+      'third_party_sharing_desc':
+          'আমরা আপনার ব্যক্তিগত তথ্য বিক্রি করি না। আমরা সেবা প্রদানকারীদের সাথে তথ্য শেয়ার করতে পারি যারা আমাদের প্ল্যাটফর্ম পরিচালনায় সহায়তা করে, তবে শুধুমাত্র প্রয়োজনীয় পরিমাণে।',
+      'your_rights': 'আপনার অধিকার',
+      'your_rights_desc':
+          'আপনার ব্যক্তিগত তথ্য অ্যাক্সেস, আপডেট বা মুছে ফেলার অধিকার রয়েছে। এই অধিকারগুলি ব্যবহার করতে চাইলে আমাদের সাথে যোগাযোগ করুন।',
+      'policy_changes': 'নীতি পরিবর্তন',
+      'policy_changes_desc':
+          'আমরা সময়ে সময়ে এই নীতি আপডেট করতে পারি। ইমেইল বা অ্যাপ নোটিফিকেশনের মাধ্যমে আমরা আপনাকে কোনো গুরুত্বপূর্ণ পরিবর্তন সম্পর্কে অবহিত করব।',
+
+      // Terms & Conditions
+      'terms_conditions_title': 'শর্তাবলী',
+      'terms_intro':
+          'পাঠশালা বন্ধু ব্যবহার করে, আপনি এই শর্তাবলীতে সম্মত হন। অনুগ্রহ করে সেগুলি সাবধানে পড়ুন।',
+      'acceptance_terms': 'শর্তাবলীর গ্রহণযোগ্যতা',
+      'acceptance_terms_desc':
+          'এই অ্যাপ্লিকেশন অ্যাক্সেস এবং ব্যবহার করে, আপনি এই চুক্তির শর্তাবলী মেনে নিতে এবং তা মানতে সম্মত হন।',
+      'user_responsibilities': 'ব্যবহারকারীর দায়িত্ব',
+      'user_responsibilities_desc':
+          'আপনার অ্যাকাউন্ট শংসাপত্রের গোপনীয়তা বজায় রাখার জন্য আপনি দায়ী। আপনি শুধুমাত্র আইনসম্মত উদ্দেশ্যে প্ল্যাটফর্ম ব্যবহার করতে সম্মত হন।',
+      'service_description': 'সেবার বিবরণ',
+      'service_description_desc':
+          'পাঠশালা বন্ধু উপস্থিতি ট্র্যাকিং, ফি ব্যবস্থাপনা, পরীক্ষার ফলাফল এবং অভিভাবক-শিক্ষক যোগাযোগ সহ শিক্ষা ব্যবস্থাপনা সেবা প্রদান করে।',
+      'intellectual_property': 'বৌদ্ধিক সম্পত্তি',
+      'intellectual_property_desc':
+          'সমস্ত বিষয়বস্তু, বৈশিষ্ট্য এবং কার্যকারিতা পাঠশালা বন্ধুর মালিকানাধীন এবং বৌদ্ধিক সম্পত্তি আইন দ্বারা সুরক্ষিত।',
+      'limitation_liability': 'দায়বদ্ধতার সীমাবদ্ধতা',
+      'limitation_liability_desc':
+          'পাঠশালা বন্ধু আপনার সেবা ব্যবহার থেকে উদ্ভূত কোনো পরোক্ষ, আনুষঙ্গিক, বিশেষ, পরিণতিগত ক্ষতির জন্য দায়ী থাকবে না।',
+      'termination': 'সমাপ্তি',
+      'termination_desc':
+          'এই শর্তাবলী লঙ্ঘন করে এমন আচরণের জন্য আমরা পূর্ব বিজ্ঞপ্তি ছাড়াই আপনার অ্যাকাউন্ট বাতিল বা স্থগিত করার অধিকার সংরক্ষণ করি।',
+      'governing_law': 'প্রযোজ্য আইন',
+      'governing_law_desc':
+          'এই শর্তাবলী বাংলাদেশের আইন অনুযায়ী পরিচালিত এবং ব্যাখ্যা করা হবে।',
+      'contact_for_terms': 'প্রশ্নের জন্য যোগাযোগ',
+      'contact_for_terms_desc':
+          'এই শর্তাবলী সম্পর্কে কোনো প্রশ্ন থাকলে, যোগাযোগ করুন বিভাগে প্রদত্ত তথ্য ব্যবহার করে আমাদের সাথে যোগাযোগ করুন।',
     },
   };
 
