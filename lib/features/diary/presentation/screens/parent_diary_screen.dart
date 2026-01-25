@@ -80,16 +80,35 @@ class _ParentDiaryScreenState extends State<ParentDiaryScreen> {
                 final diaries = provider.currentStudentDiaries;
 
                 if (diaries.isEmpty) {
-                  return _buildEmptyState();
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await provider.fetchDiaries();
+                    },
+                    color: AppColors.primary,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: _buildEmptyState(),
+                      ),
+                    ),
+                  );
                 }
 
-                return ListView.separated(
-                  padding: EdgeInsets.all(16.w),
-                  itemCount: diaries.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 16.h),
-                  itemBuilder: (context, index) {
-                    return _buildDiaryCard(diaries[index]);
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await provider.fetchDiaries();
                   },
+                  color: AppColors.primary,
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(16.w),
+                    itemCount: diaries.length,
+                    separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                    itemBuilder: (context, index) {
+                      return _buildDiaryCard(diaries[index]);
+                    },
+                  ),
                 );
               },
             ),

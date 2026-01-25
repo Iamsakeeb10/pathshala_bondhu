@@ -50,10 +50,22 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
                 }
 
                 if (provider.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.calendar_today_outlined,
-                    message: 'No routines found',
-                    subMessage: 'There are no class routines assigned yet.',
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await context.read<RoutineProvider>().fetchRoutines();
+                    },
+                    color: AppColors.primary,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const EmptyState(
+                          icon: Icons.calendar_today_outlined,
+                          message: 'No routines found',
+                          subMessage: 'There are no class routines assigned yet.',
+                        ),
+                      ),
+                    ),
                   );
                 }
 
@@ -88,15 +100,22 @@ class _ClassRoutineScreenState extends State<ClassRoutineScreen> {
           .toList();
     }
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSchoolHeader(data),
-          SizedBox(height: 20.h),
-          ...routinesToShow.map((child) => _buildStudentRoutine(child)),
-        ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<RoutineProvider>().fetchRoutines();
+      },
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSchoolHeader(data),
+            SizedBox(height: 20.h),
+            ...routinesToShow.map((child) => _buildStudentRoutine(child)),
+          ],
+        ),
       ),
     );
   }

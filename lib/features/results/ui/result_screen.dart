@@ -69,10 +69,22 @@ class _ResultScreenState extends State<ResultScreen> {
     }
 
     if (!provider.hasResults) {
-      return EmptyState(
-        icon: Icons.emoji_events_outlined,
-        message: localizations.translate('no_results_found'),
-        subMessage: localizations.translate('no_results_available'),
+      return RefreshIndicator(
+        onRefresh: () async {
+          await provider.fetchResults();
+        },
+        color: AppColors.primary,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: EmptyState(
+              icon: Icons.emoji_events_outlined,
+              message: localizations.translate('no_results_found'),
+              subMessage: localizations.translate('no_results_available'),
+            ),
+          ),
+        ),
       );
     }
 
@@ -91,12 +103,19 @@ class _ResultScreenState extends State<ResultScreen> {
           .toList();
     }
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        children: resultsToShow.map((child) {
-          return _buildStudentResults(child, context);
-        }).toList(),
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<ResultProvider>().fetchResults();
+      },
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          children: resultsToShow.map((child) {
+            return _buildStudentResults(child, context);
+          }).toList(),
+        ),
       ),
     );
   }

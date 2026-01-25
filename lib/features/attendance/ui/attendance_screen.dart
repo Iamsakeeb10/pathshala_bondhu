@@ -174,10 +174,22 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
 
     if (provider.isEmpty) {
-      return const EmptyState(
-        icon: Icons.event_available,
-        message: 'No attendance records',
-        subMessage: 'No records for selected month and year.',
+      return RefreshIndicator(
+        onRefresh: () async {
+          await provider.fetchAttendance();
+        },
+        color: AppColors.primary,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: const EmptyState(
+              icon: Icons.event_available,
+              message: 'No attendance records',
+              subMessage: 'No records for selected month and year.',
+            ),
+          ),
+        ),
       );
     }
 
@@ -199,12 +211,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           .toList();
     }
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        children: attendanceToShow
-            .map((child) => _buildStudentCard(child))
-            .toList(),
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<AttendanceProvider>().fetchAttendance();
+      },
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          children: attendanceToShow
+              .map((child) => _buildStudentCard(child))
+              .toList(),
+        ),
       ),
     );
   }

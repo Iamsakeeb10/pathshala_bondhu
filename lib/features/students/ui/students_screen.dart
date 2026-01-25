@@ -61,10 +61,22 @@ class _StudentsScreenState extends State<StudentsScreen> {
                 }
 
                 if (provider.hasNoStudents) {
-                  return const EmptyState(
-                    icon: Icons.people_outline,
-                    message: 'No students found',
-                    subMessage: 'No students are linked to your account.',
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await provider.fetchStudents();
+                    },
+                    color: AppColors.primary,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const EmptyState(
+                          icon: Icons.people_outline,
+                          message: 'No students found',
+                          subMessage: 'No students are linked to your account.',
+                        ),
+                      ),
+                    ),
                   );
                 }
 
@@ -81,12 +93,19 @@ class _StudentsScreenState extends State<StudentsScreen> {
     List<StudentInfo> students,
     StudentProvider provider,
   ) {
-    return ListView.builder(
-      padding: EdgeInsets.all(16.w),
-      itemCount: students.length,
-      itemBuilder: (context, index) {
-        return _buildStudentCard(students[index], provider);
+    return RefreshIndicator(
+      onRefresh: () async {
+        await provider.fetchStudents();
       },
+      color: AppColors.primary,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(16.w),
+        itemCount: students.length,
+        itemBuilder: (context, index) {
+          return _buildStudentCard(students[index], provider);
+        },
+      ),
     );
   }
 

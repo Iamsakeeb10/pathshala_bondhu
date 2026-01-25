@@ -50,10 +50,22 @@ class _BooksScreenState extends State<BooksScreen> {
                 }
 
                 if (provider.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.book_outlined,
-                    message: 'No books found',
-                    subMessage: 'There are no books assigned yet.',
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await provider.fetchBookList();
+                    },
+                    color: AppColors.primary,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const EmptyState(
+                          icon: Icons.book_outlined,
+                          message: 'No books found',
+                          subMessage: 'There are no books assigned yet.',
+                        ),
+                      ),
+                    ),
                   );
                 }
 
@@ -88,18 +100,25 @@ class _BooksScreenState extends State<BooksScreen> {
           .toList();
     }
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header - School Info
-          _buildSchoolHeader(data),
-          SizedBox(height: 20.h),
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<BooksProvider>().fetchBookList();
+      },
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header - School Info
+            _buildSchoolHeader(data),
+            SizedBox(height: 20.h),
 
-          // Books by student
-          ...booksToShow.map((child) => _buildStudentBookList(child)),
-        ],
+            // Books by student
+            ...booksToShow.map((child) => _buildStudentBookList(child)),
+          ],
+        ),
       ),
     );
   }

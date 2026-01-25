@@ -145,10 +145,22 @@ class _FeesScreenState extends State<FeesScreen> {
     }
 
     if (provider.isEmpty) {
-      return EmptyState(
-        icon: Icons.payment,
-        message: localizations.translate('no_fee_records'),
-        subMessage: localizations.translate('no_fee_records_year'),
+      return RefreshIndicator(
+        onRefresh: () async {
+          await provider.fetchFees();
+        },
+        color: AppColors.primary,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: EmptyState(
+              icon: Icons.payment,
+              message: localizations.translate('no_fee_records'),
+              subMessage: localizations.translate('no_fee_records_year'),
+            ),
+          ),
+        ),
       );
     }
 
@@ -178,27 +190,34 @@ class _FeesScreenState extends State<FeesScreen> {
     // Requirement says "Future months fees dont show", assuming for current year.
     // If year is past, show all. If year is future, show none.
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        children: feesToShow.map((child) {
-          // Clone the object or just filter the list in the UI builder?
-          // Since models are final, we can't modify them easily without copyWith.
-          // But we can just pass the filtered list to a modified _buildStudentFees or handle it there.
-          // Let's handle it by passing a filtered list to _buildStudentFees if possible,
-          // or just modify _buildStudentFees to accept max month.
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<FeesProvider>().fetchFees();
+      },
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          children: feesToShow.map((child) {
+            // Clone the object or just filter the list in the UI builder?
+            // Since models are final, we can't modify them easily without copyWith.
+            // But we can just pass the filtered list to a modified _buildStudentFees or handle it there.
+            // Let's handle it by passing a filtered list to _buildStudentFees if possible,
+            // or just modify _buildStudentFees to accept max month.
 
-          List<MonthlyFee> monthlyBreakdown = child.monthlyBreakdown;
-          if (data.academicYear == currentYear) {
-            monthlyBreakdown = child.monthlyBreakdown
-                .take(currentMonth)
-                .toList();
-          } else if (data.academicYear > currentYear) {
-            monthlyBreakdown = [];
-          }
+            List<MonthlyFee> monthlyBreakdown = child.monthlyBreakdown;
+            if (data.academicYear == currentYear) {
+              monthlyBreakdown = child.monthlyBreakdown
+                  .take(currentMonth)
+                  .toList();
+            } else if (data.academicYear > currentYear) {
+              monthlyBreakdown = [];
+            }
 
-          return _buildStudentFees(child, monthlyBreakdown, context);
-        }).toList(),
+            return _buildStudentFees(child, monthlyBreakdown, context);
+          }).toList(),
+        ),
       ),
     );
   }

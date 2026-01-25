@@ -91,11 +91,23 @@ class _ParentsScreenState extends State<ParentsScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradientColors = isDark
+        ? [
+            AppColors.borderDark.withOpacity(0.8),
+            AppColors.borderDark.withOpacity(0.6),
+            AppColors.borderDark.withOpacity(0.4),
+          ]
+        : [AppColors.primary, AppColors.primaryDark, AppColors.accent];
+    final shadowColor = isDark
+        ? Colors.transparent
+        : AppColors.primary.withOpacity(0.2);
+
     return Container(
       padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 20.h),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark, AppColors.accent],
+          colors: gradientColors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -105,7 +117,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.2),
+            color: shadowColor,
             offset: Offset(0, 2.h),
             blurRadius: 20.r,
             spreadRadius: 4.r,
@@ -143,10 +155,7 @@ class _ParentsScreenState extends State<ParentsScreen> {
                 decoration: BoxDecoration(
                   color: cardBackgroundColor,
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: borderColor,
-                    width: 1,
-                  ),
+                  border: Border.all(color: borderColor, width: 1),
                 ),
                 child: Row(
                   children: [

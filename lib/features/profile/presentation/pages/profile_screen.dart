@@ -9,49 +9,25 @@ import '../../../../core/services/logout_service.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/utils/image_url_helper.dart';
+import '../../../../shared/widgets/animated_dialog.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   Future<void> _handleLogout(BuildContext context) async {
     final localizations = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AnimatedDialog.show<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        title: Text(
-          localizations.translate('logout'),
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          localizations.translate('are_you_sure_logout'),
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              localizations.translate('cancel'),
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              localizations.translate('logout'),
-              style: TextStyle(
-                color: AppColors.error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
+      title: localizations.translate('logout'),
+      message: localizations.translate('are_you_sure_logout'),
+      icon: Icons.logout_rounded,
+      iconColor: AppColors.error,
+      confirmText: localizations.translate('logout'),
+      cancelText: localizations.translate('cancel'),
+      isDestructive: true,
+      confirmColor: AppColors.error,
+      onConfirm: () => Navigator.of(context).pop(true),
+      onCancel: () => Navigator.of(context).pop(false),
     );
 
     if (confirmed == true && context.mounted) {

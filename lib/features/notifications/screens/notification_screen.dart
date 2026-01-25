@@ -207,16 +207,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   }
 
                   if (provider.hasError && provider.notifications.isEmpty) {
+                    final isDark = Theme.of(context).brightness == Brightness.dark;
                     return Center(
                       child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 32.w),
                         padding: EdgeInsets.all(24.w),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceLight,
+                          color: isDark
+                              ? AppColors.surfaceDark
+                              : AppColors.surfaceLight,
                           borderRadius: BorderRadius.circular(20.r),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.08),
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.3)
+                                  : AppColors.primary.withOpacity(0.08),
                               offset: Offset(0, 4.h),
                               blurRadius: 20.r,
                             ),
@@ -245,7 +250,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               ),
                               style: TextStyle(
                                 fontSize: 18.sp,
-                                color: AppColors.textPrimary,
+                                color: isDark
+                                    ? AppColors.textDark
+                                    : AppColors.textPrimary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -254,7 +261,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               provider.errorMessage,
                               style: TextStyle(
                                 fontSize: 14.sp,
-                                color: AppColors.textSecondary,
+                                color: isDark
+                                    ? AppColors.textDarkSecondary
+                                    : AppColors.textSecondary,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -289,6 +298,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   }
 
                   if (provider.notifications.isEmpty) {
+                    final isDark = Theme.of(context).brightness == Brightness.dark;
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -297,13 +307,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             width: 120.w,
                             height: 120.w,
                             decoration: BoxDecoration(
-                              color: AppColors.grey200.withOpacity(0.3),
+                              color: isDark
+                                  ? AppColors.surfaceDark.withOpacity(0.5)
+                                  : AppColors.grey200.withOpacity(0.3),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               Icons.notifications_none_rounded,
                               size: 60.sp,
-                              color: AppColors.textSecondary.withOpacity(0.5),
+                              color: isDark
+                                  ? AppColors.textDarkSecondary.withOpacity(0.6)
+                                  : AppColors.textSecondary.withOpacity(0.5),
                             ),
                           ),
                           SizedBox(height: 24.h),
@@ -311,7 +325,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             localizations.translate('no_notifications_yet'),
                             style: TextStyle(
                               fontSize: 20.sp,
-                              color: AppColors.textPrimary,
+                              color: isDark
+                                  ? AppColors.textDark
+                                  : AppColors.textPrimary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -321,7 +337,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14.sp,
-                              color: AppColors.textSecondary,
+                              color: isDark
+                                  ? AppColors.textDarkSecondary
+                                  : AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -385,7 +403,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 style: TextStyle(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.textSecondary,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? AppColors.textDarkSecondary
+                                      : AppColors.textSecondary,
                                   letterSpacing: 0.5,
                                 ),
                               ),
@@ -506,26 +527,31 @@ class _NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _getColorByType(notification.type);
     final categoryName = _getCategoryName();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
         color: notification.isRead
             ? Theme.of(context).cardColor
-            : color.withOpacity(0.03),
+            : isDark
+                ? color.withOpacity(0.08)
+                : color.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: notification.isRead
-              ? (Theme.of(context).brightness == Brightness.dark
+              ? (isDark
                     ? AppColors.borderDark
                     : AppColors.grey200.withOpacity(0.6))
-              : color.withOpacity(0.15),
+              : color.withOpacity(isDark ? 0.25 : 0.15),
           width: 1.w,
         ),
         boxShadow: [
           BoxShadow(
             color: notification.isRead
-                ? AppColors.grey200.withOpacity(0.3)
-                : color.withOpacity(0.05),
+                ? (isDark
+                      ? Colors.black.withOpacity(0.3)
+                      : AppColors.grey200.withOpacity(0.3))
+                : color.withOpacity(isDark ? 0.1 : 0.05),
             offset: Offset(0, 2.h),
             blurRadius: 8.r,
             spreadRadius: 0,
@@ -551,8 +577,8 @@ class _NotificationCard extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        color.withOpacity(0.15),
-                        color.withOpacity(0.08),
+                        color.withOpacity(isDark ? 0.25 : 0.15),
+                        color.withOpacity(isDark ? 0.15 : 0.08),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(12.r),
@@ -587,7 +613,9 @@ class _NotificationCard extends StatelessWidget {
                                       fontWeight: notification.isRead
                                           ? FontWeight.w600
                                           : FontWeight.bold,
-                                      color: AppColors.textPrimary,
+                                      color: isDark
+                                          ? AppColors.textDark
+                                          : AppColors.textPrimary,
                                       letterSpacing: -0.2,
                                     ),
                                     maxLines: 1,
@@ -614,7 +642,9 @@ class _NotificationCard extends StatelessWidget {
                             timeago.format(notification.createdAt),
                             style: TextStyle(
                               fontSize: 11.sp,
-                              color: AppColors.textSecondary.withOpacity(0.7),
+                              color: isDark
+                                  ? AppColors.textDarkSecondary.withOpacity(0.8)
+                                  : AppColors.textSecondary.withOpacity(0.7),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -627,7 +657,9 @@ class _NotificationCard extends StatelessWidget {
                         notification.message,
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: AppColors.textSecondary,
+                          color: isDark
+                              ? AppColors.textDarkSecondary
+                              : AppColors.textSecondary,
                           height: 1.4,
                           letterSpacing: -0.1,
                         ),
@@ -660,7 +692,7 @@ class _NotificationCard extends StatelessWidget {
                               vertical: 4.h,
                             ),
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.1),
+                              color: color.withOpacity(isDark ? 0.2 : 0.1),
                               borderRadius: BorderRadius.circular(6.r),
                             ),
                             child: Text(
@@ -685,10 +717,10 @@ class _NotificationCard extends StatelessWidget {
                                   vertical: 6.h,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: color.withOpacity(0.1),
+                                  color: color.withOpacity(isDark ? 0.2 : 0.1),
                                   borderRadius: BorderRadius.circular(8.r),
                                   border: Border.all(
-                                    color: color.withOpacity(0.3),
+                                    color: color.withOpacity(isDark ? 0.4 : 0.3),
                                     width: 1,
                                   ),
                                 ),

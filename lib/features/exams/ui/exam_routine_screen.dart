@@ -54,10 +54,22 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
                 }
 
                 if (provider.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.event_note_outlined,
-                    message: 'No exam routines found',
-                    subMessage: 'There are no exams scheduled yet.',
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await context.read<ExamRoutineProvider>().fetchExamRoutines();
+                    },
+                    color: AppColors.primary,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: const EmptyState(
+                          icon: Icons.event_note_outlined,
+                          message: 'No exam routines found',
+                          subMessage: 'There are no exams scheduled yet.',
+                        ),
+                      ),
+                    ),
                   );
                 }
 
@@ -85,15 +97,22 @@ class _ExamRoutineScreenState extends State<ExamRoutineScreen> {
           .toList();
     }
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSchoolHeader(data),
-          SizedBox(height: 20.h),
-          ...routinesToShow.map((child) => _buildStudentExam(child)),
-        ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<ExamRoutineProvider>().fetchExamRoutines();
+      },
+      color: AppColors.primary,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSchoolHeader(data),
+            SizedBox(height: 20.h),
+            ...routinesToShow.map((child) => _buildStudentExam(child)),
+          ],
+        ),
       ),
     );
   }
