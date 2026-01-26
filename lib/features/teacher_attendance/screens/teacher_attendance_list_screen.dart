@@ -43,6 +43,29 @@ class _TeacherAttendanceListScreenState
     super.dispose();
   }
 
+  // Convert 24-hour format to 12-hour format with AM/PM
+  String _formatTime(String? time24) {
+    if (time24 == null || time24.isEmpty) return '';
+    try {
+      final parts = time24.split(':');
+      if (parts.length < 2) return time24;
+
+      var hour = int.parse(parts[0]);
+      final minute = parts[1];
+      final period = hour >= 12 ? 'PM' : 'AM';
+
+      if (hour > 12) {
+        hour -= 12;
+      } else if (hour == 0) {
+        hour = 12;
+      }
+
+      return '$hour:$minute $period';
+    } catch (e) {
+      return time24;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -208,9 +231,9 @@ class _TeacherAttendanceListScreenState
         _buildAttendanceCard(attendance, localizations),
         SizedBox(height: 20.h),
         if (provider.isToday)
-          CustomButton(
-            text: localizations.translate('update'),
-            icon: Icons.edit,
+          _buildGradientButton(
+            text: 'Update Attendance',
+            icon: Icons.update_rounded,
             onPressed: () => _handleAttendanceTap(attendance),
           )
         else
@@ -221,6 +244,58 @@ class _TeacherAttendanceListScreenState
             isOutlined: true,
           ),
       ],
+    );
+  }
+
+  Widget _buildGradientButton({
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 54.h,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.primary, AppColors.primaryDark],
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(16.r),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: Colors.white, size: 24.sp),
+                SizedBox(width: 10.w),
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -298,7 +373,7 @@ class _TeacherAttendanceListScreenState
                   _buildInfoRow(
                     Icons.login,
                     localizations.translate('check_in'),
-                    attendance.checkInTime!,
+                    _formatTime(attendance.checkInTime),
                     isDark,
                   ),
                 ],
@@ -307,7 +382,7 @@ class _TeacherAttendanceListScreenState
                   _buildInfoRow(
                     Icons.logout,
                     localizations.translate('check_out'),
-                    attendance.checkOutTime!,
+                    _formatTime(attendance.checkOutTime),
                     isDark,
                   ),
                 ],

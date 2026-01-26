@@ -71,47 +71,56 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 : localizations.translate('mark_attendance'),
           ),
           Expanded(
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Teacher info card (if updating)
-                    if (teacher != null) ...[
-                      _buildTeacherInfoCard(teacher, localizations),
+            child: SafeArea(
+              top: false,
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(16.w, 16.w, 16.w, 24.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Teacher info card (if updating)
+                      if (teacher != null) ...[
+                        _buildTeacherInfoCard(teacher, localizations),
+                        SizedBox(height: 16.h),
+                      ],
+
+                      // Date field
+                      _buildDateCard(localizations),
+                      SizedBox(height: 16.h),
+
+                      // Status selection
+                      _buildStatusSelection(localizations),
+                      SizedBox(height: 16.h),
+
+                      // Time fields (only if present)
+                      if (_selectedStatus == 'present') ...[
+                        _buildTimeFields(localizations),
+                        SizedBox(height: 16.h),
+                      ],
+
+                      // Remarks field (only for absent/leave)
+                      if (_selectedStatus == 'absent' ||
+                          _selectedStatus == 'leave') ...[
+                        _buildRemarksCard(localizations),
+                        SizedBox(height: 16.h),
+                      ],
+
+                      SizedBox(height: 8.h),
+
+                      // Past date warning
+                      if (_isPastDate()) ...[
+                        _buildPastDateWarning(localizations),
+                        SizedBox(height: 16.h),
+                      ],
+
+                      // Submit button
+                      _buildSubmitButton(localizations, isUpdate, teacher),
                       SizedBox(height: 16.h),
                     ],
-
-                    // Date field
-                    _buildDateCard(localizations),
-                    SizedBox(height: 16.h),
-
-                    // Status selection
-                    _buildStatusSelection(localizations),
-                    SizedBox(height: 16.h),
-
-                    // Time fields (only if present)
-                    if (_selectedStatus == 'present') ...[
-                      _buildTimeFields(localizations),
-                      SizedBox(height: 16.h),
-                    ],
-
-                    // Remarks field
-                    _buildRemarksCard(localizations),
-                    SizedBox(height: 24.h),
-
-                    // Past date warning
-                    if (_isPastDate()) ...[
-                      _buildPastDateWarning(localizations),
-                      SizedBox(height: 16.h),
-                    ],
-
-                    // Submit button
-                    _buildSubmitButton(localizations, isUpdate),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -600,12 +609,8 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
             if (!isRequired && value != null && value.isNotEmpty) {
               final checkIn = _checkInController.text;
               if (checkIn.isNotEmpty) {
-                final checkInTime = TimeOfDay.fromDateTime(
-                  DateFormat('HH:mm').parse(checkIn),
-                );
-                final checkOutTime = TimeOfDay.fromDateTime(
-                  DateFormat('HH:mm').parse(value),
-                );
+                final checkInTime = _parseTimeString(checkIn);
+                final checkOutTime = _parseTimeString(value);
                 if (_isTimeBefore(checkOutTime, checkInTime)) {
                   return localizations.translate(
                     'check_out_must_be_after_check_in',
@@ -663,6 +668,13 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
             controller: _remarksController,
             maxLines: 3,
             maxLength: 200,
+            buildCounter:
+                (
+                  context, {
+                  required currentLength,
+                  required isFocused,
+                  maxLength,
+                }) => null,
             style: TextStyle(
               fontSize: 14.sp,
               color:
@@ -715,20 +727,54 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     );
   }
 
-  Widget _buildSubmitButton(AppLocalizations localizations, bool isUpdate) {
+  Widget _buildSubmitButton(
+    AppLocalizations localizations,
+    bool isUpdate,
+    TeacherBasicModel? teacher,
+  ) {
+    // Determine button state based on attendance
+    String buttonText;
+    IconData buttonIcon;
+    Color buttonStartColor;
+    Color buttonEndColor;
+
+    if (!isUpdate) {
+      // Case 1: No attendance marked - Show Check In
+      buttonText = 'Check In';
+      buttonIcon = Icons.login_rounded;
+      buttonStartColor = Colors.green.shade600;
+      buttonEndColor = Colors.green.shade800;
+    } else if (widget.attendance?.checkInTime != null &&
+        widget.attendance?.checkOutTime == null) {
+      // Case 2: Checked in but not checked out - Show Check Out
+      buttonText = 'Check Out';
+      buttonIcon = Icons.logout_rounded;
+      buttonStartColor = Colors.orange.shade600;
+      buttonEndColor = Colors.orange.shade800;
+    } else {
+      // Case 3: Update existing attendance
+      buttonText = 'Update Attendance';
+      buttonIcon = Icons.update_rounded;
+      buttonStartColor = AppColors.primary;
+      buttonEndColor = AppColors.primaryDark;
+    }
+
     return Container(
       width: double.infinity,
-      height: 52.h,
+      height: 54.h,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [buttonStartColor, buttonEndColor],
         ),
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: buttonStartColor.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -736,7 +782,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: _isSubmitting ? null : _submitAttendance,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(16.r),
           child: Center(
             child: _isSubmitting
                 ? SizedBox(
@@ -750,23 +796,15 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        isUpdate
-                            ? Icons.check_circle_outline_rounded
-                            : Icons.add_circle_outline_rounded,
-                        color: Colors.white,
-                        size: 22.sp,
-                      ),
-                      SizedBox(width: 8.w),
+                      Icon(buttonIcon, color: Colors.white, size: 24.sp),
+                      SizedBox(width: 10.w),
                       Text(
-                        isUpdate
-                            ? localizations.translate('update')
-                            : localizations.translate('mark_attendance'),
+                        buttonText,
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          letterSpacing: 0.3,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
@@ -802,7 +840,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
 
   Future<void> _selectTime(TextEditingController controller) async {
     final initialTime = controller.text.isNotEmpty
-        ? TimeOfDay.fromDateTime(DateFormat('HH:mm').parse(controller.text))
+        ? _parseTimeString(controller.text)
         : TimeOfDay.now();
 
     final selectedTime = await showTimePicker(
@@ -818,9 +856,33 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   }
 
   String _formatTimeOfDay(TimeOfDay time) {
-    final hour = time.hour.toString().padLeft(2, '0');
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
     final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
+  TimeOfDay _parseTimeString(String timeString) {
+    try {
+      // Handle 12-hour format with AM/PM
+      if (timeString.contains('AM') || timeString.contains('PM')) {
+        final parts = timeString.split(' ');
+        final timeParts = parts[0].split(':');
+        var hour = int.parse(timeParts[0]);
+        final minute = int.parse(timeParts[1]);
+        final isPM = parts[1] == 'PM';
+
+        if (isPM && hour != 12) hour += 12;
+        if (!isPM && hour == 12) hour = 0;
+
+        return TimeOfDay(hour: hour, minute: minute);
+      }
+      // Fallback for 24-hour format
+      final parts = timeString.split(':');
+      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    } catch (e) {
+      return TimeOfDay.now();
+    }
   }
 
   bool _isTimeBefore(TimeOfDay time1, TimeOfDay time2) {
