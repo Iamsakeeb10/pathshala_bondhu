@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../shared/localization/app_localizations.dart';
 import '../../../shared/utils/app_colors.dart';
@@ -10,7 +11,6 @@ import '../../../shared/widgets/custom_appbar.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../models/teacher_attendance_model.dart';
 import '../providers/teacher_attendance_list_provider.dart';
-import '../widgets/attendance_skeleton_loader.dart';
 import '../widgets/date_selector_widget.dart';
 import '../widgets/empty_attendance_widget.dart';
 
@@ -182,7 +182,7 @@ class _TeacherAttendanceListScreenState
     AppLocalizations localizations,
   ) {
     if (provider.isLoadingList) {
-      return const AttendanceSkeletonLoader();
+      return _buildShimmerLoader();
     }
 
     if (provider.errorMessage != null) {
@@ -296,6 +296,134 @@ class _TeacherAttendanceListScreenState
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildShimmerLoader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Shimmer.fromColors(
+      baseColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+      highlightColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: AppColors.primary.withOpacity(0.3),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header shimmer
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12.r),
+                  topRight: Radius.circular(12.r),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 20.w,
+                        height: 20.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Container(
+                        width: 150.w,
+                        height: 16.h,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    width: 70.w,
+                    height: 28.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Body shimmer
+            Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Date row
+                  _buildShimmerInfoRow(),
+                  SizedBox(height: 12.h),
+                  // Check-in row
+                  _buildShimmerInfoRow(),
+                  SizedBox(height: 12.h),
+                  // Check-out row
+                  _buildShimmerInfoRow(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerInfoRow() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 18.w,
+          height: 18.w,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4.r),
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 60.w,
+                height: 12.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Container(
+                width: double.infinity,
+                height: 14.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
