@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../shared/localization/app_localizations.dart';
 import '../../../shared/utils/app_colors.dart';
+import '../../../shared/widgets/custom_appbar.dart';
 import '../models/teacher_attendance_model.dart';
 
 /// Mark/Update Teacher Attendance Screen
@@ -61,52 +62,61 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     final teacher = widget.attendance?.teacher;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          isUpdate
-              ? localizations.translate('update_attendance')
-              : localizations.translate('mark_attendance'),
-        ),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.all(16.w),
-          children: [
-            // Teacher info card (if updating)
-            if (teacher != null) ...[
-              _buildTeacherInfoCard(teacher, localizations),
-              SizedBox(height: 16.h),
-            ],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          CustomAppBar(
+            title: isUpdate
+                ? localizations.translate('update_attendance')
+                : localizations.translate('mark_attendance'),
+          ),
+          Expanded(
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Teacher info card (if updating)
+                    if (teacher != null) ...[
+                      _buildTeacherInfoCard(teacher, localizations),
+                      SizedBox(height: 16.h),
+                    ],
 
-            // Date field
-            _buildDateField(localizations),
-            SizedBox(height: 16.h),
+                    // Date field
+                    _buildDateCard(localizations),
+                    SizedBox(height: 16.h),
 
-            // Status selection
-            _buildStatusSelection(localizations),
-            SizedBox(height: 16.h),
+                    // Status selection
+                    _buildStatusSelection(localizations),
+                    SizedBox(height: 16.h),
 
-            // Time fields (only if present)
-            if (_selectedStatus == 'present') ...[
-              _buildTimeFields(localizations),
-              SizedBox(height: 16.h),
-            ],
+                    // Time fields (only if present)
+                    if (_selectedStatus == 'present') ...[
+                      _buildTimeFields(localizations),
+                      SizedBox(height: 16.h),
+                    ],
 
-            // Remarks field
-            _buildRemarksField(localizations),
-            SizedBox(height: 16.h),
+                    // Remarks field
+                    _buildRemarksCard(localizations),
+                    SizedBox(height: 24.h),
 
-            // Warning banner for past dates
-            if (_isPastDate()) ...[
-              _buildPastDateWarning(localizations),
-              SizedBox(height: 16.h),
-            ],
+                    // Past date warning
+                    if (_isPastDate()) ...[
+                      _buildPastDateWarning(localizations),
+                      SizedBox(height: 16.h),
+                    ],
 
-            // Submit button
-            _buildSubmitButton(localizations, isUpdate),
-          ],
-        ),
+                    // Submit button
+                    _buildSubmitButton(localizations, isUpdate),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -115,64 +125,105 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     TeacherBasicModel teacher,
     AppLocalizations localizations,
   ) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Row(
-          children: [
-            // Avatar
-            CircleAvatar(
-              radius: 30.r,
-              backgroundColor: AppColors.primary.withOpacity(0.1),
-              child: teacher.avatar != null
-                  ? ClipOval(
-                      child: Image.network(
-                        teacher.avatar!,
-                        width: 60.w,
-                        height: 60.w,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildInitialsAvatar(teacher);
-                        },
-                      ),
-                    )
-                  : _buildInitialsAvatar(teacher),
-            ),
-            SizedBox(width: 16.w),
-
-            // Teacher details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    teacher.fullName,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    teacher.displayDepartment,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    teacher.email,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Avatar
+          CircleAvatar(
+            radius: 30.r,
+            backgroundColor: AppColors.primary.withOpacity(0.1),
+            child: teacher.avatar != null
+                ? ClipOval(
+                    child: Image.network(
+                      teacher.avatar!,
+                      width: 60.w,
+                      height: 60.w,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildInitialsAvatar(teacher);
+                      },
+                    ),
+                  )
+                : _buildInitialsAvatar(teacher),
+          ),
+          SizedBox(width: 16.w),
+
+          // Teacher details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  teacher.fullName,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.business_outlined,
+                      size: 14.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      teacher.displayDepartment,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color:
+                            Theme.of(context).textTheme.bodySmall?.color ??
+                            AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4.h),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      size: 14.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        teacher.email,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.textSecondary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -195,63 +246,140 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     );
   }
 
-  Widget _buildDateField(AppLocalizations localizations) {
-    return TextFormField(
-      enabled: false,
-      decoration: InputDecoration(
-        labelText: localizations.translate('date'),
-        prefixIcon: const Icon(Icons.calendar_today),
+  Widget _buildDateCard(AppLocalizations localizations) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      controller: TextEditingController(
-        text: DateFormat('dd MMMM yyyy').format(widget.date),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.w),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(
+              Icons.calendar_today,
+              color: AppColors.primary,
+              size: 24.sp,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                localizations.translate('date'),
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                DateFormat('dd MMMM yyyy').format(widget.date),
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildStatusSelection(AppLocalizations localizations) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          localizations.translate('status'),
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).textTheme.bodyLarge?.color,
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          children: [
-            Expanded(
-              child: _buildStatusOption(
-                'present',
-                localizations.translate('present'),
-                Icons.check_circle,
-                Colors.green,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.check_box_outlined,
+                size: 16.sp,
+                color: AppColors.primary,
               ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: _buildStatusOption(
-                'absent',
-                localizations.translate('absent'),
-                Icons.cancel,
-                Colors.red,
+              SizedBox(width: 6.w),
+              Text(
+                localizations.translate('status'),
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      Theme.of(context).textTheme.titleMedium?.color ??
+                      AppColors.textPrimary,
+                  letterSpacing: 0.2,
+                ),
               ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: _buildStatusOption(
-                'leave',
-                localizations.translate('leave'),
-                Icons.event_busy,
-                Colors.orange,
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatusOption(
+                  'present',
+                  localizations.translate('present'),
+                  Icons.check_circle,
+                  Colors.green,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+              SizedBox(width: 12.w),
+              Expanded(
+                child: _buildStatusOption(
+                  'absent',
+                  localizations.translate('absent'),
+                  Icons.cancel,
+                  Colors.red,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: _buildStatusOption(
+                  'leave',
+                  localizations.translate('leave'),
+                  Icons.event_busy,
+                  Colors.orange,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -317,43 +445,159 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   }
 
   Widget _buildTimeFields(AppLocalizations localizations) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.access_time, size: 16.sp, color: AppColors.primary),
+              SizedBox(width: 6.w),
+              Text(
+                localizations.translate('time'),
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      Theme.of(context).textTheme.titleMedium?.color ??
+                      AppColors.textPrimary,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          _buildTimeField(
+            controller: _checkInController,
+            label: '${localizations.translate('check_in_time')} *',
+            icon: Icons.login,
+            localizations: localizations,
+            isRequired: true,
+          ),
+          SizedBox(height: 16.h),
+          _buildTimeField(
+            controller: _checkOutController,
+            label: localizations.translate('check_out_time'),
+            icon: Icons.logout,
+            localizations: localizations,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    required AppLocalizations localizations,
+    bool isRequired = false,
+  }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w500,
+            color:
+                Theme.of(context).textTheme.bodyMedium?.color ??
+                AppColors.textSecondary,
+          ),
+        ),
+        SizedBox(height: 8.h),
         TextFormField(
-          controller: _checkInController,
+          controller: controller,
+          readOnly: true,
+          onTap: () => _selectTime(controller),
+          style: TextStyle(
+            fontSize: 15.sp,
+            color:
+                Theme.of(context).textTheme.bodyLarge?.color ??
+                AppColors.textPrimary,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
-            labelText: '${localizations.translate('check_in_time')} *',
-            prefixIcon: const Icon(Icons.login),
+            hintText: 'HH:mm',
+            hintStyle: TextStyle(
+              color:
+                  Theme.of(context).textTheme.bodySmall?.color ??
+                  AppColors.grey400,
+              fontSize: 14.sp,
+            ),
+            prefixIcon: Icon(icon, size: 20.sp),
             suffixIcon: IconButton(
               icon: const Icon(Icons.access_time),
-              onPressed: () => _selectTime(_checkInController),
+              onPressed: () => _selectTime(controller),
+            ),
+            fillColor: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.surfaceDark
+                : AppColors.grey100,
+            filled: true,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 14.h,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.borderDark
+                    : AppColors.grey200.withOpacity(0.6),
+                width: 1.2,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.borderDark
+                    : AppColors.grey200.withOpacity(0.6),
+                width: 1.2,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(color: AppColors.error, width: 1.2),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(color: AppColors.error, width: 2),
+            ),
+            errorStyle: TextStyle(
+              fontSize: 12.sp,
+              color: AppColors.error,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          readOnly: true,
-          onTap: () => _selectTime(_checkInController),
           validator: (value) {
-            if (_selectedStatus == 'present' &&
+            if (isRequired &&
+                _selectedStatus == 'present' &&
                 (value == null || value.isEmpty)) {
               return localizations.translate('check_in_required');
             }
-            return null;
-          },
-        ),
-        SizedBox(height: 16.h),
-        TextFormField(
-          controller: _checkOutController,
-          decoration: InputDecoration(
-            labelText: localizations.translate('check_out_time'),
-            prefixIcon: const Icon(Icons.logout),
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.access_time),
-              onPressed: () => _selectTime(_checkOutController),
-            ),
-          ),
-          readOnly: true,
-          onTap: () => _selectTime(_checkOutController),
-          validator: (value) {
-            if (value != null && value.isNotEmpty) {
+            if (!isRequired && value != null && value.isNotEmpty) {
               final checkIn = _checkInController.text;
               if (checkIn.isNotEmpty) {
                 final checkInTime = TimeOfDay.fromDateTime(
@@ -362,7 +606,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 final checkOutTime = TimeOfDay.fromDateTime(
                   DateFormat('HH:mm').parse(value),
                 );
-
                 if (_isTimeBefore(checkOutTime, checkInTime)) {
                   return localizations.translate(
                     'check_out_must_be_after_check_in',
@@ -377,16 +620,160 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     );
   }
 
-  Widget _buildRemarksField(AppLocalizations localizations) {
-    return TextFormField(
-      controller: _remarksController,
-      decoration: InputDecoration(
-        labelText: localizations.translate('remarks'),
-        prefixIcon: const Icon(Icons.note),
-        hintText: localizations.translate('add_remarks'),
+  Widget _buildRemarksCard(AppLocalizations localizations) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      maxLines: 3,
-      maxLength: 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.note_outlined, size: 16.sp, color: AppColors.primary),
+              SizedBox(width: 6.w),
+              Text(
+                localizations.translate('remarks'),
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      Theme.of(context).textTheme.titleMedium?.color ??
+                      AppColors.textPrimary,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          TextFormField(
+            controller: _remarksController,
+            maxLines: 3,
+            maxLength: 200,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color:
+                  Theme.of(context).textTheme.bodyLarge?.color ??
+                  AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+            decoration: InputDecoration(
+              hintText: localizations.translate('add_remarks'),
+              hintStyle: TextStyle(
+                color:
+                    Theme.of(context).textTheme.bodySmall?.color ??
+                    AppColors.grey400,
+                fontSize: 13.sp,
+              ),
+              fillColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.surfaceDark
+                  : AppColors.grey100,
+              filled: true,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 14.w,
+                vertical: 12.h,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.r),
+                borderSide: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey200.withOpacity(0.6),
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.r),
+                borderSide: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.borderDark
+                      : AppColors.grey200.withOpacity(0.6),
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.r),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton(AppLocalizations localizations, bool isUpdate) {
+    return Container(
+      width: double.infinity,
+      height: 52.h,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryDark],
+        ),
+        borderRadius: BorderRadius.circular(14.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _isSubmitting ? null : _submitAttendance,
+          borderRadius: BorderRadius.circular(14.r),
+          child: Center(
+            child: _isSubmitting
+                ? SizedBox(
+                    width: 24.w,
+                    height: 24.w,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isUpdate
+                            ? Icons.check_circle_outline_rounded
+                            : Icons.add_circle_outline_rounded,
+                        color: Colors.white,
+                        size: 22.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      Text(
+                        isUpdate
+                            ? localizations.translate('update')
+                            : localizations.translate('mark_attendance'),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -410,24 +797,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSubmitButton(AppLocalizations localizations, bool isUpdate) {
-    return ElevatedButton(
-      onPressed: _isSubmitting ? null : _submitAttendance,
-      style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50.h)),
-      child: _isSubmitting
-          ? SizedBox(
-              height: 20.h,
-              width: 20.w,
-              child: const CircularProgressIndicator(strokeWidth: 2),
-            )
-          : Text(
-              isUpdate
-                  ? localizations.translate('update_attendance')
-                  : localizations.translate('mark_attendance'),
-            ),
     );
   }
 

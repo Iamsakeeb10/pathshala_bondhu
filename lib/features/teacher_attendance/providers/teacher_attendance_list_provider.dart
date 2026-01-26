@@ -357,6 +357,21 @@ class TeacherAttendanceListProvider extends ChangeNotifier {
     }
   }
 
+  /// Get formatted date string for display
+  String getFormattedDateString() {
+    final now = DateTime.now();
+    if (DateUtils.isSameDay(_selectedDate, now)) {
+      return 'Today';
+    } else if (DateUtils.isSameDay(
+      _selectedDate,
+      now.subtract(const Duration(days: 1)),
+    )) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('dd MMM yyyy').format(_selectedDate);
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();

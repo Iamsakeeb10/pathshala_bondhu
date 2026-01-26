@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../shared/localization/app_localizations.dart';
 import '../../../shared/utils/app_colors.dart';
+import '../../../shared/widgets/custom_appbar.dart';
+import '../../../shared/widgets/custom_button.dart';
+import '../models/teacher_attendance_model.dart';
 import '../providers/teacher_attendance_list_provider.dart';
 import '../widgets/attendance_skeleton_loader.dart';
 import '../widgets/date_selector_widget.dart';
 import '../widgets/empty_attendance_widget.dart';
-import '../widgets/teacher_attendance_card.dart';
 
 /// Teacher Attendance List Screen
 /// Shows teacher's own attendance record for selected dates
@@ -47,160 +50,347 @@ class _TeacherAttendanceListScreenState
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(localizations.translate('teacher_attendance')),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.calendar_month),
-              onPressed: () => _selectDate(context),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Column(
+          children: [
+            CustomAppBar(
+              title: localizations.translate('my_attendance'),
+              actions: [
+                IconAction(
+                  icon: Icons.calendar_month,
+                  onTap: () => _selectDate(context),
+                  tooltip: localizations.translate('select_date'),
+                ),
+                SizedBox(width: 8.w),
+                IconAction(
+                  icon: Icons.refresh,
+                  onTap: () => _provider.refresh(),
+                  tooltip: localizations.translate('refresh'),
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () => _provider.refresh(),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => _provider.refresh(),
+                color: AppColors.primary,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16.w),
+                  child: Consumer<TeacherAttendanceListProvider>(
+                    builder: (context, provider, _) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDateSelector(provider, localizations),
+                          SizedBox(height: 16.h),
+                          if (provider.isPastDate)
+                            _buildPastDateWarning(localizations),
+                          if (provider.isPastDate) SizedBox(height: 16.h),
+                          _buildAttendanceContent(provider, localizations),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           ],
         ),
-        body: RefreshIndicator(
-          onRefresh: () => _provider.refresh(),
+      ),
+    );
+  }
+
+  Widget _buildDateSelector(
+    TeacherAttendanceListProvider provider,
+    AppLocalizations localizations,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: DateSelectorWidget(
+        selectedDate: provider.selectedDate,
+        onPreviousDay: provider.previousDay,
+        onNextDay: provider.nextDay,
+        onDateTap: () => _selectDate(context),
+        canGoForward: !provider.isToday,
+      ),
+    );
+  }
+
+  Widget _buildPastDateWarning(AppLocalizations localizations) {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade100,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: Colors.orange.shade300),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.orange.shade700, size: 20.sp),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              localizations.translate('past_record_warning'),
+              style: TextStyle(fontSize: 13.sp, color: Colors.orange.shade700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAttendanceContent(
+    TeacherAttendanceListProvider provider,
+    AppLocalizations localizations,
+  ) {
+    if (provider.isLoadingList) {
+      return const AttendanceSkeletonLoader();
+    }
+
+    if (provider.errorMessage != null) {
+      return EmptyAttendanceWidget(
+        icon: Icons.error_outline,
+        title: localizations.translate('error'),
+        subtitle: provider.errorMessage,
+        action: CustomButton(
+          text: localizations.translate('retry'),
+          onPressed: () => provider.refresh(),
+          height: 40.h,
+        ),
+      );
+    }
+
+    if (provider.filteredAttendances.isEmpty) {
+      return Column(
+        children: [
+          SizedBox(height: 40.h),
+          EmptyAttendanceWidget(
+            icon: Icons.assignment_outlined,
+            title: localizations.translate('attendance_not_marked'),
+            subtitle: provider.isPastDate
+                ? 'No attendance record for this date'
+                : 'Mark your attendance for today',
+          ),
+          if (provider.canMarkAttendance) ...[
+            SizedBox(height: 24.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 32.w),
+              child: CustomButton(
+                text: localizations.translate('mark_attendance'),
+                icon: Icons.add_circle_outline,
+                onPressed: () => _navigateToMarkAttendance(),
+              ),
+            ),
+          ],
+        ],
+      );
+    }
+
+    final attendance = provider.filteredAttendances.first;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAttendanceCard(attendance, localizations),
+        SizedBox(height: 20.h),
+        if (provider.isToday)
+          CustomButton(
+            text: localizations.translate('update'),
+            icon: Icons.edit,
+            onPressed: () => _handleAttendanceTap(attendance),
+          )
+        else
+          CustomButton(
+            text: localizations.translate('view_details'),
+            icon: Icons.visibility,
+            onPressed: () => _handleAttendanceTap(attendance),
+            isOutlined: true,
+          ),
+      ],
+    );
+  }
+
+  Widget _buildAttendanceCard(
+    TeacherAttendanceModel attendance,
+    AppLocalizations localizations,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12.r),
+                topRight: Radius.circular(12.r),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.person, color: Colors.white, size: 20.sp),
+                    SizedBox(width: 8.w),
+                    Text(
+                      attendance.teacher.fullName,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                _buildStatusBadge(attendance, localizations),
+              ],
+            ),
+          ),
+
+          // Body
+          Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoRow(
+                  Icons.calendar_today,
+                  localizations.translate('date'),
+                  DateFormat('dd MMMM yyyy').format(attendance.date),
+                  isDark,
+                ),
+                if (attendance.checkInTime != null) ...[
+                  SizedBox(height: 12.h),
+                  _buildInfoRow(
+                    Icons.login,
+                    localizations.translate('check_in'),
+                    attendance.checkInTime!,
+                    isDark,
+                  ),
+                ],
+                if (attendance.checkOutTime != null) ...[
+                  SizedBox(height: 12.h),
+                  _buildInfoRow(
+                    Icons.logout,
+                    localizations.translate('check_out'),
+                    attendance.checkOutTime!,
+                    isDark,
+                  ),
+                ],
+                if (attendance.remarks != null &&
+                    attendance.remarks!.isNotEmpty) ...[
+                  SizedBox(height: 12.h),
+                  _buildInfoRow(
+                    Icons.note,
+                    localizations.translate('remarks'),
+                    attendance.remarks!,
+                    isDark,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value, bool isDark) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18.sp, color: AppColors.primary.withOpacity(0.7)),
+        SizedBox(width: 12.w),
+        Expanded(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Date selector
-              Consumer<TeacherAttendanceListProvider>(
-                builder: (context, provider, _) {
-                  return DateSelectorWidget(
-                    selectedDate: provider.selectedDate,
-                    onPreviousDay: provider.previousDay,
-                    onNextDay: provider.nextDay,
-                    onDateTap: () => _selectDate(context),
-                    canGoForward: !provider.isToday,
-                  );
-                },
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                ),
               ),
-
-              // Warning banner for past dates
-              Consumer<TeacherAttendanceListProvider>(
-                builder: (context, provider, _) {
-                  if (provider.isPastDate) {
-                    return Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 8.h,
-                      ),
-                      color: Colors.orange.shade100,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: Colors.orange.shade700,
-                            size: 20.sp,
-                          ),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: Text(
-                              localizations.translate('past_record_warning'),
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                color: Colors.orange.shade700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-
-              SizedBox(height: 16.h),
-
-              // My Attendance Card
-              Expanded(
-                child: Consumer<TeacherAttendanceListProvider>(
-                  builder: (context, provider, _) {
-                    if (provider.isLoadingList) {
-                      return const AttendanceSkeletonLoader();
-                    }
-
-                    if (provider.errorMessage != null) {
-                      return EmptyAttendanceWidget(
-                        icon: Icons.error_outline,
-                        title: localizations.translate('error'),
-                        subtitle: provider.errorMessage,
-                        action: ElevatedButton(
-                          onPressed: () => provider.refresh(),
-                          child: Text(localizations.translate('retry')),
-                        ),
-                      );
-                    }
-
-                    if (provider.filteredAttendances.isEmpty) {
-                      return EmptyAttendanceWidget(
-                        icon: Icons.assignment_outlined,
-                        title: localizations.translate('attendance_not_marked'),
-                        subtitle: provider.isPastDate
-                            ? 'No attendance record for this date'
-                            : 'Tap the button below to mark your attendance',
-                      );
-                    }
-
-                    // Show only the first attendance (current teacher's record)
-                    final attendance = provider.filteredAttendances.first;
-                    return SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            localizations.translate('my_attendance'),
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 12.h),
-                          TeacherAttendanceCard(
-                            attendance: attendance,
-                            onTap: () => _handleAttendanceTap(attendance),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+              SizedBox(height: 2.h),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
             ],
           ),
         ),
-        floatingActionButton: Consumer<TeacherAttendanceListProvider>(
-          builder: (context, provider, _) {
-            if (provider.isLoading) {
-              return const SizedBox.shrink();
-            }
+      ],
+    );
+  }
 
-            // Show update button if attendance is already marked
-            if (provider.filteredAttendances.isNotEmpty) {
-              final attendance = provider.filteredAttendances.first;
-              return FloatingActionButton.extended(
-                onPressed: () => _handleAttendanceTap(attendance),
-                icon: const Icon(Icons.edit),
-                label: Text(localizations.translate('update')),
-                backgroundColor: AppColors.primary,
-              );
-            }
+  Widget _buildStatusBadge(
+    TeacherAttendanceModel attendance,
+    AppLocalizations localizations,
+  ) {
+    String statusText;
 
-            // Show mark button if not marked yet and can mark
-            if (provider.canMarkAttendance) {
-              return FloatingActionButton.extended(
-                onPressed: () => _navigateToMarkAttendance(),
-                icon: const Icon(Icons.add),
-                label: Text(localizations.translate('mark_attendance')),
-              );
-            }
+    if (attendance.isPresent) {
+      statusText = localizations.translate('present');
+    } else if (attendance.isAbsent) {
+      statusText = localizations.translate('absent');
+    } else if (attendance.isLeave) {
+      statusText = localizations.translate('leave');
+    } else {
+      statusText = localizations.translate('pending');
+    }
 
-            return const SizedBox.shrink();
-          },
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
+      ),
+      child: Text(
+        statusText,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
