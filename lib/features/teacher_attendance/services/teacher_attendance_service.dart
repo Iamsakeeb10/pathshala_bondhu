@@ -7,7 +7,7 @@ import '../models/teacher_attendance_model.dart';
 /// Service for teacher attendance API calls
 class TeacherAttendanceService {
   final DioClient _dioClient;
-  static const String _baseUrl = '/api/v1/teacher-attendance';
+  static const String _baseUrl = '/teacher-attendance';
 
   TeacherAttendanceService() : _dioClient = DioClient();
 
