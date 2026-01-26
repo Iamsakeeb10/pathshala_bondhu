@@ -414,6 +414,7 @@ class AppLocalizations {
       // Teacher Attendance
       'teacher_attendance': 'Teacher Attendance',
       'my_attendance': 'My Attendance',
+      'question_bank': 'Question Bank',
       'mark_attendance': 'Mark Attendance',
       'update_attendance': 'Update Attendance',
       'attendance_summary': 'Attendance Summary',
@@ -841,6 +842,7 @@ class AppLocalizations {
       // Teacher Attendance
       'teacher_attendance': 'শিক্ষক উপস্থিতি',
       'my_attendance': 'আমার উপস্থিতি',
+      'question_bank': 'প্রশ্নব্যাংক',
       'mark_attendance': 'উপস্থিতি চিহ্নিত করুন',
       'update_attendance': 'উপস্থিতি আপডেট করুন',
       'attendance_summary': 'উপস্থিতির সারসংক্ষেপ',

@@ -34,6 +34,10 @@ import 'features/fees/provider/fees_provider.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/parents/provider/parents_provider.dart';
 import 'features/profile/providers/profile_provider.dart';
+// Question Bank providers
+import 'features/question_bank/presentation/providers/question_bank_auth_provider.dart';
+import 'features/question_bank/presentation/providers/question_bank_form_provider.dart';
+import 'features/question_bank/presentation/providers/question_bank_list_provider.dart';
 import 'features/results/provider/result_provider.dart';
 import 'features/routines/provider/routine_provider.dart';
 import 'features/routines/provider/teacher_routine_provider.dart';
@@ -145,6 +149,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => ConversationsProvider()),
         ChangeNotifierProvider(create: (_) => ChatBackgroundProvider()),
+        // 🔹 Question Bank feature providers
+        ChangeNotifierProvider(create: (_) => QuestionBankAuthProvider()),
+        ChangeNotifierProvider(create: (_) => QuestionBankListProvider()),
+        ChangeNotifierProvider(create: (_) => QuestionBankFormProvider()),
       ],
       child: const MyApp(),
     ),

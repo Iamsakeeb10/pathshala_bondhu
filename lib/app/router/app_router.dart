@@ -26,6 +26,11 @@ import '../../features/profile/presentation/pages/privacy_policy_screen.dart';
 import '../../features/profile/presentation/pages/profile_details_screen.dart';
 import '../../features/profile/presentation/pages/settings_screen.dart';
 import '../../features/profile/presentation/pages/terms_conditions_screen.dart';
+// Question Bank imports
+import '../../features/question_bank/data/models/question_model.dart';
+import '../../features/question_bank/presentation/screens/question_bank_list_screen.dart';
+import '../../features/question_bank/presentation/screens/question_detail_screen.dart';
+import '../../features/question_bank/presentation/screens/question_form_screen.dart';
 import '../../features/results/ui/result_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
@@ -285,6 +290,45 @@ class AppRouter {
 
           return MarkAttendanceScreen(attendance: attendance, date: date);
         },
+      ),
+
+      // Question Bank Routes
+      GoRoute(
+        path: '/question-bank',
+        name: 'question-bank',
+        builder: (context, state) => const QuestionBankListScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: 'create-question',
+            builder: (context, state) {
+              // Support duplicate via extra
+              final extra = state.extra as Map<String, dynamic>?;
+              final duplicateQuestion = extra?['duplicate'] as Question?;
+              return QuestionFormScreen(duplicateFrom: duplicateQuestion);
+            },
+          ),
+          GoRoute(
+            path: 'edit/:id',
+            name: 'edit-question',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              final question = state.extra as Question?;
+              return QuestionFormScreen(
+                questionId: id,
+                existingQuestion: question,
+              );
+            },
+          ),
+          GoRoute(
+            path: ':id',
+            name: 'question-details',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return QuestionDetailScreen(questionId: id);
+            },
+          ),
+        ],
       ),
     ],
 

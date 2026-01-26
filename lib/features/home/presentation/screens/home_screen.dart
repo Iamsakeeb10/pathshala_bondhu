@@ -221,6 +221,12 @@ class _HomeScreenState extends State<HomeScreen> {
         'color': const Color(0xFF06B6D4),
         'route': '/teacher-attendance-management',
       });
+      commonCategories.add({
+        'icon': Icons.quiz_outlined,
+        'label': localizations.translate('question_bank'),
+        'color': const Color(0xFF8B5CF6),
+        'route': '/question-bank',
+      });
     }
 
     return commonCategories;
@@ -240,6 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
               localizations.translate('diary'),
               localizations.translate('class_routine'),
               localizations.translate('my_attendance'),
+              localizations.translate('question_bank'),
             ].contains(c['label']),
           )
           .toList();
