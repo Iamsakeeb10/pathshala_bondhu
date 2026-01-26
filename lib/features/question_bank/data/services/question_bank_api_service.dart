@@ -3,6 +3,7 @@
 
 import 'package:dio/dio.dart';
 
+import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/dio_client.dart';
 import '../models/question_model.dart';
 import 'question_bank_auth_service.dart';
@@ -11,7 +12,7 @@ import 'question_bank_auth_service.dart';
 class QBApiEndpoints {
   static const String auth = '/teacher/auth';
   static const String questions = '/questions';
-  static const String classes = '/classes';
+  static const String classes = '/teacher/classes';
   static const String subjects = '/subjects';
 }
 
@@ -42,8 +43,9 @@ class QuestionBankApiService {
   /// Returns token on success, throws on failure
   Future<String> authenticate(String email, String password) async {
     try {
+      // Use baseUrlWithoutV1 since teacher/auth doesn't have v1 prefix
       final response = await _dioClient.post(
-        QBApiEndpoints.auth,
+        '${ApiEndpoints.baseUrlWithoutV1}${QBApiEndpoints.auth}',
         data: {'email': email, 'password': password},
       );
 
