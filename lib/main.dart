@@ -39,6 +39,8 @@ import 'features/routines/provider/routine_provider.dart';
 import 'features/routines/provider/teacher_routine_provider.dart';
 import 'features/students/provider/student_provider.dart';
 import 'features/teacher_attendance/provider/teacher_attendance_provider.dart';
+// Import new teacher attendance list provider
+import 'features/teacher_attendance/providers/teacher_attendance_list_provider.dart';
 import 'features/teachers/provider/teachers_provider.dart';
 import 'firebase_options.dart';
 import 'shared/localization/app_localizations.dart';
@@ -130,6 +132,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => FeesProvider()),
         ChangeNotifierProvider(create: (_) => ResultProvider()),
         ChangeNotifierProvider(create: (_) => TeacherAttendanceProvider()),
+        ChangeNotifierProvider(create: (_) => TeacherAttendanceListProvider()),
         ChangeNotifierProvider(create: (_) => TeacherRoutineProvider()),
         ChangeNotifierProvider(create: (_) => TeacherDiaryProvider()),
         ChangeNotifierProvider(create: (_) => ParentDiaryProvider()),

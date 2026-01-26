@@ -29,6 +29,10 @@ import '../../features/profile/presentation/pages/terms_conditions_screen.dart';
 import '../../features/results/ui/result_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
+// Import new teacher attendance management screens
+import '../../features/teacher_attendance/models/teacher_attendance_model.dart';
+import '../../features/teacher_attendance/screens/mark_attendance_screen.dart';
+import '../../features/teacher_attendance/screens/teacher_attendance_list_screen.dart';
 import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
 import 'root_navigator_key.dart';
 
@@ -262,6 +266,25 @@ class AppRouter {
         path: '/chat-background',
         name: 'chat-background',
         builder: (context, state) => const ChatBackgroundSelectionScreen(),
+      ),
+
+      // Teacher Attendance Management Routes
+      GoRoute(
+        path: '/teacher-attendance-management',
+        name: 'teacher-attendance-management',
+        builder: (context, state) => const TeacherAttendanceListScreen(),
+      ),
+
+      GoRoute(
+        path: '/teacher-attendance/mark',
+        name: 'mark-teacher-attendance',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final attendance = extra?['attendance'] as TeacherAttendanceModel?;
+          final date = extra?['date'] as DateTime? ?? DateTime.now();
+
+          return MarkAttendanceScreen(attendance: attendance, date: date);
+        },
       ),
     ],
 

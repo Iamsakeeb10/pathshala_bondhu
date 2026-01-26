@@ -50,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
                       localizations.translate('notifications'),
                     ),
                     SizedBox(height: 12.h),
-                    _buildNotificationCard(context, localizations),
+                    _buildNotificationNavigationCard(context, localizations),
                     SizedBox(height: 24.h),
                     _buildSectionHeader(localizations.translate('about')),
                     SizedBox(height: 12.h),
@@ -356,7 +356,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationCard(
+  Widget _buildNotificationNavigationCard(
     BuildContext context,
     AppLocalizations localizations,
   ) {
@@ -380,16 +380,73 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          _buildNotificationItem(
-            icon: Icons.notifications_rounded,
-            title: localizations.translate('push_notifications'),
-            subtitle: localizations.translate('receive_push_notifications'),
-            value: true,
-            isFirst: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push('/notification-settings'),
+          borderRadius: BorderRadius.circular(16.r),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary.withOpacity(0.15),
+                        AppColors.primary.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Icon(
+                    Icons.notifications_rounded,
+                    color: AppColors.primary,
+                    size: 20.sp,
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        localizations.translate('notifications'),
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              Theme.of(context).textTheme.titleLarge?.color ??
+                              AppColors.textPrimary,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                      SizedBox(height: 3.h),
+                      Text(
+                        localizations.translate('manage_notification_settings'),
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color:
+                              Theme.of(context).textTheme.bodySmall?.color ??
+                              AppColors.grey500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16.sp,
+                  color: AppColors.grey400,
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -166,7 +166,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Map<String, dynamic>> _getCategories(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    return [
+    final authProvider = context.read<AuthProvider>();
+
+    final commonCategories = [
       {
         'icon': Icons.book_outlined,
         'label': localizations.translate('books'),
@@ -210,6 +212,18 @@ class _HomeScreenState extends State<HomeScreen> {
         'route': '/results',
       },
     ];
+
+    // Add teacher-specific categories
+    if (authProvider.isTeacher) {
+      commonCategories.add({
+        'icon': Icons.assignment_turned_in_outlined,
+        'label': localizations.translate('my_attendance'),
+        'color': const Color(0xFF06B6D4),
+        'route': '/teacher-attendance-management',
+      });
+    }
+
+    return commonCategories;
   }
 
   // Filter categories based on role
@@ -225,6 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
               localizations.translate('attendance'),
               localizations.translate('diary'),
               localizations.translate('class_routine'),
+              localizations.translate('my_attendance'),
             ].contains(c['label']),
           )
           .toList();

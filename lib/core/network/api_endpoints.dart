@@ -100,6 +100,32 @@ class ApiEndpoints {
   /// GET (with body): { "date": "YYYY-MM-DD" }
   static const String studentDiaries = '/student/diaries';
 
+  // ========== Teacher Attendance Management Endpoints ==========
+
+  /// Mark or update teacher attendance
+  /// POST with Bearer token
+  /// Body: {
+  ///   "teacher_id": int,
+  ///   "date": "YYYY-MM-DD",
+  ///   "status": "present"|"absent"|"leave",
+  ///   "check_in_time": "HH:mm" (optional, required if present),
+  ///   "check_out_time": "HH:mm" (optional),
+  ///   "remarks": "string" (optional)
+  /// }
+  static const String teacherAttendanceMark = '/teacher-attendance/mark';
+
+  /// Get teacher attendance summary for a date
+  /// GET with Bearer token
+  /// Query params: date (YYYY-MM-DD)
+  /// Returns: { total_teachers, marked_attendance, pending_attendance, present, absent, leave, attendance_percentage }
+  static const String teacherAttendanceSummary = '/teacher-attendance/summary';
+
+  /// Get teacher attendance list by date
+  /// GET with Bearer token
+  /// Query params: date (YYYY-MM-DD)
+  /// Returns: { date, attendances: [], summary: {} }
+  static const String teacherAttendanceByDate = '/teacher-attendance/by-date';
+
   // ========== Notification Endpoints ==========
 
   /// Get all notifications (paginated)
