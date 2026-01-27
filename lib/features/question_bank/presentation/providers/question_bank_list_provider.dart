@@ -96,21 +96,17 @@ class QuestionBankListProvider extends ChangeNotifier {
     }
   }
 
-  /// Fetch classes and subjects for filtering
+  /// Fetch classes for filtering
   Future<void> fetchMetadata() async {
-    if (_classes.isNotEmpty && _subjects.isNotEmpty) return;
+    if (_classes.isNotEmpty) return;
 
     _isMetadataLoading = true;
     notifyListeners();
 
     try {
-      final results = await Future.wait([
-        _apiService.fetchClasses(),
-        _apiService.fetchSubjects(),
-      ]);
-
-      _classes = results[0] as List<QuestionClass>;
-      _subjects = results[1] as List<QuestionSubject>;
+      _classes = await _apiService.fetchClasses();
+      // Subjects removed - not available in API
+      _subjects = [];
     } catch (e) {
       print('Error fetching metadata: $e');
     }

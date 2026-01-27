@@ -13,7 +13,7 @@ class QBApiEndpoints {
   static const String auth = '/teacher/auth';
   static const String questions = '/questions';
   static const String classes = '/teacher/classes';
-  static const String subjects = '/subjects';
+  // Note: Subjects endpoint not available in API
 }
 
 /// Question Bank API Service
@@ -233,36 +233,6 @@ class QuestionBankApiService {
             response.data['classes'] ?? response.data['data'] ?? [];
         return classesJson
             .map((json) => QuestionClass.fromJson(json as Map<String, dynamic>))
-            .toList();
-      }
-
-      return [];
-    } on DioException catch (e) {
-      _handleDioError(e);
-      return [];
-    }
-  }
-
-  /// Fetch available subjects
-  Future<List<QuestionSubject>> fetchSubjects() async {
-    try {
-      if (!await validateSession()) {
-        throw SessionExpiredException('Session expired, please login again');
-      }
-
-      final options = await _getAuthOptions();
-      final response = await _dioClient.get(
-        QBApiEndpoints.subjects,
-        options: options,
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> subjectsJson =
-            response.data['subjects'] ?? response.data['data'] ?? [];
-        return subjectsJson
-            .map(
-              (json) => QuestionSubject.fromJson(json as Map<String, dynamic>),
-            )
             .toList();
       }
 
