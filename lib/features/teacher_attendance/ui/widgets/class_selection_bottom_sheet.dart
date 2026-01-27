@@ -3,16 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../data/models/teacher_attendance_models.dart';
 import '../../provider/teacher_attendance_provider.dart';
 
 class ClassSelectionBottomSheet extends StatefulWidget {
   final Function(TeacherClass, TeacherAcademicSession) onConfirmed;
 
-  const ClassSelectionBottomSheet({
-    super.key,
-    required this.onConfirmed,
-  });
+  const ClassSelectionBottomSheet({super.key, required this.onConfirmed});
 
   static Future<void> show(
     BuildContext context, {
@@ -27,7 +25,8 @@ class ClassSelectionBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<ClassSelectionBottomSheet> createState() => _ClassSelectionBottomSheetState();
+  State<ClassSelectionBottomSheet> createState() =>
+      _ClassSelectionBottomSheetState();
 }
 
 class _ClassSelectionBottomSheetState extends State<ClassSelectionBottomSheet> {
@@ -82,12 +81,17 @@ class _ClassSelectionBottomSheetState extends State<ClassSelectionBottomSheet> {
                   Text(
                     provider.errorMessage!,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14.sp, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   SizedBox(height: 15.h),
-                  ElevatedButton(
+                  GradientButton(
+                    text: 'Retry',
                     onPressed: provider.fetchInitialData,
-                    child: const Text('Retry'),
+                    width: 120.w,
+                    height: 44.h,
                   ),
                 ],
               ),
@@ -149,7 +153,10 @@ class _ClassSelectionBottomSheetState extends State<ClassSelectionBottomSheet> {
                             return DropdownMenuItem(
                               value: session,
                               child: Text(
-                                session.title + (session.isCurrent == '1' ? ' (Current)' : ''),
+                                session.title +
+                                    (session.isCurrent == '1'
+                                        ? ' (Current)'
+                                        : ''),
                               ),
                             );
                           }).toList(),
@@ -197,8 +204,11 @@ class _ClassSelectionBottomSheetState extends State<ClassSelectionBottomSheet> {
                     SizedBox(height: 32.h),
 
                     // Submit Button
-                    ElevatedButton(
-                      onPressed: (provider.selectedClass != null && provider.selectedSession != null)
+                    GradientButton(
+                      text: 'Continue',
+                      onPressed:
+                          (provider.selectedClass != null &&
+                              provider.selectedSession != null)
                           ? () {
                               widget.onConfirmed(
                                 provider.selectedClass!,
@@ -207,25 +217,6 @@ class _ClassSelectionBottomSheetState extends State<ClassSelectionBottomSheet> {
                               Navigator.pop(context);
                             }
                           : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        disabledBackgroundColor: AppColors.grey300,
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Continue',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: (provider.selectedClass != null && provider.selectedSession != null)
-                            ? Colors.white 
-                            : AppColors.textSecondary,
-                        ),
-                      ),
                     ),
                     SizedBox(height: 20.h),
                   ],

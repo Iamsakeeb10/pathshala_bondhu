@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../data/models/question_model.dart';
 import '../../data/services/question_bank_api_service.dart';
 import '../../presentation/providers/question_bank_form_provider.dart';
@@ -119,13 +120,12 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
             },
             child: Text(_t('qb_discard')),
           ),
-          ElevatedButton(
+          GradientButton(
+            text: _t('qb_restore'),
             onPressed: () => Navigator.of(context).pop(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.textPrimary,
-            ),
-            child: Text(_t('qb_restore')),
+            startColor: AppColors.primary,
+            height: 40.h,
+            width: 100.w,
           ),
         ],
       ),
@@ -219,28 +219,26 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
             child: Text(_t('qb_view_question')),
           ),
           if (!isEdit)
-            ElevatedButton(
+            GradientButton(
+              text: _t('qb_create_another'),
               onPressed: () {
                 Navigator.of(context).pop();
                 this.context.read<QuestionBankFormProvider>().reset();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-              ),
-              child: Text(_t('qb_create_another')),
+              startColor: AppColors.primary,
+              height: 40.h,
+              width: 140.w,
             )
           else
-            ElevatedButton(
+            GradientButton(
+              text: 'Done',
               onPressed: () {
                 Navigator.of(context).pop();
                 this.context.pop();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-              ),
-              child: Text('Done'),
+              startColor: AppColors.primary,
+              height: 40.h,
+              width: 100.w,
             ),
         ],
       ),
@@ -273,18 +271,17 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
               onPressed: () => Navigator.of(context).pop('discard'),
               child: Text(_t('qb_discard')),
             ),
-            ElevatedButton(
+            GradientButton(
+              text: _t('qb_save'),
               onPressed: () async {
                 await formProvider.saveDraft();
                 if (context.mounted) {
                   Navigator.of(context).pop('save');
                 }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-              ),
-              child: Text(_t('qb_save')),
+              startColor: AppColors.primary,
+              height: 40.h,
+              width: 100.w,
             ),
           ],
         ),
@@ -483,37 +480,15 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
             // Next/Submit button
             Expanded(
               flex: isFirstStep ? 1 : 1,
-              child: ElevatedButton(
+              child: GradientButton(
+                text: isLastStep ? _t('qb_save') : _t('qb_next'),
                 onPressed: _isSubmitting
                     ? null
                     : (isLastStep ? _handleSubmit : provider.nextStep),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.textPrimary,
-                  disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: _isSubmitting
-                    ? SizedBox(
-                        width: 20.w,
-                        height: 20.w,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.textPrimary,
-                          ),
-                        ),
-                      )
-                    : Text(
-                        isLastStep ? _t('qb_save') : _t('qb_next'),
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                isLoading: _isSubmitting,
+                startColor: AppColors.primary,
+                height: 48.h,
+                borderRadius: BorderRadius.circular(12.r),
               ),
             ),
           ],

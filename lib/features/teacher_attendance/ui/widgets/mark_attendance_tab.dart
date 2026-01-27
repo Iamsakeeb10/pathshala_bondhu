@@ -7,13 +7,14 @@ import 'package:provider/provider.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/utils/image_url_helper.dart';
 import '../../../../shared/widgets/custom_text_field.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../data/models/teacher_attendance_models.dart';
 import '../../provider/teacher_attendance_provider.dart';
 
 class MarkAttendanceTab extends StatelessWidget {
   final VoidCallback? onSubmitted;
-  
+
   const MarkAttendanceTab({super.key, this.onSubmitted});
 
   @override
@@ -66,7 +67,8 @@ class MarkAttendanceTab extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.titleLarge?.color ??
+                          color:
+                              Theme.of(context).textTheme.titleLarge?.color ??
                               AppColors.textPrimary,
                         ),
                       ),
@@ -76,7 +78,8 @@ class MarkAttendanceTab extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14.sp,
-                          color: Theme.of(context).textTheme.bodyMedium?.color ??
+                          color:
+                              Theme.of(context).textTheme.bodyMedium?.color ??
                               AppColors.textSecondary,
                         ),
                       ),
@@ -93,7 +96,9 @@ class MarkAttendanceTab extends StatelessWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             child: SizedBox(
               height: MediaQuery.of(context).size.height * 0.6,
-              child: const Center(child: Text('No students found for this class')),
+              child: const Center(
+                child: Text('No students found for this class'),
+              ),
             ),
           );
         }
@@ -184,10 +189,15 @@ class MarkAttendanceTab extends StatelessWidget {
                         CircleAvatar(
                           radius: 20.r,
                           backgroundColor: AppColors.primaryLight,
-                          child: ImageUrlHelper.resolveAvatarUrl(student.user.avatar).isNotEmpty
+                          child:
+                              ImageUrlHelper.resolveAvatarUrl(
+                                student.user.avatar,
+                              ).isNotEmpty
                               ? ClipOval(
                                   child: CachedNetworkImage(
-                                    imageUrl: ImageUrlHelper.resolveAvatarUrl(student.user.avatar),
+                                    imageUrl: ImageUrlHelper.resolveAvatarUrl(
+                                      student.user.avatar,
+                                    ),
                                     width: 40.w,
                                     height: 40.w,
                                     fit: BoxFit.cover,
@@ -201,32 +211,38 @@ class MarkAttendanceTab extends StatelessWidget {
                                           height: 16.w,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            valueColor: AlwaysStoppedAnimation<Color>(
-                                              AppColors.primary,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  AppColors.primary,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          width: 40.w,
+                                          height: 40.w,
+                                          color: AppColors.primaryLight,
+                                          child: Center(
+                                            child: Text(
+                                              student.user.name
+                                                  .substring(0, 1)
+                                                  .toUpperCase(),
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16.sp,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                    errorWidget: (context, url, error) => Container(
-                                      width: 40.w,
-                                      height: 40.w,
-                                      color: AppColors.primaryLight,
-                                      child: Center(
-                                        child: Text(
-                                          student.user.name.substring(0, 1).toUpperCase(),
-                                          style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.sp,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                 )
                               : Text(
-                                  student.user.name.substring(0, 1).toUpperCase(),
+                                  student.user.name
+                                      .substring(0, 1)
+                                      .toUpperCase(),
                                   style: TextStyle(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.bold,
@@ -285,7 +301,8 @@ class MarkAttendanceTab extends StatelessWidget {
                             if (!isPresent) ...[
                               SizedBox(width: 8.w),
                               _RemarksButton(
-                                hasRemarks: provider.getRemarks(student.id) != null,
+                                hasRemarks:
+                                    provider.getRemarks(student.id) != null,
                                 onTap: () => _showRemarksDialog(
                                   context,
                                   provider,
@@ -320,68 +337,37 @@ class MarkAttendanceTab extends StatelessWidget {
                   ),
                 ],
               ),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: provider.isSubmitting
-                      ? null
-                      : () async {
-                          final date = DateFormat(
-                            'yyyy-MM-dd',
-                          ).format(DateTime.now());
-                          final success = await provider.submitAttendance(date);
-                          if (success && context.mounted) {
-                            // Refresh history for today so it shows in history tab
-                            await provider.fetchHistory(DateTime.now());
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Attendance submitted successfully',
-                                ),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                            
-                            // Switch to history tab to show submitted attendance
-                            if (onSubmitted != null) {
-                              onSubmitted!();
-                            }
-                          } else if (context.mounted &&
-                              provider.errorMessage != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(provider.errorMessage!),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                  child: provider.isSubmitting
-                      ? SizedBox(
-                          height: 20.h,
-                          width: 20.h,
-                          child: const CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          'Submit Attendance',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                ),
+              child: GradientButton(
+                text: 'Submit Attendance',
+                icon: Icons.send_rounded,
+                onPressed: () async {
+                  final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                  final success = await provider.submitAttendance(date);
+                  if (success && context.mounted) {
+                    // Refresh history for today so it shows in history tab
+                    await provider.fetchHistory(DateTime.now());
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Attendance submitted successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+
+                    // Switch to history tab to show submitted attendance
+                    if (onSubmitted != null) {
+                      onSubmitted!();
+                    }
+                  } else if (context.mounted && provider.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(provider.errorMessage!),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                isLoading: provider.isSubmitting,
               ),
             ),
           ],
@@ -430,10 +416,7 @@ class _RemarksButton extends StatelessWidget {
   final bool hasRemarks;
   final VoidCallback onTap;
 
-  const _RemarksButton({
-    required this.hasRemarks,
-    required this.onTap,
-  });
+  const _RemarksButton({required this.hasRemarks, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -469,10 +452,7 @@ void _showRemarksDialog(
 ) {
   showDialog(
     context: context,
-    builder: (context) => _RemarksDialog(
-      provider: provider,
-      student: student,
-    ),
+    builder: (context) => _RemarksDialog(provider: provider, student: student),
   );
 }
 
@@ -480,10 +460,7 @@ class _RemarksDialog extends StatefulWidget {
   final TeacherAttendanceProvider provider;
   final TeacherStudent student;
 
-  const _RemarksDialog({
-    required this.provider,
-    required this.student,
-  });
+  const _RemarksDialog({required this.provider, required this.student});
 
   @override
   State<_RemarksDialog> createState() => _RemarksDialogState();
@@ -521,10 +498,7 @@ class _RemarksDialogState extends State<_RemarksDialog> {
   void _handleSave() {
     // Dismiss keyboard first
     FocusScope.of(context).unfocus();
-    widget.provider.setRemarks(
-      widget.student.id,
-      _remarksController.text,
-    );
+    widget.provider.setRemarks(widget.student.id, _remarksController.text);
     // Use a small delay to ensure keyboard is dismissed before closing dialog
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
@@ -536,9 +510,7 @@ class _RemarksDialogState extends State<_RemarksDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
       child: Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.7,
@@ -579,7 +551,8 @@ class _RemarksDialogState extends State<_RemarksDialog> {
                           style: TextStyle(
                             fontSize: 18.sp,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).textTheme.titleLarge?.color ??
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color ??
                                 AppColors.textPrimary,
                           ),
                         ),
@@ -588,7 +561,8 @@ class _RemarksDialogState extends State<_RemarksDialog> {
                           widget.student.user.name,
                           style: TextStyle(
                             fontSize: 14.sp,
-                            color: Theme.of(context).textTheme.bodySmall?.color ??
+                            color:
+                                Theme.of(context).textTheme.bodySmall?.color ??
                                 AppColors.textSecondary,
                           ),
                         ),
@@ -642,26 +616,11 @@ class _RemarksDialogState extends State<_RemarksDialog> {
                     ),
                   ),
                   SizedBox(width: 12.w),
-                  ElevatedButton(
+                  GradientButton(
+                    text: 'Save',
                     onPressed: _handleSave,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 24.w,
-                        vertical: 12.h,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    child: Text(
-                      'Save',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    width: 100.w,
+                    height: 48.h,
                   ),
                 ],
               ),

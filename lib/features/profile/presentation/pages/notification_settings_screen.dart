@@ -9,6 +9,7 @@ import '../../../../core/providers/notification_permission_provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../../../shared/widgets/modern_alert.dart';
 
 /// Minimal notification settings screen focused on clear UX
@@ -301,55 +302,25 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
     // Permanently denied - open settings
     if (status == NotificationPermissionStatus.permanentlyDenied) {
-      return SizedBox(
-        width: double.infinity,
+      return GradientButton(
+        text: loc.translate('open_settings'),
+        onPressed: isLoading ? null : _handleOpenSettings,
+        startColor: AppColors.primary,
         height: 54.h,
-        child: ElevatedButton(
-          onPressed: isLoading ? null : _handleOpenSettings,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14.r),
-            ),
-          ),
-          child: Text(
-            loc.translate('open_settings'),
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-          ),
-        ),
+        borderRadius: BorderRadius.circular(14.r),
+        enableShadow: false,
       );
     }
 
     // Default - enable notifications
-    return SizedBox(
-      width: double.infinity,
+    return GradientButton(
+      text: loc.translate('enable_notifications'),
+      onPressed: isLoading ? null : _handleEnableNotifications,
+      isLoading: isLoading,
+      startColor: AppColors.primary,
       height: 54.h,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : _handleEnableNotifications,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-        ),
-        child: isLoading
-            ? SizedBox(
-                width: 24.sp,
-                height: 24.sp,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
-                ),
-              )
-            : Text(
-                loc.translate('enable_notifications'),
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-              ),
-      ),
+      borderRadius: BorderRadius.circular(14.r),
+      enableShadow: false,
     );
   }
 

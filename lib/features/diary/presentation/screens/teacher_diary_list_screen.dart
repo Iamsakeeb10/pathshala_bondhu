@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../../../shared/widgets/modern_alert.dart';
 import '../../data/models/teacher_diary_model.dart';
 import '../../provider/teacher_diary_provider.dart';
@@ -776,18 +777,13 @@ class _TeacherDiaryListScreenState extends State<TeacherDiaryListScreen> {
               ),
             ),
             SizedBox(height: 24.h),
-            ElevatedButton.icon(
+            GradientButton(
+              text: localizations.translate('retry'),
               onPressed: _refresh,
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(localizations.translate('retry')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
+              icon: Icons.refresh_rounded,
+              startColor: AppColors.primary,
+              height: 48.h,
+              borderRadius: BorderRadius.circular(12.r),
             ),
           ],
         ),

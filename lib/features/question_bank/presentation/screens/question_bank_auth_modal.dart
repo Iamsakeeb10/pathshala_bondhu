@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../presentation/providers/question_bank_auth_provider.dart';
 import '../../utils/question_bank_translations.dart';
 import '../../utils/validators.dart';
@@ -245,37 +246,14 @@ class _QuestionBankAuthModalState extends State<QuestionBankAuthModal> {
                 SizedBox(height: 24.h),
 
                 // Login button
-                SizedBox(
+                GradientButton(
+                  text: _t('qb_auth_login'),
+                  onPressed: _isSubmitting ? null : _handleLogin,
+                  isLoading: _isSubmitting,
+                  startColor: AppColors.primary,
                   height: 52.h,
-                  child: ElevatedButton(
-                    onPressed: _isSubmitting ? null : _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: _isSubmitting
-                        ? SizedBox(
-                            width: 24.w,
-                            height: 24.w,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.textPrimary,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            _t('qb_auth_login'),
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                  ),
+                  borderRadius: BorderRadius.circular(12.r),
+                  enableShadow: false,
                 ),
                 SizedBox(height: 12.h),
 

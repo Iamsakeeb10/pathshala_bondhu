@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../data/models/question_model.dart';
 import '../../presentation/providers/question_bank_list_provider.dart';
 import '../../utils/question_bank_translations.dart';
@@ -150,10 +151,13 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 16.h),
-            ElevatedButton.icon(
+            GradientButton(
+              text: isBangla ? 'আবার চেষ্টা করুন' : 'Retry',
               onPressed: _loadQuestion,
-              icon: const Icon(Icons.refresh),
-              label: Text(isBangla ? 'আবার চেষ্টা করুন' : 'Retry'),
+              icon: Icons.refresh,
+              startColor: AppColors.primary,
+              height: 48.h,
+              width: 200.w,
             ),
           ],
         ),

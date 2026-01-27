@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../data/models/question_model.dart';
 import '../../data/services/question_bank_api_service.dart';
 import '../../presentation/providers/question_bank_auth_provider.dart';
@@ -408,14 +409,11 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 24.h),
-            ElevatedButton.icon(
+            GradientButton(
+              text: _t('qb_try_again'),
               onPressed: _refresh,
-              icon: const Icon(Icons.refresh),
-              label: Text(_t('qb_try_again')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-              ),
+              icon: Icons.refresh,
+              startColor: AppColors.primary,
             ),
           ],
         ),
@@ -454,15 +452,12 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 32.h),
-            ElevatedButton.icon(
+            GradientButton(
+              text: _t('qb_create'),
               onPressed: () => context.push('/question-bank/create'),
-              icon: const Icon(Icons.add),
-              label: Text(_t('qb_create')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-              ),
+              icon: Icons.add,
+              startColor: AppColors.primary,
+              height: 48.h,
             ),
           ],
         ),
@@ -614,17 +609,12 @@ class _DeleteConfirmationSheet extends StatelessWidget {
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: ElevatedButton(
+                child: GradientButton(
+                  text: _t('qb_delete'),
                   onPressed: () => Navigator.of(context).pop(true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.error,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                  child: Text(_t('qb_delete')),
+                  startColor: AppColors.error,
+                  height: 48.h,
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
               ),
             ],

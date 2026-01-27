@@ -378,9 +378,12 @@ class AppRouter {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => context.go(splash),
-              child: const Text('Go Home'),
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () => context.go(splash),
+                child: const Text('Go Home'),
+              ),
             ),
           ],
         ),

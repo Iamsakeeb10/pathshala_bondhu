@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../shared/localization/app_localizations.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
+import '../../../../shared/widgets/gradient_button.dart';
 import '../../data/models/teacher_routine_model.dart';
 import '../../provider/teacher_routine_provider.dart';
 
@@ -932,20 +933,15 @@ class _TeacherRoutineScreenState extends State<TeacherRoutineScreen>
               ),
             ),
             SizedBox(height: 24.h),
-            ElevatedButton.icon(
+            GradientButton(
+              text: 'Retry',
               onPressed: () {
                 provider.fetchRoutines();
               },
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
+              icon: Icons.refresh_rounded,
+              startColor: AppColors.primary,
+              height: 48.h,
+              borderRadius: BorderRadius.circular(12.r),
             ),
           ],
         ),
