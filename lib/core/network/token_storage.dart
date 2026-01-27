@@ -71,12 +71,10 @@ class TokenStorage {
     try {
       final prefs = await SharedPreferences.getInstance();
       final roleString = prefs.getString(_userRoleKey);
-      
+
       if (roleString == null) return null;
-      
-      return UserRole.values.firstWhere(
-        (role) => role.name == roleString,
-      );
+
+      return UserRole.values.firstWhere((role) => role.name == roleString);
     } catch (e) {
       print('❌ Error getting user role: $e');
       return null;

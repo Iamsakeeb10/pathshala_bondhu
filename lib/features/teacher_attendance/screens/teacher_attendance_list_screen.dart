@@ -8,7 +8,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../shared/localization/app_localizations.dart';
 import '../../../shared/utils/app_colors.dart';
 import '../../../shared/widgets/custom_appbar.dart';
-import '../../../shared/widgets/custom_button.dart';
+import '../../../shared/widgets/gradient_button.dart';
 import '../models/teacher_attendance_model.dart';
 import '../providers/teacher_attendance_list_provider.dart';
 import '../widgets/date_selector_widget.dart';
@@ -190,10 +190,10 @@ class _TeacherAttendanceListScreenState
         icon: Icons.error_outline,
         title: localizations.translate('error'),
         subtitle: provider.errorMessage,
-        action: CustomButton(
+        action: GradientButton(
           text: localizations.translate('retry'),
+          icon: Icons.refresh,
           onPressed: () => provider.refresh(),
-          height: 40.h,
         ),
       );
     }
@@ -213,7 +213,7 @@ class _TeacherAttendanceListScreenState
             SizedBox(height: 24.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 32.w),
-              child: CustomButton(
+              child: GradientButton(
                 text: localizations.translate('mark_attendance'),
                 icon: Icons.add_circle_outline,
                 onPressed: () => _navigateToMarkAttendance(),
@@ -231,23 +231,22 @@ class _TeacherAttendanceListScreenState
         _buildAttendanceCard(attendance, localizations),
         SizedBox(height: 20.h),
         if (provider.isToday)
-          _buildGradientButton(
-            text: 'Update Attendance',
+          GradientButton(
+            text: localizations.translate('update_attendance'),
             icon: Icons.update_rounded,
             onPressed: () => _handleAttendanceTap(attendance),
           )
         else
-          CustomButton(
+          _buildOutlinedButton(
             text: localizations.translate('view_details'),
             icon: Icons.visibility,
             onPressed: () => _handleAttendanceTap(attendance),
-            isOutlined: true,
           ),
       ],
     );
   }
 
-  Widget _buildGradientButton({
+  Widget _buildOutlinedButton({
     required String text,
     required IconData icon,
     required VoidCallback onPressed,
@@ -256,20 +255,8 @@ class _TeacherAttendanceListScreenState
       width: double.infinity,
       height: 54.h,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.primary, AppColors.primaryDark],
-        ),
         borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-        ],
+        border: Border.all(color: AppColors.primary, width: 2),
       ),
       child: Material(
         color: Colors.transparent,
@@ -280,14 +267,14 @@ class _TeacherAttendanceListScreenState
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: Colors.white, size: 24.sp),
+                Icon(icon, color: AppColors.primary, size: 24.sp),
                 SizedBox(width: 10.w),
                 Text(
                   text,
                   style: TextStyle(
                     fontSize: 17.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppColors.primary,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -615,18 +602,28 @@ class _TeacherAttendanceListScreenState
     }
   }
 
-  void _handleAttendanceTap(attendance) {
+  void _handleAttendanceTap(TeacherAttendanceModel attendance) async {
     // Navigate to mark/update screen
-    context.push(
+    final result = await context.push(
       '/teacher-attendance/mark',
       extra: {'attendance': attendance, 'date': _provider.selectedDate},
     );
+
+    // Refresh if attendance was updated
+    if (result == true && mounted) {
+      _provider.refresh();
+    }
   }
 
-  void _navigateToMarkAttendance() {
-    context.push(
+  void _navigateToMarkAttendance() async {
+    final result = await context.push(
       '/teacher-attendance/mark',
       extra: {'date': _provider.selectedDate},
     );
+
+    // Refresh if attendance was marked
+    if (result == true && mounted) {
+      _provider.refresh();
+    }
   }
 }

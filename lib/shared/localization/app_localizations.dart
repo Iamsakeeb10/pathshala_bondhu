@@ -212,6 +212,7 @@ class AppLocalizations {
       'unknown': 'Unknown',
       'description': 'Description',
       'details': 'Details',
+      'view_details': 'View Details',
       'submission_date_label': 'Submission Date',
       'no_description_provided': 'No description provided.',
 

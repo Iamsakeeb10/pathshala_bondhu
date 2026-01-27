@@ -37,13 +37,18 @@ class TeacherAttendanceService {
   /// Returns list of all attendance records for the given date with teacher details
   Future<List<TeacherAttendanceModel>> getAttendanceByDate(String date) async {
     try {
+      print('📡 API Request: $_baseUrl/by-date?date=$date'); // Debug log
       final response = await _dioClient.get(
         '$_baseUrl/by-date',
         queryParameters: {'date': date},
       );
 
+      print('📥 API Response: ${response.data}'); // Debug log
       final data = response.data as Map<String, dynamic>;
       final attendancesList = data['attendances'] as List;
+      print(
+        '📊 Parsing ${attendancesList.length} attendance records',
+      ); // Debug log
 
       return attendancesList
           .map(
@@ -52,9 +57,60 @@ class TeacherAttendanceService {
           )
           .toList();
     } on DioException catch (e) {
+      print('🚨 DioException: ${e.message}'); // Debug log
       throw _handleError(e);
     } catch (e) {
+      print('🚨 Unexpected error: $e'); // Debug log
       throw Exception('Unexpected error fetching attendance list: $e');
+    }
+  }
+
+  /// Mark or update own teacher attendance (uses authenticated teacher from token)
+  ///
+  /// [date] - Date in YYYY-MM-DD format
+  /// [status] - present, absent, or leave
+  /// [checkInTime] - Time in HH:mm format (required if status is present)
+  /// [checkOutTime] - Time in HH:mm format (optional)
+  /// [remarks] - Optional notes/comments
+  Future<TeacherAttendanceModel> markMyAttendance({
+    required String date,
+    required String status,
+    String? checkInTime,
+    String? checkOutTime,
+    String? remarks,
+  }) async {
+    try {
+      final payload = <String, dynamic>{'date': date, 'status': status};
+
+      // Only include time fields if status is present
+      if (status.toLowerCase() == 'present') {
+        if (checkInTime != null && checkInTime.isNotEmpty) {
+          payload['check_in_time'] = checkInTime;
+        }
+        if (checkOutTime != null && checkOutTime.isNotEmpty) {
+          payload['check_out_time'] = checkOutTime;
+        }
+      }
+
+      // Include remarks if provided
+      if (remarks != null && remarks.trim().isNotEmpty) {
+        payload['remarks'] = remarks.trim();
+      }
+
+      print('📤 Marking own attendance with payload: $payload');
+      final response = await _dioClient.post('$_baseUrl/mark', data: payload);
+
+      final data = response.data as Map<String, dynamic>;
+      print('✅ Mark attendance response: $data');
+      return TeacherAttendanceModel.fromJson(
+        data['attendance'] as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      print('🚨 DioException marking attendance: ${e.response?.data}');
+      throw _handleError(e);
+    } catch (e) {
+      print('🚨 Unexpected error marking attendance: $e');
+      throw Exception('Unexpected error marking attendance: $e');
     }
   }
 

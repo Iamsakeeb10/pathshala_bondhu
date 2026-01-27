@@ -112,11 +112,16 @@ class TeacherAttendanceListProvider extends ChangeNotifier {
 
     try {
       final dateStr = _formatDate(_selectedDate);
+      print('🔍 Fetching attendance for date: $dateStr'); // Debug log
       _attendances = await _service.getAttendanceByDate(dateStr);
+      print(
+        '✅ Received ${_attendances.length} attendance records',
+      ); // Debug log
 
       // Extract unique teachers for pending calculation
       _allTeachers = _attendances.map((a) => a.teacher).toList();
     } catch (e) {
+      print('❌ Error fetching attendance: $e'); // Debug log
       _errorMessage = e.toString().replaceAll('Exception: ', '');
       _attendances = [];
       _allTeachers = [];

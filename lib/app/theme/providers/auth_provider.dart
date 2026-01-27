@@ -108,7 +108,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Parent login
-  /// 
+  ///
   /// Fetches FCM token and includes it in login request for push notification registration.
   Future<bool> loginAsParent({
     required String parentId,
@@ -169,7 +169,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Teacher login
-  /// 
+  ///
   /// Fetches FCM token and includes it in login request for push notification registration.
   Future<bool> loginAsTeacher({
     required String email,
@@ -293,14 +293,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Get FCM device token for push notifications
-  /// 
+  ///
   /// Returns null if token cannot be obtained (no permission, not initialized, etc.)
   Future<String?> _getFcmToken() async {
     return NotificationService.getDeviceToken();
   }
 
   /// Fetch extended profile information (e.g. parent job, teacher details)
-  /// 
+  ///
   /// Updates the current user with additional details from the API.
   Future<void> fetchExtendedProfile() async {
     if (_currentUser == null) return;
@@ -308,7 +308,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       if (isParent) {
         final parentProfile = await _authService.getParentProfile();
-        
+
         // Update current user with latest info including designation (father's job)
         // Note: Using father_name as primary name as before
         _currentUser = User(
@@ -320,12 +320,11 @@ class AuthProvider extends ChangeNotifier {
           designation: parentProfile.fatherJob,
         );
         notifyListeners();
-        
+
         // Also update stored name if changed
         await TokenStorage.saveUserName(parentProfile.fatherName);
       }
       // Can add teacher logic here later if needed
-      
     } catch (e) {
       debugPrint('⚠️ Failed to fetch extended profile: $e');
       // Fail silently as this is just UI enhancement

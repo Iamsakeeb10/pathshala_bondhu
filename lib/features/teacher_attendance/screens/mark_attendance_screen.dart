@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../shared/localization/app_localizations.dart';
 import '../../../shared/utils/app_colors.dart';
 import '../../../shared/widgets/custom_appbar.dart';
+import '../../../shared/widgets/gradient_button.dart';
+import '../../profile/providers/profile_provider.dart';
 import '../models/teacher_attendance_model.dart';
+import '../services/teacher_attendance_service.dart';
 
 /// Mark/Update Teacher Attendance Screen
 class MarkAttendanceScreen extends StatefulWidget {
@@ -32,13 +36,32 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   void initState() {
     super.initState();
     _initializeForm();
+    _ensureProfileLoaded();
+  }
+
+  Future<void> _ensureProfileLoaded() async {
+    final profileProvider = context.read<ProfileProvider>();
+
+    // If teacher profile is not loaded, fetch it
+    if (profileProvider.teacherProfile == null) {
+      await profileProvider.fetchProfile(ProfileType.teacher);
+    }
   }
 
   void _initializeForm() {
     if (widget.attendance != null) {
       _selectedStatus = widget.attendance!.status;
-      _checkInController.text = widget.attendance!.checkInTime ?? '';
-      _checkOutController.text = widget.attendance!.checkOutTime ?? '';
+      // Convert 24-hour format from API to 12-hour format for display
+      if (widget.attendance!.checkInTime != null) {
+        _checkInController.text = _convert24To12Hour(
+          widget.attendance!.checkInTime!,
+        );
+      }
+      if (widget.attendance!.checkOutTime != null) {
+        _checkOutController.text = _convert24To12Hour(
+          widget.attendance!.checkOutTime!,
+        );
+      }
       _remarksController.text = widget.attendance!.remarks ?? '';
     } else {
       // Default to current time for check-in
@@ -759,59 +782,13 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
       buttonEndColor = AppColors.primaryDark;
     }
 
-    return Container(
-      width: double.infinity,
-      height: 54.h,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [buttonStartColor, buttonEndColor],
-        ),
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: buttonStartColor.withOpacity(0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _isSubmitting ? null : _submitAttendance,
-          borderRadius: BorderRadius.circular(16.r),
-          child: Center(
-            child: _isSubmitting
-                ? SizedBox(
-                    width: 24.w,
-                    height: 24.w,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2.5,
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(buttonIcon, color: Colors.white, size: 24.sp),
-                      SizedBox(width: 10.w),
-                      Text(
-                        buttonText,
-                        style: TextStyle(
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ),
-      ),
+    return GradientButton(
+      text: buttonText,
+      icon: buttonIcon,
+      onPressed: _submitAttendance,
+      isLoading: _isSubmitting,
+      startColor: buttonStartColor,
+      endColor: buttonEndColor,
     );
   }
 
@@ -908,9 +885,48 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      // TODO: Call provider to mark/update attendance
-      // For now, just show success message and pop
-      await Future.delayed(const Duration(seconds: 1));
+      // Get teacher ID from ProfileProvider
+      final profileProvider = context.read<ProfileProvider>();
+      final teacherId = profileProvider.teacherProfile?.teacher?.id;
+
+      if (teacherId == null) {
+        throw Exception('Teacher ID not found. Please login again.');
+      }
+
+      final service = TeacherAttendanceService();
+      final dateStr = DateFormat('yyyy-MM-dd').format(widget.date);
+
+      // Convert 12-hour time to 24-hour format for API
+      String? checkInTime24;
+      String? checkOutTime24;
+
+      if (_selectedStatus == 'present') {
+        if (_checkInController.text.isNotEmpty) {
+          checkInTime24 = _convert12To24Hour(_checkInController.text);
+        }
+        if (_checkOutController.text.isNotEmpty) {
+          checkOutTime24 = _convert12To24Hour(_checkOutController.text);
+        }
+      }
+
+      print('📤 Submitting attendance:');
+      print('  Teacher ID: $teacherId');
+      print('  Date: $dateStr');
+      print('  Status: $_selectedStatus');
+      print('  Check In: $checkInTime24');
+      print('  Check Out: $checkOutTime24');
+
+      // Call API to mark attendance with teacher_id
+      await service.markAttendance(
+        teacherId: teacherId,
+        date: dateStr,
+        status: _selectedStatus,
+        checkInTime: checkInTime24,
+        checkOutTime: checkOutTime24,
+        remarks: _remarksController.text.trim().isEmpty
+            ? null
+            : _remarksController.text.trim(),
+      );
 
       if (mounted) {
         final localizations = AppLocalizations.of(context)!;
@@ -925,18 +941,73 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
           ),
         );
 
-        context.pop();
+        context.pop(true); // Return true to indicate success
       }
     } catch (e) {
+      print('❌ Error submitting attendance: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
       }
+    }
+  }
+
+  // Convert 12-hour format (e.g., "9:30 AM") to 24-hour format (e.g., "09:30")
+  String _convert12To24Hour(String time12) {
+    try {
+      final parts = time12.split(' ');
+      if (parts.length != 2) return time12;
+
+      final timeParts = parts[0].split(':');
+      if (timeParts.length < 2) return time12;
+
+      var hour = int.parse(timeParts[0]);
+      final minute = int.parse(
+        timeParts[1],
+      ); // Parse as int to strip any trailing chars
+      final period = parts[1].toUpperCase();
+
+      if (period == 'PM' && hour != 12) {
+        hour += 12;
+      } else if (period == 'AM' && hour == 12) {
+        hour = 0;
+      }
+
+      return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return time12;
+    }
+  }
+
+  // Convert 24-hour format (e.g., "09:30" or "09:30:00") to 12-hour format (e.g., "9:30 AM")
+  String _convert24To12Hour(String time24) {
+    try {
+      // Remove seconds if present
+      final timeParts = time24.split(':');
+      if (timeParts.isEmpty) return time24;
+
+      var hour = int.parse(timeParts[0]);
+      final minute = timeParts.length > 1 ? int.parse(timeParts[1]) : 0;
+
+      final period = hour >= 12 ? 'PM' : 'AM';
+
+      if (hour > 12) {
+        hour -= 12;
+      } else if (hour == 0) {
+        hour = 12;
+      }
+
+      return '$hour:${minute.toString().padLeft(2, '0')} $period';
+    } catch (e) {
+      return time24;
     }
   }
 }
