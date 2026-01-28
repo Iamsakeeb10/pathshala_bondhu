@@ -19,6 +19,7 @@ class QuestionBankListProvider extends ChangeNotifier {
   int _currentPage = 1;
   int _lastPage = 1;
   int _total = 0;
+  bool _hasAttemptedLoad = false;
 
   // Filter state
   QuestionFilterState _filterState = const QuestionFilterState();
@@ -50,9 +51,12 @@ class QuestionBankListProvider extends ChangeNotifier {
   bool get isMetadataLoading => _isMetadataLoading;
   bool get isEmpty => _questions.isEmpty && !_isLoading;
   bool get hasActiveFilters => _filterState.hasActiveFilters;
+  bool get hasAttemptedLoad => _hasAttemptedLoad;
 
   /// Fetch questions with pagination
   Future<void> fetchQuestions({bool refresh = false}) async {
+    _hasAttemptedLoad = true;
+
     if (refresh) {
       _currentPage = 1;
       _isLoading = true;

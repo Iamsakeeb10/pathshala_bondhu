@@ -266,6 +266,11 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen>
   }
 
   Widget _buildBody(QuestionBankListProvider provider) {
+    // Show loading state before any load attempt
+    if (!provider.hasAttemptedLoad) {
+      return _buildLoadingState();
+    }
+
     if (provider.isLoading && provider.questions.isEmpty) {
       return _buildLoadingState();
     }
