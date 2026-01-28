@@ -119,26 +119,19 @@ class _QuestionTypeSelectorState extends State<QuestionTypeSelector> {
               ),
               SizedBox(height: 10.h),
 
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10.w,
-                  mainAxisSpacing: 10.h,
-                  childAspectRatio: 1.15,
-                ),
-                itemCount: QuestionType.values.length,
-                itemBuilder: (context, index) {
-                  final type = QuestionType.values[index];
+              Column(
+                children: QuestionType.values.map((type) {
                   final typeData = QuestionTypeCardData(type);
-                  return _QuestionTypeCard(
-                    type: type,
-                    typeData: typeData,
-                    isBangla: _isBangla,
-                    onTap: () => _selectType(type),
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 10.h),
+                    child: _QuestionTypeCard(
+                      type: type,
+                      typeData: typeData,
+                      isBangla: _isBangla,
+                      onTap: () => _selectType(type),
+                    ),
                   );
-                },
+                }).toList(),
               ),
               SizedBox(height: 16.h),
             ],
@@ -242,62 +235,48 @@ class _QuestionTypeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(12.r),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12.r),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: isDark
-                  ? AppColors.borderDark.withOpacity(0.4)
-                  : AppColors.grey300.withOpacity(0.6),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.1 : 0.03),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(
+            color: isDark
+                ? AppColors.borderDark.withOpacity(0.3)
+                : AppColors.grey300.withOpacity(0.5),
+            width: 1,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Simple icon with colored background
-              Container(
-                width: 36.w,
-                height: 36.w,
-                decoration: BoxDecoration(
-                  color: typeData.color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Icon(typeData.icon, size: 18.sp, color: typeData.color),
-              ),
-              SizedBox(height: 6.h),
+        ),
+        child: Row(
+          children: [
+            // Simple icon
+            Icon(typeData.icon, size: 24.sp, color: typeData.color),
+            SizedBox(width: 12.w),
 
-              // Type name
-              Text(
+            // Type name
+            Expanded(
+              child: Text(
                 type.getDisplayName(isBangla),
                 style: TextStyle(
-                  fontSize: 10.5.sp,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : AppColors.textPrimary,
-                  height: 1.2,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+
+            // Arrow
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14.sp,
+              color: isDark
+                  ? AppColors.textDarkSecondary
+                  : AppColors.textSecondary,
+            ),
+          ],
         ),
       ),
     );
