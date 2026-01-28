@@ -18,7 +18,7 @@ class MatchingStep extends StatelessWidget {
     final formProvider = context.watch<QuestionBankFormProvider>();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -26,7 +26,7 @@ class MatchingStep extends StatelessWidget {
           Text(
             isBangla ? 'মিলকরণ জোড়া' : 'Matching Pairs',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
@@ -37,29 +37,33 @@ class MatchingStep extends StatelessWidget {
                 ? 'বাম ও ডান কলামের আইটেম যোগ করুন যা মিলাতে হবে'
                 : 'Add items for left and right columns to be matched',
             style: TextStyle(
-              fontSize: 13.sp,
+              fontSize: 14.sp,
               color: isDark
                   ? AppColors.textDarkSecondary
                   : AppColors.textSecondary,
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
 
           // Column headers
           Row(
             children: [
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8.r),
+                    color: AppColors.primary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.3),
+                      width: 1,
+                    ),
                   ),
                   child: Center(
                     child: Text(
                       isBangla ? 'বাম কলাম' : 'Left Column',
                       style: TextStyle(
-                        fontSize: 13.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
@@ -70,16 +74,20 @@ class MatchingStep extends StatelessWidget {
               SizedBox(width: 32.w),
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8.r),
+                    color: AppColors.secondary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: AppColors.secondary.withOpacity(0.3),
+                      width: 1,
+                    ),
                   ),
                   child: Center(
                     child: Text(
                       isBangla ? 'ডান কলাম' : 'Right Column',
                       style: TextStyle(
-                        fontSize: 13.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColors.secondary,
                       ),
@@ -89,7 +97,7 @@ class MatchingStep extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 16.h),
 
           // Pairs list
           ListView.builder(
@@ -133,27 +141,45 @@ class MatchingStep extends StatelessWidget {
               ),
             ),
 
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
 
           // Info card
           Container(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
               color: AppColors.info.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppColors.info.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: AppColors.info.withOpacity(0.3),
+                width: 1.5,
+              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.shuffle, size: 20.sp, color: AppColors.info),
+                Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.info.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.shuffle,
+                    size: 20.sp,
+                    color: AppColors.info,
+                  ),
+                ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
                     isBangla
                         ? 'পরীক্ষায় ডান কলামের আইটেমগুলো এলোমেলো করে দেখানো হবে। শিক্ষার্থীদের সঠিক জোড়া মিলাতে হবে।'
                         : 'Right column items will be shuffled during the exam. Students need to match the correct pairs.',
-                    style: TextStyle(fontSize: 12.sp, color: AppColors.info),
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: AppColors.info,
+                      height: 1.4,
+                    ),
                   ),
                 ),
               ],
@@ -165,24 +191,28 @@ class MatchingStep extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(top: 16.h),
               child: Container(
-                padding: EdgeInsets.all(12.w),
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColors.error.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 18.sp,
+                      size: 20.sp,
                       color: AppColors.error,
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         formProvider.validationErrors['matching']!,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 14.sp,
                           color: AppColors.error,
                         ),
                       ),
@@ -248,59 +278,102 @@ class _MatchingPairRow extends StatelessWidget {
           ),
           SizedBox(width: 8.w),
 
-          // Left input
-          Expanded(
-            child: TextFormField(
-              initialValue: leftValue,
-              decoration: InputDecoration(
-                hintText: isBangla ? 'আইটেম $label' : 'Item $label',
-                hintStyle: TextStyle(fontSize: 13.sp),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.r),
+              // Left input
+              Expanded(
+                child: TextFormField(
+                  initialValue: leftValue,
+                  decoration: InputDecoration(
+                    hintText: isBangla ? 'আইটেম $label' : 'Item $label',
+                    hintStyle: TextStyle(fontSize: 13.sp),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.borderDark : AppColors.grey400,
+                        width: 1.2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.borderDark : AppColors.grey400,
+                        width: 1.2,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 14.w,
+                      vertical: 12.h,
+                    ),
+                    filled: true,
+                    fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
+                  ),
+                  style: TextStyle(fontSize: 14.sp),
+                  onChanged: onLeftChanged,
                 ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12.w,
-                  vertical: 10.h,
-                ),
-                filled: true,
-                fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
               ),
-              style: TextStyle(fontSize: 13.sp),
-              onChanged: onLeftChanged,
-            ),
-          ),
 
-          // Arrow icon
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            child: Icon(
-              Icons.compare_arrows,
-              size: 20.sp,
-              color: isDark ? AppColors.grey400 : AppColors.grey500,
-            ),
-          ),
-
-          // Right input
-          Expanded(
-            child: TextFormField(
-              initialValue: rightValue,
-              decoration: InputDecoration(
-                hintText: isBangla ? 'মিল $label' : 'Match $label',
-                hintStyle: TextStyle(fontSize: 13.sp),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.r),
+              // Arrow icon
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.compare_arrows,
+                    size: 20.sp,
+                    color: AppColors.primary,
+                  ),
                 ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12.w,
-                  vertical: 10.h,
-                ),
-                filled: true,
-                fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
               ),
-              style: TextStyle(fontSize: 13.sp),
-              onChanged: onRightChanged,
-            ),
-          ),
+
+              // Right input
+              Expanded(
+                child: TextFormField(
+                  initialValue: rightValue,
+                  decoration: InputDecoration(
+                    hintText: isBangla ? 'মিল $label' : 'Match $label',
+                    hintStyle: TextStyle(fontSize: 13.sp),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.borderDark : AppColors.grey400,
+                        width: 1.2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.borderDark : AppColors.grey400,
+                        width: 1.2,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: BorderSide(
+                        color: AppColors.secondary,
+                        width: 2,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 14.w,
+                      vertical: 12.h,
+                    ),
+                    filled: true,
+                    fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
+                  ),
+                  style: TextStyle(fontSize: 14.sp),
+                  onChanged: onRightChanged,
+                ),
+              ),
 
           SizedBox(width: 8.w),
 

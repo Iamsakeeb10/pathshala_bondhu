@@ -21,15 +21,17 @@ class TrueFalseStep extends StatelessWidget {
     String t(String key) => QuestionBankTranslations.t(key, isBangla);
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Text(
-            t('qb_select_answer'),
+            t('qb_select_answer') == 'qb_select_answer'
+                ? (isBangla ? 'উত্তর নির্বাচন করুন' : 'Select Answer')
+                : t('qb_select_answer'),
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
@@ -69,12 +71,12 @@ class TrueFalseStep extends StatelessWidget {
           Text(
             isBangla ? 'ব্যাখ্যা (ঐচ্ছিক)' : 'Explanation (Optional)',
             style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           TextFormField(
             initialValue: formProvider.explanation,
             maxLines: 4,
@@ -83,10 +85,30 @@ class TrueFalseStep extends StatelessWidget {
                   ? 'সঠিক উত্তরের ব্যাখ্যা লিখুন...'
                   : 'Explain why this answer is correct...',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
               ),
               filled: true,
               fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 14.h,
+              ),
             ),
             onChanged: formProvider.setExplanation,
           ),
@@ -96,24 +118,28 @@ class TrueFalseStep extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(top: 16.h),
               child: Container(
-                padding: EdgeInsets.all(12.w),
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColors.error.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 18.sp,
+                      size: 20.sp,
                       color: AppColors.error,
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         formProvider.validationErrors['correct']!,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 14.sp,
                           color: AppColors.error,
                         ),
                       ),
@@ -149,49 +175,66 @@ class _AnswerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(20.r),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 16.w),
+        padding: EdgeInsets.symmetric(vertical: 36.h, horizontal: 20.w),
         decoration: BoxDecoration(
           color: isSelected
               ? color.withOpacity(0.15)
               : (isDark ? AppColors.surfaceDark : Colors.white),
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: isSelected
                 ? color
                 : (isDark ? AppColors.borderDark : AppColors.border),
-            width: isSelected ? 3 : 1,
+            width: isSelected ? 2.5 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: color.withOpacity(0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                    spreadRadius: 0,
                   ),
                 ]
-              : null,
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              size: 48.sp,
-              color: isSelected
-                  ? color
-                  : (isDark ? AppColors.grey400 : AppColors.grey500),
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? color.withOpacity(0.2)
+                    : (isDark ? AppColors.grey800 : AppColors.grey100),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 48.sp,
+                color: isSelected
+                    ? color
+                    : (isDark ? AppColors.grey400 : AppColors.grey500),
+              ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 16.h),
             Text(
               label,
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.bold,
                 color: isSelected
                     ? color
                     : (isDark ? Colors.white70 : AppColors.textSecondary),
+                letterSpacing: 1.2,
               ),
             ),
           ],

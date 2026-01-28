@@ -63,40 +63,50 @@ class _FillBlankStepState extends State<FillBlankStep> {
     final formProvider = context.watch<QuestionBankFormProvider>();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Instructions card
           Container(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
               color: AppColors.info.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppColors.info.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: AppColors.info.withOpacity(0.3),
+                width: 1.5,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      size: 20.sp,
-                      color: AppColors.info,
+                    Container(
+                      padding: EdgeInsets.all(6.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.info.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.lightbulb_outline,
+                        size: 20.sp,
+                        color: AppColors.info,
+                      ),
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 10.w),
                     Text(
                       isBangla ? 'নির্দেশনা' : 'Instructions',
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColors.info,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 12.h),
                 Text(
                   isBangla
                       ? '• প্রশ্নে শূন্যস্থানের জন্য ___ (তিন বা ততোধিক আন্ডারস্কোর) ব্যবহার করুন\n'
@@ -106,7 +116,7 @@ class _FillBlankStepState extends State<FillBlankStep> {
                             '• Alternatively, use [blank] markers\n'
                             '• Blanks will be auto-detected',
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 13.sp,
                     color: AppColors.info,
                     height: 1.5,
                   ),
@@ -114,27 +124,35 @@ class _FillBlankStepState extends State<FillBlankStep> {
               ],
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
 
           // Question preview with highlighted blanks
           Text(
             isBangla ? 'প্রশ্ন পূর্বরূপ' : 'Question Preview',
             style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceDark : AppColors.grey100,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(16.r),
               border: Border.all(
                 color: isDark ? AppColors.borderDark : AppColors.border,
+                width: 1,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: _buildHighlightedQuestion(
               formProvider.questionText,
@@ -143,7 +161,7 @@ class _FillBlankStepState extends State<FillBlankStep> {
             ),
           ),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Detected blanks and answers
           if (_detectedBlanks.isEmpty)
@@ -152,7 +170,7 @@ class _FillBlankStepState extends State<FillBlankStep> {
             _buildBlanksAnswerSection(formProvider, isDark, isBangla),
 
           // Refresh button
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
           Center(
             child: TextButton.icon(
               onPressed: _detectBlanks,
@@ -169,24 +187,28 @@ class _FillBlankStepState extends State<FillBlankStep> {
             Padding(
               padding: EdgeInsets.only(top: 16.h),
               child: Container(
-                padding: EdgeInsets.all(12.w),
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColors.error.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 18.sp,
+                      size: 20.sp,
                       color: AppColors.error,
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         formProvider.validationErrors['blanks']!,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 14.sp,
                           color: AppColors.error,
                         ),
                       ),
@@ -268,35 +290,45 @@ class _FillBlankStepState extends State<FillBlankStep> {
 
   Widget _buildNoBlanksWarning(bool isDark, bool isBangla) {
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(24.w),
       decoration: BoxDecoration(
         color: AppColors.warning.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.warning.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: AppColors.warning.withOpacity(0.3),
+          width: 1.5,
+        ),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.warning_amber_rounded,
-            size: 32.sp,
-            color: AppColors.warning,
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.warning.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.warning_amber_rounded,
+              size: 32.sp,
+              color: AppColors.warning,
+            ),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 16.h),
           Text(
             isBangla ? 'কোন শূন্যস্থান পাওয়া যায়নি!' : 'No blanks detected!',
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: AppColors.warning,
             ),
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 8.h),
           Text(
             isBangla
                 ? 'প্রশ্নে ___ বা [blank] যোগ করুন'
                 : 'Add ___ or [blank] to your question',
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 13.sp,
               color: isDark ? Colors.white70 : AppColors.textSecondary,
             ),
             textAlign: TextAlign.center,
@@ -319,12 +351,12 @@ class _FillBlankStepState extends State<FillBlankStep> {
               ? 'শূন্যস্থানের উত্তর (${_detectedBlanks.length}টি পাওয়া গেছে)'
               : 'Blank Answers (${_detectedBlanks.length} detected)',
           style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : AppColors.textPrimary,
           ),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 16.h),
 
         ListView.builder(
           shrinkWrap: true,
@@ -332,28 +364,35 @@ class _FillBlankStepState extends State<FillBlankStep> {
           itemCount: _detectedBlanks.length,
           itemBuilder: (context, index) {
             return Padding(
-              padding: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.only(bottom: 14.h),
               child: Row(
                 children: [
                   Container(
-                    width: 32.w,
-                    height: 32.w,
+                    width: 36.w,
+                    height: 36.w,
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: BorderRadius.circular(10.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(
                         '${index + 1}',
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 12.w),
+                  SizedBox(width: 14.w),
                   Expanded(
                     child: TextFormField(
                       initialValue: formProvider.blankAnswers.length > index
@@ -364,11 +403,33 @@ class _FillBlankStepState extends State<FillBlankStep> {
                             ? 'শূন্যস্থান ${index + 1} এর উত্তর'
                             : 'Answer for blank ${index + 1}',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? AppColors.borderDark
+                                : AppColors.grey400,
+                            width: 1.2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? AppColors.borderDark
+                                : AppColors.grey400,
+                            width: 1.2,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(
+                            color: AppColors.primary,
+                            width: 2,
+                          ),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 10.h,
+                          horizontal: 14.w,
+                          vertical: 12.h,
                         ),
                         filled: true,
                         fillColor: isDark

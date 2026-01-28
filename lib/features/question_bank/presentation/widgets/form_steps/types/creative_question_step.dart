@@ -18,24 +18,34 @@ class CreativeQuestionStep extends StatelessWidget {
     final formProvider = context.watch<QuestionBankFormProvider>();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Info banner
           Container(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
               color: AppColors.secondary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppColors.secondary.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: AppColors.secondary.withOpacity(0.3),
+                width: 1.5,
+              ),
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.auto_awesome,
-                  size: 20.sp,
-                  color: AppColors.secondary,
+                Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.auto_awesome,
+                    size: 20.sp,
+                    color: AppColors.secondary,
+                  ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
@@ -44,26 +54,27 @@ class CreativeQuestionStep extends StatelessWidget {
                         ? 'সৃজনশীল প্রশ্নে একটি উদ্দীপক এবং একাধিক উপ-প্রশ্ন থাকে। প্রতিটি উপ-প্রশ্নের জন্য আলাদা নম্বর নির্ধারণ করুন।'
                         : 'Creative questions have a stimulus and multiple sub-questions. Set separate marks for each sub-question.',
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 13.sp,
                       color: AppColors.secondary,
+                      height: 1.4,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Stimulus section
           Text(
             isBangla ? 'উদ্দীপক' : 'Stimulus',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           TextFormField(
             initialValue: formProvider.stimulus,
             maxLines: 5,
@@ -72,15 +83,34 @@ class CreativeQuestionStep extends StatelessWidget {
                   ? 'উদ্দীপক/প্যাসেজ লিখুন...'
                   : 'Enter the stimulus/passage...',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
               ),
               filled: true,
               fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 14.h,
+              ),
             ),
             onChanged: formProvider.setStimulus,
           ),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Sub-questions header
           Row(
@@ -89,7 +119,7 @@ class CreativeQuestionStep extends StatelessWidget {
               Text(
                 isBangla ? 'উপ-প্রশ্নসমূহ' : 'Sub-Questions',
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : AppColors.textPrimary,
                 ),
@@ -112,13 +142,21 @@ class CreativeQuestionStep extends StatelessWidget {
           if (formProvider.subQuestions.isEmpty)
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(24.w),
+              padding: EdgeInsets.all(28.w),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.surfaceDark : AppColors.grey100,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
                 border: Border.all(
                   color: isDark ? AppColors.borderDark : AppColors.border,
+                  width: 1,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -142,46 +180,46 @@ class CreativeQuestionStep extends StatelessWidget {
               ),
             )
           else
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: formProvider.subQuestions.length,
-              itemBuilder: (context, index) {
-                final subQ = formProvider.subQuestions[index];
-                final label = _getSubQuestionLabel(index, isBangla);
+            ...formProvider.subQuestions.asMap().entries.map((entry) {
+              final index = entry.key;
+              final subQ = entry.value;
+              final label = _getSubQuestionLabel(index, isBangla);
 
-                return _SubQuestionCard(
-                  index: index,
-                  label: label,
-                  questionText: subQ['text'] ?? '',
-                  marks: subQ['marks'] ?? 0,
-                  cognitiveLevel: subQ['level'] ?? 'knowledge',
-                  isDark: isDark,
-                  isBangla: isBangla,
-                  onTextChanged: (text) {
-                    formProvider.updateSubQuestion(index, text: text);
-                  },
-                  onMarksChanged: (marks) {
-                    formProvider.updateSubQuestion(index, marks: marks);
-                  },
-                  onLevelChanged: (level) {
-                    formProvider.updateSubQuestion(index, level: level);
-                  },
-                  onRemove: formProvider.subQuestions.length > 1
-                      ? () => formProvider.removeSubQuestion(index)
-                      : null,
-                );
-              },
-            ),
+              return _SubQuestionCard(
+                index: index,
+                label: label,
+                questionText: subQ['text'] ?? '',
+                marks: subQ['marks'] ?? 0,
+                cognitiveLevel: subQ['level'] ?? 'knowledge',
+                isDark: isDark,
+                isBangla: isBangla,
+                onTextChanged: (text) {
+                  formProvider.updateSubQuestion(index, text: text);
+                },
+                onMarksChanged: (marks) {
+                  formProvider.updateSubQuestion(index, marks: marks);
+                },
+                onLevelChanged: (level) {
+                  formProvider.updateSubQuestion(index, level: level);
+                },
+                onRemove: formProvider.subQuestions.length > 1
+                    ? () => formProvider.removeSubQuestion(index)
+                    : null,
+              );
+            }).toList(),
 
           // Total marks summary
           if (formProvider.subQuestions.isNotEmpty) ...[
-            SizedBox(height: 16.h),
+            SizedBox(height: 20.h),
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -212,24 +250,28 @@ class CreativeQuestionStep extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(top: 16.h),
               child: Container(
-                padding: EdgeInsets.all(12.w),
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColors.error.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 18.sp,
+                      size: 20.sp,
                       color: AppColors.error,
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         formProvider.validationErrors['subQuestions']!,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 14.sp,
                           color: AppColors.error,
                         ),
                       ),
@@ -292,13 +334,21 @@ class _SubQuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: isDark ? AppColors.borderDark : AppColors.border,
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,127 +409,154 @@ class _SubQuestionCard extends StatelessWidget {
                   ? 'উপ-প্রশ্ন ($label) লিখুন...'
                   : 'Enter sub-question ($label)...',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(12.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
               ),
-              contentPadding: EdgeInsets.all(10.w),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.r),
+                borderSide: BorderSide(color: AppColors.secondary, width: 2),
+              ),
+              contentPadding: EdgeInsets.all(12.w),
               filled: true,
               fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
             ),
-            style: TextStyle(fontSize: 13.sp),
+            style: TextStyle(fontSize: 14.sp),
             onChanged: onTextChanged,
           ),
           SizedBox(height: 12.h),
 
-          // Marks and cognitive level row
-          Row(
+          // Marks and cognitive level section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Marks
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isBangla ? 'নম্বর' : 'Marks',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: isDark
-                            ? Colors.white60
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [1, 2, 3, 4, 5].map((m) {
-                        final isSelected = marks == m;
-                        return Padding(
-                          padding: EdgeInsets.only(right: 6.w),
-                          child: InkWell(
-                            onTap: () => onMarksChanged(m),
-                            borderRadius: BorderRadius.circular(6.r),
-                            child: Container(
-                              width: 32.w,
-                              height: 32.w,
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : (isDark
-                                          ? AppColors.grey700
-                                          : AppColors.grey200),
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '$m',
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : (isDark
-                                              ? Colors.white70
-                                              : AppColors.textPrimary),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+              // Marks section
+              Text(
+                isBangla ? 'নম্বর' : 'Marks',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white70 : AppColors.textSecondary,
                 ),
               ),
-
-              // Cognitive level
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isBangla ? 'স্তর' : 'Level',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: isDark
-                            ? Colors.white60
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Container(
-                      height: 32.h,
-                      padding: EdgeInsets.symmetric(horizontal: 8.w),
+              SizedBox(height: 8.h),
+              Wrap(
+                spacing: 8.w,
+                runSpacing: 8.h,
+                children: [1, 2, 3, 4, 5].map((m) {
+                  final isSelected = marks == m;
+                  return InkWell(
+                    onTap: () => onMarksChanged(m),
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Container(
+                      width: 40.w,
+                      height: 40.w,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.grey800 : AppColors.grey100,
-                        borderRadius: BorderRadius.circular(6.r),
-                        border: Border.all(
-                          color: isDark
-                              ? AppColors.borderDark
-                              : AppColors.border,
-                        ),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: cognitiveLevel,
-                          isExpanded: true,
-                          isDense: true,
-                          items: _cognitiveLevels.map((level) {
-                            return DropdownMenuItem(
-                              value: level['value'],
-                              child: Text(
-                                isBangla ? level['bn']! : level['en']!,
-                                style: TextStyle(fontSize: 12.sp),
+                        color: isSelected
+                            ? AppColors.primary
+                            : (isDark ? AppColors.grey700 : AppColors.grey200),
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: isSelected
+                            ? Border.all(color: AppColors.primary, width: 2)
+                            : Border.all(
+                                color: isDark
+                                    ? AppColors.borderDark
+                                    : AppColors.grey300,
+                                width: 1,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (value != null) onLevelChanged(value);
-                          },
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$m',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                      ? Colors.white70
+                                      : AppColors.textPrimary),
+                          ),
                         ),
                       ),
                     ),
-                  ],
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 16.h),
+
+              // Cognitive level section
+              Text(
+                isBangla ? 'স্তর' : 'Level',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white70 : AppColors.textSecondary,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Container(
+                width: double.infinity,
+                height: 48.h,
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.grey800 : AppColors.grey100,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: isDark ? AppColors.borderDark : AppColors.grey400,
+                    width: 1.2,
+                  ),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: cognitiveLevel,
+                    isExpanded: true,
+                    items: _cognitiveLevels.map((level) {
+                      return DropdownMenuItem(
+                        value: level['value'],
+                        child: Text(
+                          isBangla ? level['bn']! : level['en']!,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) onLevelChanged(value);
+                    },
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: isDark ? Colors.white70 : AppColors.textSecondary,
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -18,7 +18,7 @@ class MathProblemStep extends StatelessWidget {
     final formProvider = context.watch<QuestionBankFormProvider>();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -26,12 +26,12 @@ class MathProblemStep extends StatelessWidget {
           Text(
             isBangla ? 'চূড়ান্ত উত্তর' : 'Final Answer',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           TextFormField(
             initialValue: formProvider.correctAnswer,
             decoration: InputDecoration(
@@ -39,16 +39,38 @@ class MathProblemStep extends StatelessWidget {
                   ? 'চূড়ান্ত উত্তর লিখুন...'
                   : 'Enter the final answer...',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: AppColors.primary,
+                  width: 2,
+                ),
               ),
               filled: true,
               fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
               prefixIcon: const Icon(Icons.done_all),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 14.h,
+              ),
             ),
             onChanged: formProvider.setCorrectAnswerText,
           ),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Solution steps
           Row(
@@ -57,7 +79,7 @@ class MathProblemStep extends StatelessWidget {
               Text(
                 isBangla ? 'সমাধানের ধাপসমূহ' : 'Solution Steps',
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : AppColors.textPrimary,
                 ),
@@ -73,19 +95,26 @@ class MathProblemStep extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
 
           if (formProvider.solutionSteps.isEmpty)
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(24.w),
+              padding: EdgeInsets.all(28.w),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.surfaceDark : AppColors.grey100,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
                 border: Border.all(
                   color: isDark ? AppColors.borderDark : AppColors.border,
-                  style: BorderStyle.solid,
+                  width: 1,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -127,32 +156,32 @@ class MathProblemStep extends StatelessWidget {
               },
             ),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Math symbols keyboard
           Text(
             isBangla ? 'গাণিতিক চিহ্ন' : 'Math Symbols',
             style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           _MathSymbolsKeyboard(isDark: isDark),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Explanation / Notes
           Text(
             isBangla ? 'টীকা (ঐচ্ছিক)' : 'Notes (Optional)',
             style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           TextFormField(
             initialValue: formProvider.explanation,
             maxLines: 3,
@@ -161,10 +190,32 @@ class MathProblemStep extends StatelessWidget {
                   ? 'সমস্যা সমাধানের জন্য অতিরিক্ত টীকা বা সূত্র...'
                   : 'Additional notes or formulas for solving this problem...',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: AppColors.primary,
+                  width: 2,
+                ),
               ),
               filled: true,
               fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 14.h,
+              ),
             ),
             onChanged: formProvider.setExplanation,
           ),
@@ -174,24 +225,28 @@ class MathProblemStep extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(top: 16.h),
               child: Container(
-                padding: EdgeInsets.all(12.w),
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColors.error.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 18.sp,
+                      size: 20.sp,
                       color: AppColors.error,
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         formProvider.validationErrors['answer']!,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 14.sp,
                           color: AppColors.error,
                         ),
                       ),
@@ -229,14 +284,23 @@ class _SolutionStepTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.only(bottom: 14.h),
       child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isDark ? AppColors.borderDark : AppColors.border,
+            width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -282,8 +346,12 @@ class _SolutionStepTile extends StatelessWidget {
                       ? 'ধাপ $stepNumber লিখুন...'
                       : 'Enter step $stepNumber...',
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 8.w,
+                    vertical: 12.h,
+                  ),
                 ),
+                style: TextStyle(fontSize: 14.sp),
                 onChanged: onChanged,
               ),
             ),
@@ -351,10 +419,14 @@ class _MathSymbolsKeyboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8.w),
+      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.grey100,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.border,
+          width: 1,
+        ),
       ),
       child: GridView.builder(
         shrinkWrap: true,
@@ -384,7 +456,7 @@ class _SymbolButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: isDark ? AppColors.grey700 : Colors.white,
-      borderRadius: BorderRadius.circular(8.r),
+      borderRadius: BorderRadius.circular(12.r),
       child: InkWell(
         onTap: () {
           // Copy to clipboard and show feedback
@@ -397,13 +469,13 @@ class _SymbolButton extends StatelessWidget {
             ),
           );
         },
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: BorderRadius.circular(12.r),
         child: Center(
           child: Text(
             symbol,
             style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),

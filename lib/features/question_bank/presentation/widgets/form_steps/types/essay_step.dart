@@ -18,7 +18,7 @@ class EssayStep extends StatelessWidget {
     final formProvider = context.watch<QuestionBankFormProvider>();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -26,7 +26,7 @@ class EssayStep extends StatelessWidget {
           Text(
             isBangla ? 'শব্দ সীমা' : 'Word Limit',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
@@ -37,21 +37,21 @@ class EssayStep extends StatelessWidget {
                 ? 'শিক্ষার্থীদের জন্য প্রত্যাশিত শব্দ সংখ্যা নির্বাচন করুন'
                 : 'Select expected word count for students',
             style: TextStyle(
-              fontSize: 13.sp,
+              fontSize: 14.sp,
               color: isDark
                   ? AppColors.textDarkSecondary
                   : AppColors.textSecondary,
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
 
           // Word limit grid
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: 3,
-            crossAxisSpacing: 12.w,
-            mainAxisSpacing: 12.h,
+            crossAxisSpacing: 14.w,
+            mainAxisSpacing: 14.h,
             childAspectRatio: 2.5,
             children: [
               _WordLimitCard(
@@ -99,18 +99,18 @@ class EssayStep extends StatelessWidget {
             ],
           ),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Grading rubric
           Text(
             isBangla ? 'মূল্যায়ন মানদণ্ড' : 'Grading Rubric',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           TextFormField(
             initialValue: formProvider.explanation,
             maxLines: 5,
@@ -119,26 +119,48 @@ class EssayStep extends StatelessWidget {
                   ? 'প্রবন্ধ মূল্যায়নের জন্য মানদণ্ড ও নির্দেশনা...\n\n• বিষয়বস্তু: X নম্বর\n• উপস্থাপনা: X নম্বর\n• ভাষা: X নম্বর'
                   : 'Criteria and guidelines for essay evaluation...\n\n• Content: X marks\n• Presentation: X marks\n• Language: X marks',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: AppColors.primary,
+                  width: 2,
+                ),
               ),
               filled: true,
               fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 14.h,
+              ),
             ),
             onChanged: formProvider.setExplanation,
           ),
 
-          SizedBox(height: 24.h),
+          SizedBox(height: 28.h),
 
           // Key points to cover
           Text(
             isBangla ? 'মূল পয়েন্ট' : 'Key Points to Cover',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
           TextFormField(
             initialValue: formProvider.correctAnswer,
             maxLines: 4,
@@ -147,10 +169,32 @@ class EssayStep extends StatelessWidget {
                   ? 'উত্তরে অবশ্যই থাকতে হবে এমন মূল পয়েন্ট...'
                   : 'Key points that must be included in the answer...',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: isDark ? AppColors.borderDark : AppColors.grey400,
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.r),
+                borderSide: BorderSide(
+                  color: AppColors.primary,
+                  width: 2,
+                ),
               ),
               filled: true,
               fillColor: isDark ? AppColors.grey800 : AppColors.grey100,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 14.h,
+              ),
             ),
             onChanged: formProvider.setCorrectAnswerText,
           ),
@@ -160,24 +204,28 @@ class EssayStep extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(top: 16.h),
               child: Container(
-                padding: EdgeInsets.all(12.w),
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: AppColors.error.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.error_outline,
-                      size: 18.sp,
+                      size: 20.sp,
                       color: AppColors.error,
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         formProvider.validationErrors['wordLimit']!,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 14.sp,
                           color: AppColors.error,
                         ),
                       ),
@@ -211,19 +259,35 @@ class _WordLimitCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(16.r),
       child: Container(
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withOpacity(0.15)
               : (isDark ? AppColors.surfaceDark : Colors.white),
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
                 : (isDark ? AppColors.borderDark : AppColors.border),
-            width: isSelected ? 2 : 1,
+            width: isSelected ? 2.5 : 1,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -231,17 +295,18 @@ class _WordLimitCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
                 color: isSelected
                     ? AppColors.primary
                     : (isDark ? Colors.white : AppColors.textPrimary),
               ),
             ),
+            SizedBox(height: 4.h),
             Text(
               sublabel,
               style: TextStyle(
-                fontSize: 10.sp,
+                fontSize: 11.sp,
                 color: isSelected
                     ? AppColors.primary
                     : (isDark ? Colors.white60 : AppColors.textSecondary),
