@@ -50,74 +50,100 @@ class _QuestionTypeSelectorState extends State<QuestionTypeSelector> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Recent types section
-          if (_recentTypes.isNotEmpty) ...[
-            Text(
-              _t('qb_recent_types'),
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: isDark
-                    ? AppColors.textDarkSecondary
-                    : AppColors.textSecondary,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 500.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Recent types section
+              if (_recentTypes.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(
+                      Icons.history_rounded,
+                      size: 18.sp,
+                      color: AppColors.primary,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      _t('qb_recent_types'),
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                Wrap(
+                  spacing: 10.w,
+                  runSpacing: 10.h,
+                  children: _recentTypes.map((type) {
+                    final typeData = QuestionTypeCardData(type);
+                    return _RecentTypeChip(
+                      type: type,
+                      typeData: typeData,
+                      isBangla: _isBangla,
+                      onTap: () => _selectType(type),
+                    );
+                  }).toList(),
+                ),
+                SizedBox(height: 20.h),
+                Divider(
+                  color: isDark ? AppColors.borderDark : AppColors.grey200,
+                ),
+                SizedBox(height: 16.h),
+              ],
+
+              // All types grid
+              Row(
+                children: [
+                  Icon(
+                    Icons.dashboard_customize_rounded,
+                    size: 18.sp,
+                    color: AppColors.primary,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    _t('qb_step_type'),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 12.h),
-            Wrap(
-              spacing: 8.w,
-              runSpacing: 8.h,
-              children: _recentTypes.map((type) {
-                final typeData = QuestionTypeCardData(type);
-                return _RecentTypeChip(
-                  type: type,
-                  typeData: typeData,
-                  isBangla: _isBangla,
-                  onTap: () => _selectType(type),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 24.h),
-            Divider(color: isDark ? AppColors.borderDark : AppColors.border),
-            SizedBox(height: 16.h),
-          ],
+              SizedBox(height: 10.h),
 
-          // All types grid
-          Text(
-            _t('qb_step_type'),
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10.w,
+                  mainAxisSpacing: 10.h,
+                  childAspectRatio: 1.15,
+                ),
+                itemCount: QuestionType.values.length,
+                itemBuilder: (context, index) {
+                  final type = QuestionType.values[index];
+                  final typeData = QuestionTypeCardData(type);
+                  return _QuestionTypeCard(
+                    type: type,
+                    typeData: typeData,
+                    isBangla: _isBangla,
+                    onTap: () => _selectType(type),
+                  );
+                },
+              ),
+              SizedBox(height: 16.h),
+            ],
           ),
-          SizedBox(height: 16.h),
-
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: 1.1,
-            ),
-            itemCount: QuestionType.values.length,
-            itemBuilder: (context, index) {
-              final type = QuestionType.values[index];
-              final typeData = QuestionTypeCardData(type);
-              return _QuestionTypeCard(
-                type: type,
-                typeData: typeData,
-                isBangla: _isBangla,
-                onTap: () => _selectType(type),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -142,29 +168,52 @@ class _RecentTypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: typeData.backgroundColor,
-          borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(color: typeData.borderColor),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(typeData.icon, size: 18.sp, color: typeData.color),
-            SizedBox(width: 6.w),
-            Text(
-              type.getDisplayName(isBangla),
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w500,
-                color: typeData.color,
-              ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                typeData.color.withOpacity(0.15),
+                typeData.color.withOpacity(0.08),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(
+              color: typeData.color.withOpacity(0.3),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: typeData.color.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(typeData.icon, size: 13.sp, color: typeData.color),
+              ),
+              SizedBox(width: 5.w),
+              Text(
+                type.getDisplayName(isBangla),
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : typeData.color,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -193,55 +242,62 @@ class _QuestionTypeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: () => _showTooltip(context),
-      child: Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: isDark ? AppColors.borderDark : AppColors.border,
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12.r),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.borderDark.withOpacity(0.4)
+                  : AppColors.grey300.withOpacity(0.6),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.1 : 0.03),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Icon container
-            Container(
-              width: 52.w,
-              height: 52.w,
-              decoration: BoxDecoration(
-                color: typeData.backgroundColor,
-                borderRadius: BorderRadius.circular(12.r),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Simple icon with colored background
+              Container(
+                width: 36.w,
+                height: 36.w,
+                decoration: BoxDecoration(
+                  color: typeData.color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Icon(typeData.icon, size: 18.sp, color: typeData.color),
               ),
-              child: Center(
-                child: Icon(typeData.icon, size: 28.sp, color: typeData.color),
-              ),
-            ),
-            SizedBox(height: 12.h),
+              SizedBox(height: 6.h),
 
-            // Type name
-            Text(
-              type.getDisplayName(isBangla),
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+              // Type name
+              Text(
+                type.getDisplayName(isBangla),
+                style: TextStyle(
+                  fontSize: 10.5.sp,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  height: 1.2,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

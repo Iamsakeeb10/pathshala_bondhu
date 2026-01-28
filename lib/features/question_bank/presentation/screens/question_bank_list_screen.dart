@@ -32,6 +32,7 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   Timer? _searchDebounce;
   bool _isSearchExpanded = false;
   late AnimationController _searchAnimationController;
@@ -60,6 +61,7 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen>
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    _searchFocusNode.dispose();
     _searchDebounce?.cancel();
     _searchAnimationController.dispose();
     super.dispose();
@@ -136,11 +138,15 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen>
 
       if (_isSearchExpanded) {
         _searchAnimationController.forward();
+        // Request focus after animation starts
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _searchFocusNode.requestFocus();
+        });
       } else {
         _searchAnimationController.reverse();
         _searchController.clear();
         context.read<QuestionBankListProvider>().updateSearchQuery('');
-        FocusScope.of(context).unfocus();
+        _searchFocusNode.unfocus();
       }
     });
   }
@@ -354,13 +360,14 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen>
         ),
         child: _QuestionSearchField(
           controller: _searchController,
+          focusNode: _searchFocusNode,
           hint: _t('qb_search'),
           isDark: isDark,
           onChanged: _onSearchChanged,
           onClear: () {
             _searchController.clear();
             context.read<QuestionBankListProvider>().updateSearchQuery('');
-            FocusScope.of(context).unfocus();
+            _searchFocusNode.unfocus();
           },
           hasText: _searchController.text.isNotEmpty,
         ),
@@ -791,6 +798,7 @@ class _DeleteConfirmationSheet extends StatelessWidget {
 // ============================================
 class _QuestionSearchField extends StatefulWidget {
   final TextEditingController controller;
+  final FocusNode focusNode;
   final String hint;
   final bool isDark;
   final ValueChanged<String> onChanged;
@@ -799,6 +807,7 @@ class _QuestionSearchField extends StatefulWidget {
 
   const _QuestionSearchField({
     required this.controller,
+    required this.focusNode,
     required this.hint,
     required this.isDark,
     required this.onChanged,
@@ -811,23 +820,21 @@ class _QuestionSearchField extends StatefulWidget {
 }
 
 class _QuestionSearchFieldState extends State<_QuestionSearchField> {
-  late FocusNode _focusNode;
   bool _isFocused = false;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
-    _focusNode.addListener(() {
+    widget.focusNode.addListener(() {
       setState(() {
-        _isFocused = _focusNode.hasFocus;
+        _isFocused = widget.focusNode.hasFocus;
       });
     });
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    // Don't dispose focusNode here since it's managed by parent
     super.dispose();
   }
 
@@ -844,8 +851,8 @@ class _QuestionSearchFieldState extends State<_QuestionSearchField> {
       ),
       child: TextField(
         controller: widget.controller,
-        focusNode: _focusNode,
-        autofocus: true,
+        focusNode: widget.focusNode,
+        autofocus: false,
         style: TextStyle(
           fontSize: 15.sp,
           color: widget.isDark ? AppColors.textDark : AppColors.textPrimary,

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../../shared/widgets/gradient_button.dart';
 import '../../data/models/question_model.dart';
 import '../../data/services/question_bank_api_service.dart';
@@ -312,17 +313,15 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
         backgroundColor: isDark
             ? AppColors.backgroundDark
             : AppColors.backgroundLight,
-        appBar: _buildAppBar(isDark, isEdit),
         body: Consumer<QuestionBankFormProvider>(
           builder: (context, formProvider, child) {
             return Column(
               children: [
+                _buildCustomAppBar(isDark, isEdit),
                 // Step indicator
                 _buildStepIndicator(formProvider, isDark),
-
                 // Form content
                 Expanded(child: _buildStepContent(formProvider)),
-
                 // Navigation buttons
                 _buildNavigationButtons(formProvider, isDark),
               ],
@@ -333,26 +332,15 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(bool isDark, bool isEdit) {
-    return AppBar(
-      backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-      surfaceTintColor: Colors.transparent,
-      leading: IconButton(
-        icon: const Icon(Icons.close),
-        onPressed: () async {
-          final shouldPop = await _onWillPop();
-          if (shouldPop && mounted) {
-            context.pop();
-          }
-        },
-      ),
-      title: Text(
-        isEdit ? _t('qb_edit_question') : _t('qb_create'),
-        style: TextStyle(
-          color: isDark ? Colors.white : AppColors.textPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+  Widget _buildCustomAppBar(bool isDark, bool isEdit) {
+    return CustomAppBar(
+      title: isEdit ? _t('qb_edit_question') : _t('qb_create'),
+      onBackPressed: () async {
+        final shouldPop = await _onWillPop();
+        if (shouldPop && mounted) {
+          context.pop();
+        }
+      },
     );
   }
 
@@ -365,8 +353,17 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
     ];
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      color: isDark ? AppColors.surfaceDark : Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
       child: Row(
         children: List.generate(steps.length, (index) {
           final isActive = index == provider.currentStep.index;
@@ -375,47 +372,103 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
           return Expanded(
             child: Row(
               children: [
-                // Step circle
-                Container(
-                  width: 28.w,
-                  height: 28.w,
-                  decoration: BoxDecoration(
-                    color: isActive || isCompleted
-                        ? AppColors.primary
-                        : (isDark ? AppColors.grey700 : AppColors.grey200),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: isCompleted
-                        ? Icon(
-                            Icons.check,
-                            size: 16.sp,
-                            color: AppColors.textPrimary,
-                          )
-                        : Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              color: isActive
-                                  ? AppColors.textPrimary
-                                  : (isDark
-                                        ? AppColors.textDarkSecondary
-                                        : AppColors.textSecondary),
-                            ),
-                          ),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Step circle
+                      Container(
+                        width: 32.w,
+                        height: 32.w,
+                        decoration: BoxDecoration(
+                          gradient: isActive || isCompleted
+                              ? LinearGradient(
+                                  colors: [
+                                    AppColors.primary,
+                                    AppColors.primaryDark,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : null,
+                          color: isActive || isCompleted
+                              ? null
+                              : (isDark
+                                    ? AppColors.grey800
+                                    : AppColors.grey200),
+                          shape: BoxShape.circle,
+                          boxShadow: isActive
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.25),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Center(
+                          child: isCompleted
+                              ? Icon(
+                                  Icons.check_rounded,
+                                  size: 16.sp,
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  '${index + 1}',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: isActive
+                                        ? Colors.white
+                                        : (isDark
+                                              ? AppColors.textDarkSecondary
+                                              : AppColors.textSecondary),
+                                  ),
+                                ),
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      // Step label
+                      Text(
+                        steps[index],
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: isActive
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: isActive
+                              ? AppColors.primary
+                              : (isDark
+                                    ? AppColors.textDarkSecondary
+                                    : AppColors.textSecondary),
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
-
                 // Connector line
                 if (index < steps.length - 1)
-                  Expanded(
-                    child: Container(
-                      height: 2.h,
-                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                  Container(
+                    width: 16.w,
+                    height: 2.h,
+                    margin: EdgeInsets.only(bottom: 22.h),
+                    decoration: BoxDecoration(
+                      gradient: isCompleted
+                          ? LinearGradient(
+                              colors: [
+                                AppColors.primary,
+                                AppColors.primaryDark,
+                              ],
+                            )
+                          : null,
                       color: isCompleted
-                          ? AppColors.primary
-                          : (isDark ? AppColors.grey700 : AppColors.grey200),
+                          ? null
+                          : (isDark ? AppColors.grey800 : AppColors.grey200),
+                      borderRadius: BorderRadius.circular(1.r),
                     ),
                   ),
               ],
@@ -447,32 +500,61 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
     final isLastStep = provider.currentStep == FormStep.preview;
 
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
       ),
       child: SafeArea(
+        top: false,
         child: Row(
           children: [
             // Previous button
             if (!isFirstStep)
               Expanded(
-                child: OutlinedButton(
-                  onPressed: provider.previousStep,
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                child: Container(
+                  height: 48.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.4),
+                      width: 1.5,
                     ),
                   ),
-                  child: Text(_t('qb_previous')),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: provider.previousStep,
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.arrow_back_rounded,
+                              size: 18.sp,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 6.w),
+                            Text(
+                              _t('qb_previous'),
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
 
@@ -483,11 +565,15 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
               flex: isFirstStep ? 1 : 1,
               child: GradientButton(
                 text: isLastStep ? _t('qb_save') : _t('qb_next'),
+                icon: isLastStep
+                    ? Icons.check_circle_rounded
+                    : Icons.arrow_forward_rounded,
                 onPressed: _isSubmitting
                     ? null
                     : (isLastStep ? _handleSubmit : provider.nextStep),
                 isLoading: _isSubmitting,
                 startColor: AppColors.primary,
+                endColor: AppColors.primaryDark,
                 height: 48.h,
                 borderRadius: BorderRadius.circular(12.r),
               ),
