@@ -20,6 +20,25 @@ class TrueFalseStep extends StatelessWidget {
 
     String t(String key) => QuestionBankTranslations.t(key, isBangla);
 
+    // Normalize correctAnswer for comparison (handle case variations)
+    final normalizedAnswer = formProvider.correctAnswer.toLowerCase().trim();
+    final isTrueSelected = normalizedAnswer == 'true';
+    final isFalseSelected = normalizedAnswer == 'false';
+
+    // Debug logging
+    print(
+      '🔍 [True/False Step Debug] correctAnswer: "${formProvider.correctAnswer}"',
+    );
+    print('🔍 [True/False Step Debug] normalizedAnswer: "$normalizedAnswer"');
+    print('🔍 [True/False Step Debug] isTrueSelected: $isTrueSelected');
+    print('🔍 [True/False Step Debug] isFalseSelected: $isFalseSelected');
+    print(
+      '🔍 [True/False Step Debug] Question Type: ${formProvider.selectedType}',
+    );
+    print(
+      '🔍 [True/False Step Debug] Is Edit Mode: ${formProvider.isEditMode}',
+    );
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Column(
@@ -45,10 +64,13 @@ class TrueFalseStep extends StatelessWidget {
                 child: _AnswerCard(
                   label: isBangla ? 'সত্য' : 'TRUE',
                   icon: Icons.check_circle,
-                  isSelected: formProvider.correctAnswer == 'true',
+                  isSelected: isTrueSelected,
                   color: AppColors.success,
                   isDark: isDark,
-                  onTap: () => formProvider.setCorrectAnswerText('true'),
+                  onTap: () {
+                    print('🔍 [True/False Step Debug] TRUE tapped');
+                    formProvider.setCorrectAnswerText('true');
+                  },
                 ),
               ),
               SizedBox(width: 16.w),
@@ -56,10 +78,13 @@ class TrueFalseStep extends StatelessWidget {
                 child: _AnswerCard(
                   label: isBangla ? 'মিথ্যা' : 'FALSE',
                   icon: Icons.cancel,
-                  isSelected: formProvider.correctAnswer == 'false',
+                  isSelected: isFalseSelected,
                   color: AppColors.error,
                   isDark: isDark,
-                  onTap: () => formProvider.setCorrectAnswerText('false'),
+                  onTap: () {
+                    print('🔍 [True/False Step Debug] FALSE tapped');
+                    formProvider.setCorrectAnswerText('false');
+                  },
                 ),
               ),
             ],

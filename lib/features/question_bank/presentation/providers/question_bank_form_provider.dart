@@ -625,8 +625,95 @@ class QuestionBankFormProvider extends ChangeNotifier {
     _selectedSubject = question.subject;
     _marks = question.marks;
     _questionText = question.questionText;
-    _options = question.options ?? [];
-    _correctAnswer = question.expectedAnswer ?? '';
+    
+    // For True/False questions, get answer from options array (where is_correct = true)
+    if (question.questionType == QuestionType.trueFalse) {
+      // For True/False, we don't store options in _options, we use _correctAnswer
+      // But we need to extract the answer from the options array if available
+      _options = [];
+      print('🔍 [LoadQuestion Debug] Loading True/False question');
+      print('🔍 [LoadQuestion Debug] Expected Answer: ${question.expectedAnswer}');
+      print('🔍 [LoadQuestion Debug] Options count: ${question.options?.length ?? 0}');
+      
+      // Find the option with isCorrect = true
+      String answerText = '';
+      if (question.options != null && question.options!.isNotEmpty) {
+        print('🔍 [LoadQuestion Debug] Checking ${question.options!.length} options...');
+        for (var i = 0; i < question.options!.length; i++) {
+          final option = question.options![i];
+          print('🔍 [LoadQuestion Debug] Option $i: text="${option.text}", isCorrect=${option.isCorrect}');
+        }
+        
+        try {
+          final correctOption = question.options!.firstWhere(
+            (option) => option.isCorrect,
+          );
+          print('🔍 [LoadQuestion Debug] Found correct option: text="${correctOption.text}", isCorrect=${correctOption.isCorrect}');
+          answerText = correctOption.text.toLowerCase();
+          print('🔍 [LoadQuestion Debug] Extracted answer: "$answerText"');
+        } catch (e) {
+          print('🔍 [LoadQuestion Debug] ⚠️ No correct option found in array!');
+          print('🔍 [LoadQuestion Debug] Error: $e');
+          print('🔍 [LoadQuestion Debug] All options checked:');
+          for (var i = 0; i < question.options!.length; i++) {
+            final opt = question.options![i];
+            print('🔍 [LoadQuestion Debug]   Option $i: text="${opt.text}", isCorrect=${opt.isCorrect}');
+          }
+          
+          // Try to infer from option text if one matches "true" or "false"
+          // This handles cases where is_correct flag wasn't set properly
+          // We'll check both options and try to find which one matches the expected answer
+          // or use the option order as a hint
+          bool foundInferredAnswer = false;
+          
+          // First, try to match with expectedAnswer if available
+          if (question.expectedAnswer != null && question.expectedAnswer!.isNotEmpty) {
+            final expectedLower = question.expectedAnswer!.toLowerCase().trim();
+            for (var option in question.options!) {
+              final normalizedText = option.text.toLowerCase().trim();
+              if (normalizedText == expectedLower) {
+                answerText = normalizedText;
+                foundInferredAnswer = true;
+                print('🔍 [LoadQuestion Debug] ⚠️ Inferred answer from expectedAnswer match: "$answerText"');
+                break;
+              }
+            }
+          }
+          
+          // If still not found, use the first option that matches "true" or "false"
+          if (!foundInferredAnswer) {
+            for (var option in question.options!) {
+              final normalizedText = option.text.toLowerCase().trim();
+              if (normalizedText == 'true' || normalizedText == 'false') {
+                answerText = normalizedText;
+                foundInferredAnswer = true;
+                print('🔍 [LoadQuestion Debug] ⚠️ Inferred answer from option text (first match): "$answerText"');
+                print('🔍 [LoadQuestion Debug] ⚠️ WARNING: This may not be the correct answer!');
+                break;
+              }
+            }
+          }
+          
+          if (!foundInferredAnswer) {
+            print('🔍 [LoadQuestion Debug] Falling back to expectedAnswer: ${question.expectedAnswer}');
+            // No correct option found, fallback to expectedAnswer
+            answerText = (question.expectedAnswer ?? '').toLowerCase();
+          }
+        }
+      } else {
+        print('🔍 [LoadQuestion Debug] No options array, using expectedAnswer: ${question.expectedAnswer}');
+        // No options, use expectedAnswer
+        answerText = (question.expectedAnswer ?? '').toLowerCase();
+      }
+      
+      print('🔍 [LoadQuestion Debug] Final answerText: "$answerText"');
+      _correctAnswer = answerText;
+      print('🔍 [LoadQuestion Debug] Set _correctAnswer to: "$_correctAnswer"');
+    } else {
+      // For other question types, use expectedAnswer directly
+      _correctAnswer = question.expectedAnswer ?? '';
+    }
+    
     _explanation = question.explanation ?? '';
     _wordLimit = question.expectedWordCount;
     _currentStep = FormStep.basicInfo;
@@ -646,7 +733,32 @@ class QuestionBankFormProvider extends ChangeNotifier {
             ?.map((o) => QuestionOption(text: o.text, isCorrect: o.isCorrect))
             .toList() ??
         [];
-    _correctAnswer = question.expectedAnswer ?? '';
+    
+    // For True/False questions, get answer from options array (where is_correct = true)
+    if (question.questionType == QuestionType.trueFalse) {
+      // Find the option with isCorrect = true
+      String answerText = '';
+      if (question.options != null && question.options!.isNotEmpty) {
+        try {
+          final correctOption = question.options!.firstWhere(
+            (option) => option.isCorrect,
+          );
+          answerText = correctOption.text.toLowerCase();
+        } catch (e) {
+          // No correct option found, fallback to expectedAnswer
+          answerText = (question.expectedAnswer ?? '').toLowerCase();
+        }
+      } else {
+        // No options, use expectedAnswer
+        answerText = (question.expectedAnswer ?? '').toLowerCase();
+      }
+      
+      _correctAnswer = answerText;
+    } else {
+      // For other question types, use expectedAnswer directly
+      _correctAnswer = question.expectedAnswer ?? '';
+    }
+    
     _explanation = question.explanation ?? '';
     _wordLimit = question.expectedWordCount;
     _currentStep = FormStep.basicInfo;

@@ -48,6 +48,26 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       final question = await listProvider.getQuestion(
         int.parse(widget.questionId),
       );
+
+      // Debug logging for True/False questions
+      if (question?.questionType == QuestionType.trueFalse) {
+        print('🔍 [True/False Debug] Question ID: ${question?.id}');
+        print(
+          '🔍 [True/False Debug] Expected Answer: ${question?.expectedAnswer}',
+        );
+        print(
+          '🔍 [True/False Debug] Options count: ${question?.options?.length ?? 0}',
+        );
+        if (question?.options != null) {
+          for (var i = 0; i < question!.options!.length; i++) {
+            final option = question.options![i];
+            print(
+              '🔍 [True/False Debug] Option $i: text="${option.text}", isCorrect=${option.isCorrect}',
+            );
+          }
+        }
+      }
+
       setState(() {
         _question = question;
         _isLoading = false;
@@ -481,7 +501,6 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
         final option = entry.value;
         final label = String.fromCharCode(65 + index);
 
-
         return Container(
           margin: EdgeInsets.only(bottom: 10.h),
           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
@@ -565,7 +584,58 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   }
 
   Widget _buildTrueFalseAnswer(bool isDark, bool isBangla) {
-    final isTrue = _question!.expectedAnswer?.toLowerCase() == 'true';
+    // For True/False questions, check options array for the correct answer
+    bool isTrue = false;
+
+    print('🔍 [True/False Answer Debug] Building answer display');
+    print(
+      '🔍 [True/False Answer Debug] Expected Answer: ${_question!.expectedAnswer}',
+    );
+    print(
+      '🔍 [True/False Answer Debug] Options: ${_question!.options?.length ?? 0}',
+    );
+
+    if (_question!.options != null && _question!.options!.isNotEmpty) {
+      print('🔍 [True/False Answer Debug] Checking options array...');
+      try {
+        final correctOption = _question!.options!.firstWhere(
+          (option) => option.isCorrect,
+        );
+        print(
+          '🔍 [True/False Answer Debug] Found correct option: text="${correctOption.text}", isCorrect=${correctOption.isCorrect}',
+        );
+        isTrue = correctOption.text.toLowerCase() == 'true';
+        print(
+          '🔍 [True/False Answer Debug] Is True? $isTrue (after comparing "${correctOption.text.toLowerCase()}" == "true")',
+        );
+      } catch (e) {
+        print(
+          '🔍 [True/False Answer Debug] No correct option found in array, error: $e',
+        );
+        print(
+          '🔍 [True/False Answer Debug] Falling back to expectedAnswer: ${_question!.expectedAnswer}',
+        );
+        // Fallback to expectedAnswer if no correct option found
+        isTrue = _question!.expectedAnswer?.toLowerCase() == 'true';
+        print(
+          '🔍 [True/False Answer Debug] Is True? $isTrue (from expectedAnswer fallback)',
+        );
+      }
+    } else {
+      print(
+        '🔍 [True/False Answer Debug] No options array, using expectedAnswer: ${_question!.expectedAnswer}',
+      );
+      // Fallback to expectedAnswer if no options
+      isTrue = _question!.expectedAnswer?.toLowerCase() == 'true';
+      print(
+        '🔍 [True/False Answer Debug] Is True? $isTrue (from expectedAnswer)',
+      );
+    }
+
+    print(
+      '🔍 [True/False Answer Debug] Final result: ${isTrue ? "TRUE" : "FALSE"}',
+    );
+
     final color = isTrue ? AppColors.success : AppColors.error;
 
     return Container(
