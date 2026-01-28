@@ -599,6 +599,44 @@ class QuestionBankFormProvider extends ChangeNotifier {
 
   /// Build question from form state
   Question buildQuestion() {
+    // For True/False questions, build options array with correct is_correct flag
+    List<QuestionOption>? options;
+    if (_selectedType == QuestionType.mcq) {
+      options = _options;
+    } else if (_selectedType == QuestionType.trueFalse) {
+      // Build True/False options with correct answer marked
+      final isTrue = _correctAnswer.toLowerCase().trim() == 'true';
+      
+      // If editing, try to preserve existing option IDs
+      if (_editingQuestion?.options != null && 
+          _editingQuestion!.options!.length >= 2) {
+        final existingOptions = _editingQuestion!.options!;
+        options = [
+          QuestionOption(
+            id: existingOptions[0].id,
+            text: 'True',
+            isCorrect: isTrue,
+          ),
+          QuestionOption(
+            id: existingOptions.length > 1 ? existingOptions[1].id : null,
+            text: 'False',
+            isCorrect: !isTrue,
+          ),
+        ];
+        print('🔍 [BuildQuestion Debug] True/False options built (preserving IDs):');
+        print('🔍 [BuildQuestion Debug]   True: id=${options[0].id}, isCorrect=$isTrue');
+        print('🔍 [BuildQuestion Debug]   False: id=${options[1].id}, isCorrect=${!isTrue}');
+      } else {
+        options = [
+          QuestionOption(text: 'True', isCorrect: isTrue),
+          QuestionOption(text: 'False', isCorrect: !isTrue),
+        ];
+        print('🔍 [BuildQuestion Debug] True/False options built (new):');
+        print('🔍 [BuildQuestion Debug]   True: isCorrect=$isTrue');
+        print('🔍 [BuildQuestion Debug]   False: isCorrect=${!isTrue}');
+      }
+    }
+    
     return Question(
       id: _editingQuestion?.id,
       classId: _selectedClass?.id ?? 0,
@@ -606,7 +644,7 @@ class QuestionBankFormProvider extends ChangeNotifier {
       questionType: _selectedType!,
       questionText: _questionText,
       marks: _marks,
-      options: _selectedType == QuestionType.mcq ? _options : null,
+      options: options,
       expectedAnswer: _correctAnswer.isNotEmpty ? _correctAnswer : null,
       explanation: _explanation.isNotEmpty ? _explanation : null,
       expectedWordCount: _wordLimit,
