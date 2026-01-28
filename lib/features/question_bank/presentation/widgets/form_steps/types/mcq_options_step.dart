@@ -212,15 +212,20 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
               ? AppColors.borderDark.withOpacity(0.3)
               : AppColors.grey300.withOpacity(0.5));
     final bgColor = isCorrect
-        ? AppColors.success.withOpacity(0.08)
+        ? AppColors.success.withOpacity(0.10)
         : (widget.isDark ? AppColors.surfaceDark : Colors.white);
 
     return Padding(
-      padding: EdgeInsets.only(bottom: 14.h),
+      padding: EdgeInsets.only(bottom: 16.h),
       child: Material(
         color: Colors.transparent,
+        elevation: isCorrect ? 2 : 1,
+        borderRadius: BorderRadius.circular(14.r),
+        shadowColor: isCorrect
+            ? AppColors.success.withOpacity(0.10)
+            : Colors.black.withOpacity(0.04),
         child: InkWell(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(14.r),
           onTap: widget.onCorrectChanged,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -228,33 +233,33 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
             padding: EdgeInsets.all(0),
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
                 color: borderColor,
                 width: isCorrect || _isFocused ? 2 : 1,
               ),
-              boxShadow: isCorrect
-                  ? [
-                      BoxShadow(
-                        color: AppColors.success.withOpacity(0.10),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
+              boxShadow: [
+                BoxShadow(
+                  color: isCorrect
+                      ? AppColors.success.withOpacity(0.13)
+                      : Colors.black.withOpacity(0.03),
+                  blurRadius: isCorrect ? 12 : 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Selection indicator (vertical, left)
                 Padding(
-                  padding: EdgeInsets.only(left: 10.w, top: 18.h, right: 0),
+                  padding: EdgeInsets.only(left: 12.w, top: 20.h, right: 0),
                   child: GestureDetector(
                     onTap: widget.onCorrectChanged,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      width: 24.w,
-                      height: 24.w,
+                      width: 26.w,
+                      height: 26.w,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isCorrect
@@ -268,6 +273,15 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
                                     : AppColors.grey400),
                           width: isCorrect ? 0 : 2,
                         ),
+                        boxShadow: isCorrect
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.success.withOpacity(0.18),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
                       ),
                       child: isCorrect
                           ? Icon(
@@ -279,12 +293,12 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
                     ),
                   ),
                 ),
-                SizedBox(width: 8.w),
+                SizedBox(width: 10.w),
                 // Main content
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      vertical: 12.h,
+                      vertical: 14.h,
                       horizontal: 0,
                     ),
                     child: Column(
@@ -293,21 +307,32 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
                         Row(
                           children: [
                             Container(
-                              width: 28.w,
-                              height: 28.w,
+                              width: 30.w,
+                              height: 30.w,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(7.r),
+                                borderRadius: BorderRadius.circular(8.r),
                                 color: isCorrect
                                     ? AppColors.success
                                     : (widget.isDark
                                           ? AppColors.grey700
                                           : AppColors.grey200),
+                                boxShadow: isCorrect
+                                    ? [
+                                        BoxShadow(
+                                          color: AppColors.success.withOpacity(
+                                            0.18,
+                                          ),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
                               ),
                               child: Center(
                                 child: Text(
                                   widget.label,
                                   style: TextStyle(
-                                    fontSize: 13.sp,
+                                    fontSize: 14.sp,
                                     fontWeight: FontWeight.w700,
                                     color: isCorrect
                                         ? Colors.white
@@ -318,29 +343,48 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 10.w),
+                            SizedBox(width: 12.w),
                             if (isCorrect)
                               Container(
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w,
-                                  vertical: 4.h,
+                                  horizontal: 12.w,
+                                  vertical: 5.h,
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.success,
-                                  borderRadius: BorderRadius.circular(4.r),
+                                  borderRadius: BorderRadius.circular(6.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.success.withOpacity(
+                                        0.18,
+                                      ),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                                child: Text(
-                                  widget.isBangla ? 'সঠিক' : 'Correct',
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.check,
+                                      size: 13.sp,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      widget.isBangla ? 'সঠিক' : 'Correct',
+                                      style: TextStyle(
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                           ],
                         ),
-                        SizedBox(height: 8.h),
+                        SizedBox(height: 10.h),
                         // Option text field
                         TextField(
                           controller: _controller,
@@ -351,14 +395,14 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
                                 : 'Enter option ${widget.label}',
                             filled: true,
                             fillColor: widget.isDark
-                                ? AppColors.grey800
+                                ? AppColors.grey900
                                 : AppColors.grey100,
                             contentPadding: EdgeInsets.symmetric(
-                              horizontal: 14.w,
-                              vertical: 12.h,
+                              horizontal: 16.w,
+                              vertical: 14.h,
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.r),
+                              borderRadius: BorderRadius.circular(9.r),
                               borderSide: BorderSide(
                                 color: _isFocused
                                     ? AppColors.primary.withOpacity(0.5)
@@ -371,7 +415,7 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.r),
+                              borderRadius: BorderRadius.circular(9.r),
                               borderSide: BorderSide(
                                 color: AppColors.primary,
                                 width: 2,
