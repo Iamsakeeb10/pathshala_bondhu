@@ -348,8 +348,9 @@ class QuestionClass {
 class QuestionSubject {
   final int id;
   final String name;
+  final String? code;
 
-  QuestionSubject({required this.id, required this.name});
+  QuestionSubject({required this.id, required this.name, this.code});
 
   factory QuestionSubject.fromJson(Map<String, dynamic> json) {
     return QuestionSubject(
@@ -357,10 +358,15 @@ class QuestionSubject {
           ? json['id']
           : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String? ?? 'Unknown',
+      code: json['code'] as String?,
     );
   }
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    if (code != null) 'code': code,
+  };
 }
 
 /// Paginated response for question list

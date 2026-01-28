@@ -195,53 +195,24 @@ class _QuestionBankAuthModalState extends State<QuestionBankAuthModal> {
                 SizedBox(height: 32.h),
 
                 // Email field
-                TextFormField(
+                _EmailField(
                   controller: _emailController,
                   focusNode: _emailFocusNode,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  autocorrect: false,
-                  autofillHints: const [AutofillHints.email],
-                  validator: QuestionBankValidators.validateEmail,
-                  onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
-                  decoration: InputDecoration(
-                    labelText: _t('qb_auth_email'),
-                    hintText: _t('qb_auth_email_hint'),
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
+                  passwordFocusNode: _passwordFocusNode,
+                  isBangla: _isBangla,
                 ),
                 SizedBox(height: 16.h),
 
                 // Password field
-                TextFormField(
+                _PasswordField(
                   controller: _passwordController,
                   focusNode: _passwordFocusNode,
-                  obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.done,
-                  autofillHints: const [AutofillHints.password],
-                  validator: QuestionBankValidators.validatePassword,
-                  onFieldSubmitted: (_) => _handleLogin(),
-                  decoration: InputDecoration(
-                    labelText: _t('qb_auth_password'),
-                    hintText: _t('qb_auth_password_hint'),
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
+                  obscurePassword: _obscurePassword,
+                  onToggleVisibility: () {
+                    setState(() => _obscurePassword = !_obscurePassword);
+                  },
+                  onSubmitted: _handleLogin,
+                  isBangla: _isBangla,
                 ),
                 SizedBox(height: 24.h),
 
@@ -275,6 +246,99 @@ class _QuestionBankAuthModalState extends State<QuestionBankAuthModal> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// Helper widget for email field
+class _EmailField extends StatelessWidget {
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final FocusNode passwordFocusNode;
+  final bool isBangla;
+
+  const _EmailField({
+    required this.controller,
+    required this.focusNode,
+    required this.passwordFocusNode,
+    required this.isBangla,
+  });
+
+  String _t(String key) => QuestionBankTranslations.t(key, isBangla);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      autocorrect: false,
+      autofillHints: const [AutofillHints.email],
+      validator: QuestionBankValidators.validateEmail,
+      onFieldSubmitted: (_) => passwordFocusNode.requestFocus(),
+      style: Theme.of(context).textTheme.bodyLarge,
+      decoration: InputDecoration(
+        labelText: _t('qb_auth_email'),
+        hintText: _t('qb_auth_email_hint'),
+        prefixIcon: const Icon(Icons.email_outlined),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        filled: true,
+        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+      ),
+    );
+  }
+}
+
+// Helper widget for password field
+class _PasswordField extends StatelessWidget {
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool obscurePassword;
+  final VoidCallback onToggleVisibility;
+  final VoidCallback onSubmitted;
+  final bool isBangla;
+
+  const _PasswordField({
+    required this.controller,
+    required this.focusNode,
+    required this.obscurePassword,
+    required this.onToggleVisibility,
+    required this.onSubmitted,
+    required this.isBangla,
+  });
+
+  String _t(String key) => QuestionBankTranslations.t(key, isBangla);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      obscureText: obscurePassword,
+      textInputAction: TextInputAction.done,
+      autofillHints: const [AutofillHints.password],
+      validator: QuestionBankValidators.validatePassword,
+      onFieldSubmitted: (_) => onSubmitted(),
+      style: Theme.of(context).textTheme.bodyLarge,
+      decoration: InputDecoration(
+        labelText: _t('qb_auth_password'),
+        hintText: _t('qb_auth_password_hint'),
+        prefixIcon: const Icon(Icons.lock_outline),
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+          onPressed: onToggleVisibility,
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        filled: true,
+        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
       ),
     );
   }

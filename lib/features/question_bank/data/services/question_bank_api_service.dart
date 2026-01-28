@@ -13,7 +13,7 @@ class QBApiEndpoints {
   static const String auth = '/teacher/auth';
   static const String questions = '/questions';
   static const String classes = '/teacher/classes';
-  // Note: Subjects endpoint not available in API
+  static const String subjects = '/subjects';
 }
 
 /// Question Bank API Service
@@ -239,6 +239,28 @@ class QuestionBankApiService {
       return [];
     } on DioException catch (e) {
       _handleDioError(e);
+      return [];
+    }
+  }
+
+  /// Fetch available subjects
+  Future<List<QuestionSubject>> fetchSubjects() async {
+    try {
+      final response = await _dioClient.get(QBApiEndpoints.subjects);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> subjectsJson =
+            response.data['subjects'] ?? response.data['data'] ?? [];
+        return subjectsJson
+            .map(
+              (json) => QuestionSubject.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
+      }
+
+      return [];
+    } on DioException catch (e) {
+      print('Error fetching subjects: $e');
       return [];
     }
   }
