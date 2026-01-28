@@ -226,11 +226,6 @@ class _QuestionTypeCard extends StatelessWidget {
     required this.onTap,
   });
 
-  String _getDescription() {
-    final key = 'qb_type_${type.apiValue}_desc';
-    return QuestionBankTranslations.t(key, isBangla);
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -282,28 +277,4 @@ class _QuestionTypeCard extends StatelessWidget {
     );
   }
 
-  void _showTooltip(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-        title: Row(
-          children: [
-            Icon(typeData.icon, color: typeData.color),
-            SizedBox(width: 8.w),
-            Text(type.getDisplayName(isBangla)),
-          ],
-        ),
-        content: Text(_getDescription()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
 }

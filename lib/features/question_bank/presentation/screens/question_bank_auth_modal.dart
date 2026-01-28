@@ -109,7 +109,9 @@ class _QuestionBankAuthModalState extends State<QuestionBankAuthModal> {
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16.w),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.r),
+        ),
       ),
     );
   }

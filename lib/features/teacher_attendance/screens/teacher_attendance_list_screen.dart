@@ -603,10 +603,10 @@ class _TeacherAttendanceListScreenState
   }
 
   void _handleAttendanceTap(TeacherAttendanceModel attendance) async {
-    // Navigate to mark/update screen
+    // Navigate to mark/update screen using query parameters
+    final dateStr = attendance.date.toIso8601String();
     final result = await context.push(
-      '/teacher-attendance/mark',
-      extra: {'attendance': attendance, 'date': _provider.selectedDate},
+      '/teacher-attendance/mark?attendanceId=${attendance.id}&date=$dateStr',
     );
 
     // Refresh if attendance was updated
@@ -616,9 +616,10 @@ class _TeacherAttendanceListScreenState
   }
 
   void _navigateToMarkAttendance() async {
+    // Navigate to mark/update screen using query parameters
+    final dateStr = _provider.selectedDate.toIso8601String();
     final result = await context.push(
-      '/teacher-attendance/mark',
-      extra: {'date': _provider.selectedDate},
+      '/teacher-attendance/mark?date=$dateStr',
     );
 
     // Refresh if attendance was marked

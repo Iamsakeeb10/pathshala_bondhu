@@ -348,9 +348,14 @@ class MarkAttendanceTab extends StatelessWidget {
                     await provider.fetchHistory(DateTime.now());
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Attendance submitted successfully'),
-                        backgroundColor: Colors.green,
+                      SnackBar(
+                        content: const Text('Attendance submitted successfully'),
+                        backgroundColor: AppColors.success,
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.all(16.w),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
                       ),
                     );
 
@@ -362,7 +367,12 @@ class MarkAttendanceTab extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(provider.errorMessage!),
-                        backgroundColor: Colors.red,
+                        backgroundColor: AppColors.error,
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.all(16.w),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
                       ),
                     );
                   }

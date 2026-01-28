@@ -12,6 +12,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../../shared/widgets/gradient_button.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../data/models/question_model.dart';
 import '../../data/services/question_bank_api_service.dart';
 import '../../presentation/providers/question_bank_auth_provider.dart';
@@ -184,64 +185,52 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen>
   }
 
   Future<bool> _showDeleteConfirmation(Question question) async {
-    final result = await showModalBottomSheet<bool>(
+    bool? confirmed = false;
+    
+    await ModernAlert.show(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) =>
-          _DeleteConfirmationSheet(question: question, isBangla: _isBangla),
+      type: AlertType.warning,
+      title: _t('qb_delete_title'),
+      message: '${_t('qb_delete_confirm')}\n\n${question.previewText}\n\n${_t('qb_delete_warning')}',
+      confirmText: _t('qb_delete'),
+      cancelText: _t('qb_cancel'),
+      onConfirm: () {
+        confirmed = true;
+      },
+      onCancel: () {
+        confirmed = false;
+      },
     );
-    return result ?? false;
+    
+    return confirmed ?? false;
   }
 
   void _showUndoSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(_t('qb_deleted')),
-        duration: const Duration(seconds: 3),
-        action: SnackBarAction(
-          label: _t('qb_undo'),
-          onPressed: () async {
-            await context.read<QuestionBankListProvider>().undoDelete();
-          },
-        ),
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.all(16.w),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
     );
-
-    // Clear undo state after snackbar duration
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        context.read<QuestionBankListProvider>().clearUndoState();
-      }
-    });
   }
 
   void _showLogoutConfirmation() async {
-    final result = await showDialog<bool>(
+    await ModernAlert.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(_t('qb_logout_title')),
-        content: Text(_t('qb_logout_confirm')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(_t('qb_cancel')),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(_t('qb_logout')),
-          ),
-        ],
-      ),
+      type: AlertType.warning,
+      title: _t('qb_logout_title'),
+      message: _t('qb_logout_confirm'),
+      confirmText: _t('qb_logout'),
+      cancelText: _t('qb_cancel'),
+      onConfirm: () async {
+        if (mounted) {
+          await context.read<QuestionBankAuthProvider>().logout();
+          if (mounted) context.pop();
+        }
+      },
     );
-
-    if (result == true && mounted) {
-      await context.read<QuestionBankAuthProvider>().logout();
-      if (mounted) context.pop();
-    }
   }
 
   @override
@@ -666,132 +655,6 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen>
   }
 }
 
-class _DeleteConfirmationSheet extends StatelessWidget {
-  final Question question;
-  final bool isBangla;
-
-  const _DeleteConfirmationSheet({
-    required this.question,
-    required this.isBangla,
-  });
-
-  String _t(String key) => QuestionBankTranslations.t(key, isBangla);
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Warning icon
-          Container(
-            width: 64.w,
-            height: 64.w,
-            decoration: BoxDecoration(
-              color: AppColors.error.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.warning_amber_rounded,
-              size: 32.sp,
-              color: AppColors.error,
-            ),
-          ),
-          SizedBox(height: 16.h),
-
-          // Title
-          Text(
-            _t('qb_delete_title'),
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
-          ),
-          SizedBox(height: 8.h),
-
-          // Description
-          Text(
-            _t('qb_delete_confirm'),
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: isDark
-                  ? AppColors.textDarkSecondary
-                  : AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 12.h),
-
-          // Question preview
-          Container(
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.grey800 : AppColors.grey100,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Text(
-              question.previewText,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontStyle: FontStyle.italic,
-                color: isDark
-                    ? AppColors.textDarkSecondary
-                    : AppColors.textSecondary,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          SizedBox(height: 12.h),
-
-          // Warning
-          Text(
-            _t('qb_delete_warning'),
-            style: TextStyle(fontSize: 12.sp, color: AppColors.error),
-          ),
-          SizedBox(height: 24.h),
-
-          // Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                  child: Text(_t('qb_cancel')),
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: GradientButton(
-                  text: _t('qb_delete'),
-                  onPressed: () => Navigator.of(context).pop(true),
-                  startColor: AppColors.error,
-                  height: 48.h,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: MediaQuery.of(context).padding.bottom),
-        ],
-      ),
-    );
-  }
-}
 
 // ============================================
 // Inline Search Field Widget for Question Bank

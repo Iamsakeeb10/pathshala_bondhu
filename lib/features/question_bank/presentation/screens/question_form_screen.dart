@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../../shared/widgets/gradient_button.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../data/models/question_model.dart';
 import '../../data/services/question_bank_api_service.dart';
 import '../../presentation/providers/question_bank_form_provider.dart';
@@ -106,30 +107,21 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
   }
 
   void _showDraftRestoreDialog() {
-    showDialog(
+    ModernAlert.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(_t('qb_draft_found')),
-        content: Text(_t('qb_draft_restore')),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.read<QuestionBankFormProvider>()
-                ..reset()
-                ..clearDraft();
-            },
-            child: Text(_t('qb_discard')),
-          ),
-          GradientButton(
-            text: _t('qb_restore'),
-            onPressed: () => Navigator.of(context).pop(),
-            startColor: AppColors.primary,
-            height: 40.h,
-            width: 100.w,
-          ),
-        ],
-      ),
+      type: AlertType.info,
+      title: _t('qb_draft_found'),
+      message: _t('qb_draft_restore'),
+      confirmText: _t('qb_restore'),
+      cancelText: _t('qb_discard'),
+      onConfirm: () {
+        // Draft is already loaded, just close dialog
+      },
+      onCancel: () {
+        context.read<QuestionBankFormProvider>()
+          ..reset()
+          ..clearDraft();
+      },
     );
   }
 
@@ -183,67 +175,28 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
   void _showSuccessDialog(Question question) {
     final isEdit = widget.questionId != null;
 
-    showDialog(
+    ModernAlert.show(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64.w,
-              height: 64.w,
-              decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check_circle,
-                size: 40.sp,
-                color: AppColors.success,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              isEdit ? _t('qb_updated') : _t('qb_created'),
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              Navigator.of(context).pop(); // Go back from form
-              context.push('/question-bank/detail/${question.id}');
-            },
-            child: Text(_t('qb_view_question')),
-          ),
-          if (!isEdit)
-            GradientButton(
-              text: _t('qb_create_another'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                this.context.read<QuestionBankFormProvider>().reset();
-              },
-              startColor: AppColors.primary,
-              height: 40.h,
-              width: 140.w,
-            )
-          else
-            GradientButton(
-              text: 'Done',
-              onPressed: () {
-                Navigator.of(context).pop();
-                this.context.pop();
-              },
-              startColor: AppColors.primary,
-              height: 40.h,
-              width: 100.w,
-            ),
-        ],
-      ),
+      type: AlertType.success,
+      title: isEdit ? _t('qb_updated') : _t('qb_created'),
+      message: isEdit
+          ? _t('qb_updated')
+          : _t('qb_created'),
+      confirmText: isEdit ? 'Done' : _t('qb_view_question'),
+      cancelText: !isEdit ? _t('qb_create_another') : null,
+      onConfirm: () {
+        if (isEdit) {
+          context.pop();
+        } else {
+          context.pop(); // Go back from form
+          context.push('/question-bank/detail/${question.id}');
+        }
+      },
+      onCancel: !isEdit
+          ? () {
+              context.read<QuestionBankFormProvider>().reset();
+            }
+          : null,
     );
   }
 
@@ -253,6 +206,10 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
         content: Text(message),
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(16.w),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.r),
+        ),
       ),
     );
   }
@@ -263,33 +220,25 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
     // If form has data, ask to save draft
     if (formProvider.questionText.isNotEmpty ||
         formProvider.selectedType != null) {
-      final result = await showDialog<String>(
+      bool? shouldPop = false;
+      
+      await ModernAlert.show(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(_t('qb_discard_title')),
-          content: Text(_t('qb_discard_confirm')),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop('discard'),
-              child: Text(_t('qb_discard')),
-            ),
-            GradientButton(
-              text: _t('qb_save'),
-              onPressed: () async {
-                await formProvider.saveDraft();
-                if (context.mounted) {
-                  Navigator.of(context).pop('save');
-                }
-              },
-              startColor: AppColors.primary,
-              height: 40.h,
-              width: 100.w,
-            ),
-          ],
-        ),
+        type: AlertType.warning,
+        title: _t('qb_discard_title'),
+        message: _t('qb_discard_confirm'),
+        confirmText: _t('qb_save'),
+        cancelText: _t('qb_discard'),
+        onConfirm: () async {
+          await formProvider.saveDraft();
+          shouldPop = true;
+        },
+        onCancel: () {
+          shouldPop = true;
+        },
       );
 
-      return result != null;
+      return shouldPop ?? false;
     }
 
     return true;

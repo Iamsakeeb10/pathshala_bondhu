@@ -14,10 +14,14 @@ import '../services/teacher_attendance_service.dart';
 
 /// Mark/Update Teacher Attendance Screen
 class MarkAttendanceScreen extends StatefulWidget {
-  final TeacherAttendanceModel? attendance;
+  final int? attendanceId;
   final DateTime date;
 
-  const MarkAttendanceScreen({super.key, this.attendance, required this.date});
+  const MarkAttendanceScreen({
+    super.key,
+    this.attendanceId,
+    required this.date,
+  });
 
   @override
   State<MarkAttendanceScreen> createState() => _MarkAttendanceScreenState();
@@ -31,12 +35,21 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
 
   String _selectedStatus = 'present';
   bool _isSubmitting = false;
+  TeacherAttendanceModel? _attendance;
+  bool _isLoadingAttendance = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeForm();
-    _ensureProfileLoaded();
+    // Defer async operations to after build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ensureProfileLoaded();
+      if (widget.attendanceId != null) {
+        _loadAttendance();
+      } else {
+        _initializeForm();
+      }
+    });
   }
 
   Future<void> _ensureProfileLoaded() async {
@@ -48,21 +61,47 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     }
   }
 
+  Future<void> _loadAttendance() async {
+    if (widget.attendanceId == null) return;
+
+    setState(() => _isLoadingAttendance = true);
+
+    try {
+      final service = TeacherAttendanceService();
+      final dateStr = DateFormat('yyyy-MM-dd').format(widget.date);
+      final attendances = await service.getAttendanceByDate(dateStr);
+      
+      _attendance = attendances.firstWhere(
+        (a) => a.id == widget.attendanceId,
+        orElse: () => attendances.first,
+      );
+      
+      _initializeForm();
+    } catch (e) {
+      print('❌ Error loading attendance: $e');
+      // Continue without attendance data
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingAttendance = false);
+      }
+    }
+  }
+
   void _initializeForm() {
-    if (widget.attendance != null) {
-      _selectedStatus = widget.attendance!.status;
+    if (_attendance != null) {
+      _selectedStatus = _attendance!.status;
       // Convert 24-hour format from API to 12-hour format for display
-      if (widget.attendance!.checkInTime != null) {
+      if (_attendance!.checkInTime != null) {
         _checkInController.text = _convert24To12Hour(
-          widget.attendance!.checkInTime!,
+          _attendance!.checkInTime!,
         );
       }
-      if (widget.attendance!.checkOutTime != null) {
+      if (_attendance!.checkOutTime != null) {
         _checkOutController.text = _convert24To12Hour(
-          widget.attendance!.checkOutTime!,
+          _attendance!.checkOutTime!,
         );
       }
-      _remarksController.text = widget.attendance!.remarks ?? '';
+      _remarksController.text = _attendance!.remarks ?? '';
     } else {
       // Default to current time for check-in
       final now = TimeOfDay.now();
@@ -81,8 +120,25 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final isUpdate = widget.attendance != null;
-    final teacher = widget.attendance?.teacher;
+    
+    if (_isLoadingAttendance) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Column(
+          children: [
+            CustomAppBar(
+              title: localizations.translate('mark_attendance'),
+            ),
+            const Expanded(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    final isUpdate = _attendance != null;
+    final teacher = _attendance?.teacher;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -767,8 +823,8 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
       buttonIcon = Icons.login_rounded;
       buttonStartColor = Colors.green.shade600;
       buttonEndColor = Colors.green.shade800;
-    } else if (widget.attendance?.checkInTime != null &&
-        widget.attendance?.checkOutTime == null) {
+    } else if (_attendance?.checkInTime != null &&
+        _attendance?.checkOutTime == null) {
       // Case 2: Checked in but not checked out - Show Check Out
       buttonText = 'Check Out';
       buttonIcon = Icons.logout_rounded;
@@ -933,11 +989,16 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              widget.attendance != null
+              _attendance != null
                   ? localizations.translate('attendance_updated_successfully')
                   : localizations.translate('attendance_marked_successfully'),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
           ),
         );
 
@@ -949,7 +1010,12 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16.w),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
           ),
         );
       }

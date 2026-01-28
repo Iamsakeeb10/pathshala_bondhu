@@ -10,6 +10,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../../../../shared/utils/app_colors.dart';
 import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../../shared/widgets/gradient_button.dart';
+import '../../../../shared/widgets/modern_alert.dart';
 import '../../data/models/question_model.dart';
 import '../../presentation/providers/question_bank_list_provider.dart';
 import '../../utils/question_bank_translations.dart';
@@ -730,48 +731,46 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   void _showDeleteConfirmation(BuildContext context, bool isBangla) {
     String t(String key) => QuestionBankTranslations.t(key, isBangla);
 
-    showDialog(
+    ModernAlert.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(t('qb_confirm_delete')),
-        content: Text(t('qb_delete_message')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(t('qb_cancel')),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                final listProvider = context.read<QuestionBankListProvider>();
-                await listProvider.deleteQuestion(_question!.id!);
-                if (context.mounted) {
-                  context.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(t('qb_deleted')),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${t('qb_error')}: $e'),
-                      backgroundColor: AppColors.error,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              }
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(t('qb_delete')),
-          ),
-        ],
-      ),
+      type: AlertType.warning,
+      title: t('qb_delete_title'),
+      message: '${t('qb_delete_confirm')}\n\n${_question!.previewText}\n\n${t('qb_delete_warning')}',
+      confirmText: t('qb_delete'),
+      cancelText: t('qb_cancel'),
+      onConfirm: () async {
+        try {
+          final listProvider = context.read<QuestionBankListProvider>();
+          await listProvider.deleteQuestion(_question!.id!);
+          if (context.mounted) {
+            context.pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(t('qb_deleted')),
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.all(16.w),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${t('qb_error')}: $e'),
+                backgroundColor: AppColors.error,
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.all(16.w),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+            );
+          }
+        }
+      },
     );
   }
 }

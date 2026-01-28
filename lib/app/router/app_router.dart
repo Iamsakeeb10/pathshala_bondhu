@@ -35,7 +35,6 @@ import '../../features/results/ui/result_screen.dart';
 import '../../features/routines/presentation/screens/teacher_routine_screen.dart';
 import '../../features/routines/ui/class_routine_screen.dart';
 // Import new teacher attendance management screens
-import '../../features/teacher_attendance/models/teacher_attendance_model.dart';
 import '../../features/teacher_attendance/screens/mark_attendance_screen.dart';
 import '../../features/teacher_attendance/screens/teacher_attendance_list_screen.dart';
 import '../../features/teacher_attendance/ui/teacher_attendance_screen.dart';
@@ -284,11 +283,31 @@ class AppRouter {
         path: '/teacher-attendance/mark',
         name: 'mark-teacher-attendance',
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          final attendance = extra?['attendance'] as TeacherAttendanceModel?;
-          final date = extra?['date'] as DateTime? ?? DateTime.now();
+          // Parse query parameters for primitive types
+          final attendanceIdStr = state.uri.queryParameters['attendanceId'];
+          final dateStr = state.uri.queryParameters['date'];
+          
+          // Parse date from ISO string or use current date
+          DateTime date = DateTime.now();
+          if (dateStr != null && dateStr.isNotEmpty) {
+            try {
+              date = DateTime.parse(dateStr);
+            } catch (e) {
+              // If parsing fails, use current date
+              date = DateTime.now();
+            }
+          }
+          
+          // Parse attendance ID if provided
+          int? attendanceId;
+          if (attendanceIdStr != null && attendanceIdStr.isNotEmpty) {
+            attendanceId = int.tryParse(attendanceIdStr);
+          }
 
-          return MarkAttendanceScreen(attendance: attendance, date: date);
+          return MarkAttendanceScreen(
+            attendanceId: attendanceId,
+            date: date,
+          );
         },
       ),
 
