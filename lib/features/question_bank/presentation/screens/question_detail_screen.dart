@@ -481,6 +481,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
         final option = entry.value;
         final label = String.fromCharCode(65 + index);
 
+
         return Container(
           margin: EdgeInsets.only(bottom: 10.h),
           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
@@ -735,7 +736,8 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       context: context,
       type: AlertType.warning,
       title: t('qb_delete_title'),
-      message: '${t('qb_delete_confirm')}\n\n${_question!.previewText}\n\n${t('qb_delete_warning')}',
+      message:
+          '${t('qb_delete_confirm')}\n\n${_question!.previewText}\n\n${t('qb_delete_warning')}',
       confirmText: t('qb_delete'),
       cancelText: t('qb_cancel'),
       onConfirm: () async {

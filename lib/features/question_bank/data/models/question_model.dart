@@ -136,10 +136,35 @@ class QuestionOption {
   });
 
   factory QuestionOption.fromJson(Map<String, dynamic> json) {
+    // Try multiple possible field names for option text
+    final text = json['text'] as String? ??
+        json['option_text'] as String? ??
+        json['optionText'] as String? ??
+        json['value'] as String? ??
+        json['content'] as String? ??
+        json['label'] as String? ??
+        '';
+    
+    // Parse isCorrect from multiple possible formats
+    bool isCorrect = false;
+    if (json['is_correct'] != null) {
+      if (json['is_correct'] is bool) {
+        isCorrect = json['is_correct'] as bool;
+      } else if (json['is_correct'] == 1 || json['is_correct'] == '1') {
+        isCorrect = true;
+      }
+    } else if (json['isCorrect'] != null) {
+      if (json['isCorrect'] is bool) {
+        isCorrect = json['isCorrect'] as bool;
+      } else if (json['isCorrect'] == 1 || json['isCorrect'] == '1') {
+        isCorrect = true;
+      }
+    }
+    
     return QuestionOption(
       id: json['id']?.toString(),
-      text: json['text'] as String? ?? '',
-      isCorrect: json['is_correct'] as bool? ?? false,
+      text: text,
+      isCorrect: isCorrect,
       marks: json['marks'] != null
           ? double.tryParse(json['marks'].toString())
           : null,
