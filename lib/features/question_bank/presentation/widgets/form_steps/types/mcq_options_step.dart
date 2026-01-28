@@ -169,11 +169,19 @@ class _MCQOptionTile extends StatefulWidget {
 
 class _MCQOptionTileState extends State<_MCQOptionTile> {
   late TextEditingController _controller;
+  late FocusNode _focusNode;
+  bool _isFocused = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.option.text);
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
   }
 
   @override
@@ -189,90 +197,210 @@ class _MCQOptionTileState extends State<_MCQOptionTile> {
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isCorrect = widget.option.isCorrect;
+    final borderColor = isCorrect
+        ? AppColors.success
+        : _isFocused
+        ? AppColors.primary
+        : (widget.isDark
+              ? AppColors.borderDark.withOpacity(0.3)
+              : AppColors.grey300.withOpacity(0.5));
+    final bgColor = isCorrect
+        ? AppColors.success.withOpacity(0.08)
+        : (widget.isDark ? AppColors.surfaceDark : Colors.white);
+
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
-      child: Container(
-        decoration: BoxDecoration(
-          color: widget.option.isCorrect
-              ? AppColors.success.withOpacity(0.08)
-              : (widget.isDark ? AppColors.surfaceDark : Colors.white),
+      padding: EdgeInsets.only(bottom: 14.h),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: widget.option.isCorrect
-                ? AppColors.success
-                : (widget.isDark ? AppColors.borderDark : AppColors.border),
-            width: widget.option.isCorrect ? 2 : 1,
+          onTap: widget.onCorrectChanged,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: EdgeInsets.all(0),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: borderColor,
+                width: isCorrect || _isFocused ? 2 : 1,
+              ),
+              boxShadow: isCorrect
+                  ? [
+                      BoxShadow(
+                        color: AppColors.success.withOpacity(0.10),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Selection indicator (vertical, left)
+                Padding(
+                  padding: EdgeInsets.only(left: 10.w, top: 18.h, right: 0),
+                  child: GestureDetector(
+                    onTap: widget.onCorrectChanged,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 24.w,
+                      height: 24.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isCorrect
+                            ? AppColors.success
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: isCorrect
+                              ? AppColors.success
+                              : (widget.isDark
+                                    ? AppColors.grey500
+                                    : AppColors.grey400),
+                          width: isCorrect ? 0 : 2,
+                        ),
+                      ),
+                      child: isCorrect
+                          ? Icon(
+                              Icons.check_rounded,
+                              size: 16.sp,
+                              color: Colors.white,
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                // Main content
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 12.h,
+                      horizontal: 0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 28.w,
+                              height: 28.w,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7.r),
+                                color: isCorrect
+                                    ? AppColors.success
+                                    : (widget.isDark
+                                          ? AppColors.grey700
+                                          : AppColors.grey200),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  widget.label,
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: isCorrect
+                                        ? Colors.white
+                                        : (widget.isDark
+                                              ? Colors.white
+                                              : AppColors.textPrimary),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            if (isCorrect)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 4.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.success,
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                                child: Text(
+                                  widget.isBangla ? 'সঠিক' : 'Correct',
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+                        // Option text field
+                        TextField(
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          decoration: InputDecoration(
+                            hintText: widget.isBangla
+                                ? 'অপশন ${widget.label} লিখুন'
+                                : 'Enter option ${widget.label}',
+                            filled: true,
+                            fillColor: widget.isDark
+                                ? AppColors.grey800
+                                : AppColors.grey100,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 14.w,
+                              vertical: 12.h,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                              borderSide: BorderSide(
+                                color: _isFocused
+                                    ? AppColors.primary.withOpacity(0.5)
+                                    : (widget.isDark
+                                          ? AppColors.borderDark.withOpacity(
+                                              0.15,
+                                            )
+                                          : AppColors.grey300.withOpacity(0.5)),
+                                width: 1,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                              borderSide: BorderSide(
+                                color: AppColors.primary,
+                                width: 2,
+                              ),
+                            ),
+                            hintStyle: TextStyle(
+                              fontSize: 13.sp,
+                              color: widget.isDark
+                                  ? AppColors.textDarkSecondary.withOpacity(0.5)
+                                  : AppColors.textSecondary.withOpacity(0.5),
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: widget.isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
+                          ),
+                          onChanged: widget.onTextChanged,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10.w),
+              ],
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            SizedBox(width: 12.w),
-
-            // Radio button
-            Radio<bool>(
-              value: true,
-              groupValue: widget.option.isCorrect,
-              activeColor: AppColors.success,
-              onChanged: (_) => widget.onCorrectChanged(),
-            ),
-
-            // Option label (A, B, C, D)
-            Container(
-              width: 32.w,
-              height: 32.w,
-              decoration: BoxDecoration(
-                color: widget.option.isCorrect
-                    ? AppColors.success
-                    : (widget.isDark ? AppColors.grey600 : AppColors.grey300),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: widget.option.isCorrect
-                        ? Colors.white
-                        : (widget.isDark
-                              ? Colors.white
-                              : AppColors.textPrimary),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: 12.w),
-
-            // Text field
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                  hintText: widget.isBangla
-                      ? 'অপশন ${widget.label} লিখুন'
-                      : 'Enter option ${widget.label}',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12.h),
-                  hintStyle: TextStyle(
-                    color: widget.isDark
-                        ? AppColors.textDarkSecondary.withOpacity(0.6)
-                        : AppColors.textSecondary.withOpacity(0.6),
-                  ),
-                ),
-                style: TextStyle(
-                  color: widget.isDark ? Colors.white : AppColors.textPrimary,
-                ),
-                onChanged: widget.onTextChanged,
-              ),
-            ),
-
-            SizedBox(width: 12.w),
-          ],
         ),
       ),
     );
