@@ -21,6 +21,8 @@ class BasicInfoStep extends StatefulWidget {
 class _BasicInfoStepState extends State<BasicInfoStep> {
   final _questionTextController = TextEditingController();
   final _questionTextFocusNode = FocusNode();
+  final _customMarksController = TextEditingController();
+  final _customMarksFocusNode = FocusNode();
 
   bool get _isBangla {
     final locale = Localizations.localeOf(context);
@@ -35,13 +37,20 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final formProvider = context.read<QuestionBankFormProvider>();
       _questionTextController.text = formProvider.questionText;
+      _customMarksController.text = formProvider.marks.toString();
     });
+
+    // Listen to focus changes to rebuild UI
+    _questionTextFocusNode.addListener(() => setState(() {}));
+    _customMarksFocusNode.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _questionTextController.dispose();
     _questionTextFocusNode.dispose();
+    _customMarksController.dispose();
+    _customMarksFocusNode.dispose();
     super.dispose();
   }
 
@@ -52,53 +61,65 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     final formProvider = context.watch<QuestionBankFormProvider>();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Class dropdown
-          _buildLabel(_t('qb_class'), true),
-          SizedBox(height: 8.h),
-          _buildClassDropdown(listProvider, formProvider, isDark),
-          SizedBox(height: 20.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 600.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Class dropdown
+              _buildLabel(_t('qb_class'), true, Icons.school_outlined),
+              SizedBox(height: 8.h),
+              _buildClassDropdown(listProvider, formProvider, isDark),
+              SizedBox(height: 16.h),
 
-          // Subject dropdown
-          _buildLabel(_t('qb_subject'), true),
-          SizedBox(height: 8.h),
-          _buildSubjectDropdown(listProvider, formProvider, isDark),
-          SizedBox(height: 20.h),
+              // Subject dropdown
+              _buildLabel(_t('qb_subject'), true, Icons.book_outlined),
+              SizedBox(height: 8.h),
+              _buildSubjectDropdown(listProvider, formProvider, isDark),
+              SizedBox(height: 16.h),
 
-          // Marks input
-          _buildLabel(_t('qb_marks'), true),
-          SizedBox(height: 8.h),
-          _buildMarksInput(formProvider, isDark),
-          SizedBox(height: 20.h),
+              // Marks input
+              _buildLabel(_t('qb_marks'), true, Icons.grade_outlined),
+              SizedBox(height: 8.h),
+              _buildMarksInput(formProvider, isDark),
+              SizedBox(height: 16.h),
 
-          // Question text
-          _buildLabel(_t('qb_question_text'), true),
-          SizedBox(height: 8.h),
-          _buildQuestionTextInput(formProvider, isDark),
+              // Question text
+              _buildLabel(_t('qb_question_text'), true, Icons.edit_outlined),
+              SizedBox(height: 8.h),
+              // Question text input
+              _buildQuestionTextInput(formProvider, isDark),
 
-          // Validation errors
-          if (formProvider.validationErrors.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(top: 16.h),
-              child: _buildValidationErrors(formProvider),
-            ),
-        ],
+              // Validation errors
+              if (formProvider.validationErrors.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(top: 16.h),
+                  child: _buildValidationErrors(formProvider),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildLabel(String label, bool required) {
+  Widget _buildLabel(String label, bool required, IconData icon) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Row(
       children: [
+        Icon(
+          icon,
+          size: 16.sp,
+          color: isDark ? AppColors.textDarkSecondary : AppColors.textSecondary,
+        ),
+        SizedBox(width: 6.w),
         Text(
           label,
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 13.sp,
             fontWeight: FontWeight.w600,
             color: isDark ? Colors.white : AppColors.textPrimary,
           ),
@@ -106,7 +127,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         if (required)
           Text(
             ' *',
-            style: TextStyle(fontSize: 14.sp, color: AppColors.error),
+            style: TextStyle(fontSize: 13.sp, color: AppColors.error),
           ),
       ],
     );
@@ -120,21 +141,34 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: formProvider.validationErrors['class'] != null
               ? AppColors.error
-              : (isDark ? AppColors.borderDark : AppColors.border),
+              : (isDark
+                    ? AppColors.borderDark.withOpacity(0.3)
+                    : AppColors.grey300.withOpacity(0.5)),
+          width: 1,
         ),
       ),
       child: DropdownButtonFormField<int>(
         value: formProvider.selectedClass?.id,
         isExpanded: true,
+        style: TextStyle(
+          fontSize: 13.sp,
+          color: isDark ? Colors.white : AppColors.textPrimary,
+        ),
         decoration: InputDecoration(
           hintText: _t('qb_class_hint'),
+          hintStyle: TextStyle(
+            fontSize: 13.sp,
+            color: isDark
+                ? AppColors.textDarkSecondary
+                : AppColors.textSecondary,
+          ),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
-            horizontal: 16.w,
+            horizontal: 14.w,
             vertical: 12.h,
           ),
         ),
@@ -159,21 +193,34 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: formProvider.validationErrors['subject'] != null
               ? AppColors.error
-              : (isDark ? AppColors.borderDark : AppColors.border),
+              : (isDark
+                    ? AppColors.borderDark.withOpacity(0.3)
+                    : AppColors.grey300.withOpacity(0.5)),
+          width: 1,
         ),
       ),
       child: DropdownButtonFormField<int>(
         value: formProvider.selectedSubject?.id,
         isExpanded: true,
+        style: TextStyle(
+          fontSize: 13.sp,
+          color: isDark ? Colors.white : AppColors.textPrimary,
+        ),
         decoration: InputDecoration(
           hintText: _t('qb_subject_hint'),
+          hintStyle: TextStyle(
+            fontSize: 13.sp,
+            color: isDark
+                ? AppColors.textDarkSecondary
+                : AppColors.textSecondary,
+          ),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
-            horizontal: 16.w,
+            horizontal: 14.w,
             vertical: 12.h,
           ),
         ),
@@ -205,25 +252,35 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             return GestureDetector(
               onTap: () => formProvider.updateBasicInfo(marks: marks),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
                 decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? LinearGradient(
+                          colors: [AppColors.primary, AppColors.primaryDark],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
                   color: isSelected
-                      ? AppColors.primary
+                      ? null
                       : (isDark ? AppColors.surfaceDark : Colors.white),
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
                     color: isSelected
-                        ? AppColors.primary
-                        : (isDark ? AppColors.borderDark : AppColors.border),
+                        ? Colors.transparent
+                        : (isDark
+                              ? AppColors.borderDark.withOpacity(0.3)
+                              : AppColors.grey300.withOpacity(0.5)),
+                    width: 1,
                   ),
                 ),
                 child: Text(
                   '$marks',
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
                     color: isSelected
-                        ? AppColors.textPrimary
+                        ? Colors.white
                         : (isDark ? Colors.white : AppColors.textPrimary),
                   ),
                 ),
@@ -231,7 +288,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             );
           }).toList(),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 10.h),
 
         // Custom marks input
         Row(
@@ -239,31 +296,49 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             Text(
               'Custom:',
               style: TextStyle(
-                fontSize: 13.sp,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
                 color: isDark
                     ? AppColors.textDarkSecondary
                     : AppColors.textSecondary,
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 10.w),
             SizedBox(
-              width: 80.w,
+              width: 70.w,
               child: TextFormField(
-                initialValue: formProvider.marks.toString(),
+                controller: _customMarksController,
+                focusNode: _customMarksFocusNode,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                 ],
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
                 decoration: InputDecoration(
                   isDense: true,
+                  filled: true,
+                  fillColor: isDark ? AppColors.surfaceDark : Colors.white,
                   contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
+                    horizontal: 10.w,
                     vertical: 10.h,
                   ),
-                  border: OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.r),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? AppColors.borderDark.withOpacity(0.3)
+                          : AppColors.grey300.withOpacity(0.5),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                    borderSide: BorderSide(color: AppColors.primary, width: 2),
                   ),
                 ),
                 onChanged: (value) {
@@ -278,10 +353,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         ),
         if (formProvider.validationErrors['marks'] != null)
           Padding(
-            padding: EdgeInsets.only(top: 4.h),
+            padding: EdgeInsets.only(top: 6.h),
             child: Text(
               formProvider.validationErrors['marks']!,
-              style: TextStyle(fontSize: 12.sp, color: AppColors.error),
+              style: TextStyle(fontSize: 11.sp, color: AppColors.error),
             ),
           ),
       ],
@@ -292,49 +367,79 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     QuestionBankFormProvider formProvider,
     bool isDark,
   ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: formProvider.validationErrors['questionText'] != null
-              ? AppColors.error
-              : (isDark ? AppColors.borderDark : AppColors.border),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          TextFormField(
-            controller: _questionTextController,
-            focusNode: _questionTextFocusNode,
-            minLines: 4,
-            maxLines: 8,
-            maxLength: 2000,
-            decoration: InputDecoration(
-              hintText: _t('qb_question_text_hint'),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.all(16.w),
-              counterText: '',
-            ),
-            onChanged: (value) {
-              formProvider.updateBasicInfo(questionText: value);
-            },
+    final hasError = formProvider.validationErrors['questionText'] != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: _questionTextController,
+          focusNode: _questionTextFocusNode,
+          minLines: 4,
+          maxLines: 8,
+          maxLength: 2000,
+          style: TextStyle(
+            fontSize: 13.sp,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+            height: 1.4,
           ),
-          Padding(
-            padding: EdgeInsets.only(right: 12.w, bottom: 8.h),
-            child: Text(
-              '${_questionTextController.text.length}/2000',
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: isDark
-                    ? AppColors.textDarkSecondary
-                    : AppColors.textSecondary,
+          decoration: InputDecoration(
+            hintText: _t('qb_question_text_hint'),
+            hintStyle: TextStyle(
+              fontSize: 13.sp,
+              color: isDark
+                  ? AppColors.textDarkSecondary
+                  : AppColors.textSecondary,
+            ),
+            filled: true,
+            fillColor: isDark ? AppColors.surfaceDark : Colors.white,
+            contentPadding: EdgeInsets.all(14.w),
+            counterStyle: TextStyle(
+              fontSize: 11.sp,
+              color: isDark
+                  ? AppColors.textDarkSecondary
+                  : AppColors.textSecondary,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(
+                color: hasError
+                    ? AppColors.error
+                    : (isDark
+                          ? AppColors.borderDark.withOpacity(0.3)
+                          : AppColors.grey300.withOpacity(0.5)),
+                width: 1,
               ),
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(
+                color: hasError ? AppColors.error : AppColors.primary,
+                width: 2,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(color: AppColors.error, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              borderSide: BorderSide(color: AppColors.error, width: 2),
+            ),
           ),
-        ],
-      ),
+          onChanged: (value) {
+            formProvider.updateBasicInfo(questionText: value);
+          },
+        ),
+        if (hasError)
+          Padding(
+            padding: EdgeInsets.only(top: 6.h),
+            child: Text(
+              formProvider.validationErrors['questionText']!,
+              style: TextStyle(fontSize: 11.sp, color: AppColors.error),
+            ),
+          ),
+      ],
     );
   }
 
