@@ -198,6 +198,17 @@ class QuestionBankFormProvider extends ChangeNotifier {
 
   // ========== MCQ Options Methods ==========
 
+  /// Initialize MCQ options with exactly 4 empty options (Bangladeshi standard)
+  void initializeMCQOptions() {
+    if (_selectedType == QuestionType.mcq && _options.length != 4) {
+      _options = List.generate(
+        4,
+        (index) => QuestionOption(text: '', isCorrect: false),
+      );
+      notifyListeners();
+    }
+  }
+
   /// Update options (for MCQ)
   void updateOptions(List<QuestionOption> options) {
     _options = options;
@@ -206,17 +217,20 @@ class QuestionBankFormProvider extends ChangeNotifier {
     _scheduleDraftSave();
   }
 
-  /// Add new option
+  /// Add new option (Not used for MCQ - always exactly 4 options)
   void addOption() {
-    if (_selectedType == QuestionType.mcq && _options.length >= 6) return;
+    // MCQ always has exactly 4 options - no adding allowed
+    if (_selectedType == QuestionType.mcq) return;
 
     _options.add(QuestionOption(text: '', isCorrect: false));
     _validate();
     notifyListeners();
   }
 
-  /// Remove option at index
+  /// Remove option at index (Not used for MCQ - always exactly 4 options)
   void removeOption(int index) {
+    // MCQ always has exactly 4 options - no removing allowed
+    if (_selectedType == QuestionType.mcq) return;
     if (_options.length <= 2) return;
     _options.removeAt(index);
     _validate();
@@ -429,10 +443,11 @@ class QuestionBankFormProvider extends ChangeNotifier {
 
     switch (_selectedType!) {
       case QuestionType.mcq:
-        // At least 2 options with text, exactly 1 correct
-        final validOptions = _options.where((o) => o.text.isNotEmpty).length;
+        // Exactly 4 options, all filled, exactly 1 correct (Bangladeshi standard)
+        if (_options.length != 4) return false;
+        final allFilled = _options.every((o) => o.text.trim().isNotEmpty);
         final correctCount = _options.where((o) => o.isCorrect).length;
-        return validOptions >= 2 && correctCount == 1;
+        return allFilled && correctCount == 1;
 
       case QuestionType.trueFalse:
         // Must have selected true or false
@@ -511,13 +526,18 @@ class QuestionBankFormProvider extends ChangeNotifier {
   void _validateTypeSpecificFields() {
     switch (_selectedType!) {
       case QuestionType.mcq:
-        final validOptions = _options.where((o) => o.text.isNotEmpty).length;
-        final correctCount = _options.where((o) => o.isCorrect).length;
-        if (validOptions < 2) {
-          _validationErrors['options'] = 'Add at least 2 options';
+        if (_options.length != 4) {
+          _validationErrors['options'] =
+              'MCQ must have exactly 4 options (A, B, C, D)';
+          return;
         }
+        final emptyOptions = _options.where((o) => o.text.trim().isEmpty);
+        if (emptyOptions.isNotEmpty) {
+          _validationErrors['options'] = 'All MCQ options are required';
+        }
+        final correctCount = _options.where((o) => o.isCorrect).length;
         if (correctCount != 1) {
-          _validationErrors['correct'] = 'Select exactly one correct answer';
+          _validationErrors['correct'] = 'Please select one correct answer';
         }
         break;
 

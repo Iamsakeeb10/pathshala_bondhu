@@ -31,7 +31,7 @@ class QuestionBankTranslations {
       'qb_pull_refresh': 'Pull to refresh',
 
       // Question Types
-      'qb_type_mcq': 'Multiple Choice',
+      'qb_type_mcq': 'MCQ',
       'qb_type_mcq_desc':
           'Questions with multiple options and one correct answer',
       'qb_type_true_false': 'True/False',

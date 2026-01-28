@@ -1,5 +1,5 @@
 /// MCQ Options Step
-/// Form for Multiple Choice Question options
+/// Form for MCQ (Multiple Choice Question) options
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,6 +21,13 @@ class MCQOptionsStep extends StatelessWidget {
 
     String t(String key) => QuestionBankTranslations.t(key, isBangla);
 
+    // Ensure exactly 4 options for MCQ (Bangladeshi standard)
+    if (formProvider.options.length != 4) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        formProvider.initializeMCQOptions();
+      });
+    }
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.w),
       child: Column(
@@ -28,7 +35,7 @@ class MCQOptionsStep extends StatelessWidget {
         children: [
           // Header
           Text(
-            t('qb_options'),
+            '${t('qb_options')} (MCQ)',
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
@@ -47,49 +54,54 @@ class MCQOptionsStep extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
 
-          // Options list
-          ReorderableListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: formProvider.options.length,
-            onReorder: formProvider.reorderOptions,
-            itemBuilder: (context, index) {
-              final option = formProvider.options[index];
-              final optionLabel = String.fromCharCode(
-                65 + index,
-              ); // A, B, C, D...
+          // Exactly 4 options (A, B, C, D)
+          ...List.generate(4, (index) {
+            final option = formProvider.options.length > index
+                ? formProvider.options[index]
+                : QuestionOption(text: '', isCorrect: false);
+            final optionLabel = String.fromCharCode(65 + index); // A, B, C, D
 
-              return _MCQOptionTile(
-                key: ValueKey('option_$index'),
-                index: index,
-                label: optionLabel,
-                option: option,
-                isDark: isDark,
-                onTextChanged: (text) {
-                  formProvider.updateOption(index, option.copyWith(text: text));
-                },
-                onCorrectChanged: () {
-                  formProvider.setCorrectAnswer(index);
-                },
-                onRemove: formProvider.options.length > 2
-                    ? () => formProvider.removeOption(index)
-                    : null,
-              );
-            },
-          ),
+            return _MCQOptionTile(
+              key: ValueKey('option_$index'),
+              index: index,
+              label: optionLabel,
+              option: option,
+              isDark: isDark,
+              isBangla: isBangla,
+              onTextChanged: (text) {
+                formProvider.updateOption(index, option.copyWith(text: text));
+              },
+              onCorrectChanged: () {
+                formProvider.setCorrectAnswer(index);
+              },
+            );
+          }),
 
           SizedBox(height: 16.h),
 
-          // Add option button
-          if (formProvider.options.length < 6)
-            Center(
-              child: TextButton.icon(
-                onPressed: formProvider.addOption,
-                icon: const Icon(Icons.add_circle_outline),
-                label: Text(t('qb_add_option')),
-                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-              ),
+          // Info box
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.info.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: AppColors.info.withOpacity(0.3)),
             ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, size: 18.sp, color: AppColors.info),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    isBangla
+                        ? 'MCQ প্রশ্নে ঠিক ৪টি অপশন থাকবে (A, B, C, D) এবং একটি সঠিক উত্তর নির্বাচন করুন'
+                        : 'MCQ must have exactly 4 options (A, B, C, D). Select one correct answer.',
+                    style: TextStyle(fontSize: 12.sp, color: AppColors.info),
+                  ),
+                ),
+              ],
+            ),
+          ),
 
           // Validation errors
           if (formProvider.validationErrors['options'] != null ||
@@ -131,14 +143,14 @@ class MCQOptionsStep extends StatelessWidget {
   }
 }
 
-class _MCQOptionTile extends StatelessWidget {
+class _MCQOptionTile extends StatefulWidget {
   final int index;
   final String label;
   final QuestionOption option;
   final bool isDark;
+  final bool isBangla;
   final ValueChanged<String> onTextChanged;
   final VoidCallback onCorrectChanged;
-  final VoidCallback? onRemove;
 
   const _MCQOptionTile({
     super.key,
@@ -146,10 +158,39 @@ class _MCQOptionTile extends StatelessWidget {
     required this.label,
     required this.option,
     required this.isDark,
+    required this.isBangla,
     required this.onTextChanged,
     required this.onCorrectChanged,
-    this.onRemove,
   });
+
+  @override
+  State<_MCQOptionTile> createState() => _MCQOptionTileState();
+}
+
+class _MCQOptionTileState extends State<_MCQOptionTile> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.option.text);
+  }
+
+  @override
+  void didUpdateWidget(_MCQOptionTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update controller if the option text changed externally
+    if (widget.option.text != oldWidget.option.text &&
+        _controller.text != widget.option.text) {
+      _controller.text = widget.option.text;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,48 +198,50 @@ class _MCQOptionTile extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 12.h),
       child: Container(
         decoration: BoxDecoration(
-          color: option.isCorrect
-              ? AppColors.success.withOpacity(0.1)
-              : (isDark ? AppColors.surfaceDark : Colors.white),
+          color: widget.option.isCorrect
+              ? AppColors.success.withOpacity(0.08)
+              : (widget.isDark ? AppColors.surfaceDark : Colors.white),
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: option.isCorrect
+            color: widget.option.isCorrect
                 ? AppColors.success
-                : (isDark ? AppColors.borderDark : AppColors.border),
-            width: option.isCorrect ? 2 : 1,
+                : (widget.isDark ? AppColors.borderDark : AppColors.border),
+            width: widget.option.isCorrect ? 2 : 1,
           ),
         ),
         child: Row(
           children: [
-            // Drag handle
-            ReorderableDragStartListener(
-              index: index,
-              child: Container(
-                padding: EdgeInsets.all(12.w),
-                child: Icon(
-                  Icons.drag_handle,
-                  color: isDark ? AppColors.grey500 : AppColors.grey400,
-                ),
-              ),
+            SizedBox(width: 12.w),
+
+            // Radio button
+            Radio<bool>(
+              value: true,
+              groupValue: widget.option.isCorrect,
+              activeColor: AppColors.success,
+              onChanged: (_) => widget.onCorrectChanged(),
             ),
 
-            // Option label
+            // Option label (A, B, C, D)
             Container(
               width: 32.w,
               height: 32.w,
               decoration: BoxDecoration(
-                color: option.isCorrect ? AppColors.success : AppColors.grey300,
+                color: widget.option.isCorrect
+                    ? AppColors.success
+                    : (widget.isDark ? AppColors.grey600 : AppColors.grey300),
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
-                  label,
+                  widget.label,
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
-                    color: option.isCorrect
+                    color: widget.option.isCorrect
                         ? Colors.white
-                        : AppColors.textPrimary,
+                        : (widget.isDark
+                              ? Colors.white
+                              : AppColors.textPrimary),
                   ),
                 ),
               ),
@@ -207,34 +250,28 @@ class _MCQOptionTile extends StatelessWidget {
 
             // Text field
             Expanded(
-              child: TextFormField(
-                initialValue: option.text,
+              child: TextField(
+                controller: _controller,
                 decoration: InputDecoration(
-                  hintText: 'Option $label',
+                  hintText: widget.isBangla
+                      ? 'অপশন ${widget.label} লিখুন'
+                      : 'Enter option ${widget.label}',
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                  hintStyle: TextStyle(
+                    color: widget.isDark
+                        ? AppColors.textDarkSecondary.withOpacity(0.6)
+                        : AppColors.textSecondary.withOpacity(0.6),
+                  ),
                 ),
-                onChanged: onTextChanged,
+                style: TextStyle(
+                  color: widget.isDark ? Colors.white : AppColors.textPrimary,
+                ),
+                onChanged: widget.onTextChanged,
               ),
             ),
 
-            // Correct answer radio
-            Radio<bool>(
-              value: true,
-              groupValue: option.isCorrect,
-              activeColor: AppColors.success,
-              onChanged: (_) => onCorrectChanged(),
-            ),
-
-            // Remove button
-            if (onRemove != null)
-              IconButton(
-                icon: Icon(
-                  Icons.remove_circle_outline,
-                  color: AppColors.error.withOpacity(0.7),
-                ),
-                onPressed: onRemove,
-              ),
+            SizedBox(width: 12.w),
           ],
         ),
       ),

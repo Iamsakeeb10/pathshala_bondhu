@@ -213,8 +213,9 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              this.context.push('/question-bank/detail/${question.id}');
+              Navigator.of(context).pop(); // Close dialog
+              Navigator.of(context).pop(); // Go back from form
+              context.push('/question-bank/detail/${question.id}');
             },
             child: Text(_t('qb_view_question')),
           ),

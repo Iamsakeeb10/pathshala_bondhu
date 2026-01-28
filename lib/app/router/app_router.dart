@@ -321,7 +321,7 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: ':id',
+            path: 'detail/:id',
             name: 'question-details',
             builder: (context, state) {
               final id = state.pathParameters['id']!;

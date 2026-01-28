@@ -80,7 +80,7 @@ enum QuestionType {
     } else {
       switch (this) {
         case QuestionType.mcq:
-          return 'Multiple Choice';
+          return 'MCQ';
         case QuestionType.trueFalse:
           return 'True/False';
         case QuestionType.shortAnswer:
