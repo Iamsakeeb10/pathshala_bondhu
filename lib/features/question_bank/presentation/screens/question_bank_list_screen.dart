@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../shared/utils/app_colors.dart';
+import '../../../../shared/widgets/custom_appbar.dart';
 import '../../../../shared/widgets/gradient_button.dart';
 import '../../data/models/question_model.dart';
 import '../../data/services/question_bank_api_service.dart';
@@ -219,143 +220,270 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundDark
-          : AppColors.backgroundLight,
-      appBar: _buildAppBar(isDark),
-      body: Consumer<QuestionBankListProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading && provider.questions.isEmpty) {
-            return _buildLoadingState();
-          }
+    return Consumer<QuestionBankListProvider>(
+      builder: (context, provider, child) {
+        final hasQuestions = provider.questions.isNotEmpty;
 
-          if (provider.errorMessage != null && provider.questions.isEmpty) {
-            return _buildErrorState(provider.errorMessage!);
-          }
+        return Scaffold(
+          backgroundColor: isDark
+              ? AppColors.backgroundDark
+              : AppColors.backgroundLight,
+          body: Column(
+            children: [
+              _buildCustomAppBar(isDark),
+              Expanded(child: _buildBody(provider)),
+            ],
+          ),
+          floatingActionButton: hasQuestions
+              ? _buildFloatingActionButton()
+              : null,
+        );
+      },
+    );
+  }
 
-          if (provider.isEmpty) {
-            return _buildEmptyState();
-          }
+  Widget _buildBody(QuestionBankListProvider provider) {
+    if (provider.isLoading && provider.questions.isEmpty) {
+      return _buildLoadingState();
+    }
 
-          return _buildQuestionList(provider);
-        },
+    if (provider.errorMessage != null && provider.questions.isEmpty) {
+      return _buildErrorState(provider.errorMessage!);
+    }
+
+    if (provider.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return _buildQuestionList(provider);
+  }
+
+  Widget _buildFloatingActionButton() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryDark],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/question-bank/create'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textPrimary,
-        icon: const Icon(Icons.add),
-        label: Text(_t('qb_create')),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push('/question-bank/create'),
+          borderRadius: BorderRadius.circular(16.r),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.add, color: Colors.white, size: 24.sp),
+                SizedBox(width: 8.w),
+                Text(
+                  _t('qb_create'),
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(bool isDark) {
+  Widget _buildCustomAppBar(bool isDark) {
     final listProvider = context.watch<QuestionBankListProvider>();
+    final statusBarHeight = MediaQuery.of(context).padding.top;
 
-    return AppBar(
-      backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-      surfaceTintColor: Colors.transparent,
-      title: _isSearchExpanded
-          ? TextField(
-              controller: _searchController,
-              autofocus: true,
-              decoration: InputDecoration(
-                hintText: _t('qb_search'),
-                border: InputBorder.none,
-                hintStyle: TextStyle(
-                  color: isDark
-                      ? AppColors.textDarkSecondary
-                      : AppColors.textSecondary,
-                ),
-              ),
-              style: TextStyle(
-                color: isDark ? Colors.white : AppColors.textPrimary,
-              ),
-              onChanged: _onSearchChanged,
-            )
-          : Text(
-              _t('qb_title'),
-              style: TextStyle(
-                color: isDark ? Colors.white : AppColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-      leading: IconButton(
-        icon: Icon(
-          _isSearchExpanded ? Icons.close : Icons.arrow_back,
-          color: isDark ? Colors.white : AppColors.textPrimary,
-        ),
-        onPressed: () {
-          if (_isSearchExpanded) {
-            setState(() {
-              _isSearchExpanded = false;
-              _searchController.clear();
-            });
-            listProvider.updateSearchQuery('');
-          } else {
-            context.pop();
-          }
-        },
+    // Professional gradient that matches CustomAppBar
+    final gradientColors = isDark
+        ? [
+            const Color(0xFF283447),
+            const Color(0xFF1F2937),
+            const Color(0xFF111827),
+          ]
+        : [AppColors.primary, AppColors.primaryDark, AppColors.accent];
+
+    return Container(
+      padding: EdgeInsets.only(
+        top: statusBarHeight,
+        left: 16.w,
+        right: 16.w,
+        bottom: 12.h,
       ),
-      actions: [
-        if (!_isSearchExpanded) ...[
-          IconButton(
-            icon: Icon(
-              Icons.search,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
-            onPressed: () => setState(() => _isSearchExpanded = true),
-          ),
-          Stack(
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.filter_list,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.2),
+                  offset: Offset(0, 2.h),
+                  blurRadius: 20.r,
+                  spreadRadius: 4.r,
                 ),
-                onPressed: _showFilters,
-              ),
-              if (listProvider.hasActiveFilters)
-                Positioned(
-                  right: 8.w,
-                  top: 8.h,
-                  child: Container(
-                    width: 8.w,
-                    height: 8.w,
-                    decoration: const BoxDecoration(
-                      color: AppColors.error,
-                      shape: BoxShape.circle,
-                    ),
+              ],
+      ),
+      child: Column(
+        children: [
+          // Top row with back button and actions
+          Row(
+            children: [
+              // Back button
+              InkWell(
+                onTap: () {
+                  if (_isSearchExpanded) {
+                    setState(() {
+                      _isSearchExpanded = false;
+                      _searchController.clear();
+                    });
+                    listProvider.updateSearchQuery('');
+                  } else {
+                    context.pop();
+                  }
+                },
+                borderRadius: BorderRadius.circular(12.r),
+                child: Container(
+                  width: 36.w,
+                  height: 36.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(isDark ? 0.15 : 0.12),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(
+                    _isSearchExpanded
+                        ? Icons.close
+                        : Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 18.sp,
                   ),
                 ),
-            ],
-          ),
-          PopupMenuButton<String>(
-            icon: Icon(
-              Icons.more_vert,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
-            onSelected: (value) {
-              if (value == 'logout') {
-                _showLogoutConfirmation();
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'logout',
-                child: Row(
+              ),
+              SizedBox(width: 12.w),
+
+              // Title or Search field
+              if (_isSearchExpanded)
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: _t('qb_search'),
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 16.sp),
+                    onChanged: _onSearchChanged,
+                  ),
+                )
+              else
+                Text(
+                  _t('qb_title'),
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+
+              const Spacer(),
+
+              // Actions
+              if (!_isSearchExpanded) ...[
+                // Search button
+                IconAction(
+                  icon: Icons.search,
+                  onTap: () => setState(() => _isSearchExpanded = true),
+                ),
+                SizedBox(width: 8.w),
+
+                // Filter button with badge
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    const Icon(Icons.logout, color: AppColors.error),
-                    SizedBox(width: 8.w),
-                    Text(_t('qb_logout')),
+                    IconAction(icon: Icons.filter_list, onTap: _showFilters),
+                    if (listProvider.hasActiveFilters)
+                      Positioned(
+                        right: -2.w,
+                        top: -2.h,
+                        child: Container(
+                          width: 10.w,
+                          height: 10.w,
+                          decoration: BoxDecoration(
+                            color: AppColors.error,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
-              ),
+                SizedBox(width: 8.w),
+
+                // More menu
+                _buildMoreMenu(isDark),
+              ],
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMoreMenu(bool isDark) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'logout') {
+          _showLogoutConfirmation();
+        }
+      },
+      icon: Container(
+        width: 36.w,
+        height: 36.w,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(isDark ? 0.15 : 0.12),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Icon(Icons.more_vert, color: Colors.white, size: 18.sp),
+      ),
+      color: isDark ? AppColors.surfaceDark : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 'logout',
+          child: Row(
+            children: [
+              const Icon(Icons.logout, color: AppColors.error),
+              SizedBox(width: 12.w),
+              Text(
+                _t('qb_logout'),
+                style: TextStyle(
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
