@@ -28,11 +28,13 @@ class QuestionBankListScreen extends StatefulWidget {
   State<QuestionBankListScreen> createState() => _QuestionBankListScreenState();
 }
 
-class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
+class _QuestionBankListScreenState extends State<QuestionBankListScreen>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
   bool _isSearchExpanded = false;
+  late AnimationController _searchAnimationController;
 
   bool get _isBangla {
     final locale = Localizations.localeOf(context);
@@ -45,6 +47,10 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _searchAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAuthAndLoadData();
     });
@@ -55,6 +61,7 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
     _scrollController.dispose();
     _searchController.dispose();
     _searchDebounce?.cancel();
+    _searchAnimationController.dispose();
     super.dispose();
   }
 
@@ -121,6 +128,21 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
     } else {
       if (mounted) context.pop();
     }
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearchExpanded = !_isSearchExpanded;
+
+      if (_isSearchExpanded) {
+        _searchAnimationController.forward();
+      } else {
+        _searchAnimationController.reverse();
+        _searchController.clear();
+        context.read<QuestionBankListProvider>().updateSearchQuery('');
+        FocusScope.of(context).unfocus();
+      }
+    });
   }
 
   void _onSearchChanged(String query) {
@@ -231,6 +253,7 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
           body: Column(
             children: [
               _buildCustomAppBar(isDark),
+              _buildSearchBar(),
               Expanded(child: _buildBody(provider)),
             ],
           ),
@@ -304,6 +327,42 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
     );
   }
 
+  Widget _buildSearchBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return SizeTransition(
+      sizeFactor: CurvedAnimation(
+        parent: _searchAnimationController,
+        curve: Curves.easeInOut,
+      ),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              offset: Offset(0, 2.h),
+              blurRadius: 8.r,
+            ),
+          ],
+        ),
+        child: _QuestionSearchField(
+          controller: _searchController,
+          hint: _t('qb_search'),
+          isDark: isDark,
+          onChanged: _onSearchChanged,
+          onClear: () {
+            _searchController.clear();
+            context.read<QuestionBankListProvider>().updateSearchQuery('');
+            FocusScope.of(context).unfocus();
+          },
+          hasText: _searchController.text.isNotEmpty,
+        ),
+      ),
+    );
+  }
+
   Widget _buildCustomAppBar(bool isDark) {
     final listProvider = context.watch<QuestionBankListProvider>();
     final statusBarHeight = MediaQuery.of(context).padding.top;
@@ -348,17 +407,7 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
             children: [
               // Back button
               InkWell(
-                onTap: () {
-                  if (_isSearchExpanded) {
-                    setState(() {
-                      _isSearchExpanded = false;
-                      _searchController.clear();
-                    });
-                    listProvider.updateSearchQuery('');
-                  } else {
-                    context.pop();
-                  }
-                },
+                onTap: () => context.pop(),
                 borderRadius: BorderRadius.circular(12.r),
                 child: Container(
                   width: 36.w,
@@ -368,9 +417,7 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Icon(
-                    _isSearchExpanded
-                        ? Icons.close
-                        : Icons.arrow_back_ios_new_rounded,
+                    Icons.arrow_back_ios_new_rounded,
                     color: Colors.white,
                     size: 18.sp,
                   ),
@@ -378,71 +425,51 @@ class _QuestionBankListScreenState extends State<QuestionBankListScreen> {
               ),
               SizedBox(width: 12.w),
 
-              // Title or Search field
-              if (_isSearchExpanded)
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: _t('qb_search'),
-                      border: InputBorder.none,
-                      hintStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                    style: TextStyle(color: Colors.white, fontSize: 16.sp),
-                    onChanged: _onSearchChanged,
-                  ),
-                )
-              else
-                Text(
-                  _t('qb_title'),
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              // Title
+              Text(
+                _t('qb_title'),
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
+              ),
 
               const Spacer(),
 
               // Actions
-              if (!_isSearchExpanded) ...[
-                // Search button
-                IconAction(
-                  icon: Icons.search,
-                  onTap: () => setState(() => _isSearchExpanded = true),
-                ),
-                SizedBox(width: 8.w),
+              // Search button
+              IconAction(
+                icon: _isSearchExpanded ? Icons.close : Icons.search,
+                onTap: _toggleSearch,
+              ),
+              SizedBox(width: 8.w),
 
-                // Filter button with badge
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    IconAction(icon: Icons.filter_list, onTap: _showFilters),
-                    if (listProvider.hasActiveFilters)
-                      Positioned(
-                        right: -2.w,
-                        top: -2.h,
-                        child: Container(
-                          width: 10.w,
-                          height: 10.w,
-                          decoration: BoxDecoration(
-                            color: AppColors.error,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1.5),
-                          ),
+              // Filter button with badge
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconAction(icon: Icons.filter_list, onTap: _showFilters),
+                  if (listProvider.hasActiveFilters)
+                    Positioned(
+                      right: -2.w,
+                      top: -2.h,
+                      child: Container(
+                        width: 10.w,
+                        height: 10.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.error,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
                         ),
                       ),
-                  ],
-                ),
-                SizedBox(width: 8.w),
+                    ),
+                ],
+              ),
+              SizedBox(width: 8.w),
 
-                // More menu
-                _buildMoreMenu(isDark),
-              ],
+              // More menu
+              _buildMoreMenu(isDark),
             ],
           ),
         ],
@@ -749,6 +776,130 @@ class _DeleteConfirmationSheet extends StatelessWidget {
           ),
           SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
+      ),
+    );
+  }
+}
+
+// ============================================
+// Inline Search Field Widget for Question Bank
+// ============================================
+class _QuestionSearchField extends StatefulWidget {
+  final TextEditingController controller;
+  final String hint;
+  final bool isDark;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+  final bool hasText;
+
+  const _QuestionSearchField({
+    required this.controller,
+    required this.hint,
+    required this.isDark,
+    required this.onChanged,
+    required this.onClear,
+    required this.hasText,
+  });
+
+  @override
+  State<_QuestionSearchField> createState() => _QuestionSearchFieldState();
+}
+
+class _QuestionSearchFieldState extends State<_QuestionSearchField> {
+  late FocusNode _focusNode;
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.isDark ? AppColors.grey800 : AppColors.grey100,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: _isFocused ? AppColors.primary : Colors.transparent,
+          width: _isFocused ? 2 : 0,
+        ),
+      ),
+      child: TextField(
+        controller: widget.controller,
+        focusNode: _focusNode,
+        autofocus: true,
+        style: TextStyle(
+          fontSize: 15.sp,
+          color: widget.isDark ? AppColors.textDark : AppColors.textPrimary,
+          fontWeight: FontWeight.w400,
+        ),
+        decoration: InputDecoration(
+          hintText: widget.hint,
+          hintStyle: TextStyle(
+            fontSize: 15.sp,
+            color: widget.isDark
+                ? AppColors.backgroundLight
+                : AppColors.textSecondary.withOpacity(0.6),
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Padding(
+            padding: EdgeInsets.all(12.w),
+            child: Icon(
+              Icons.search,
+              color: _isFocused ? AppColors.primary : AppColors.textSecondary,
+              size: 20.sp,
+            ),
+          ),
+          suffixIcon: widget.hasText
+              ? InkWell(
+                  onTap: widget.onClear,
+                  borderRadius: BorderRadius.circular(20.r),
+                  child: Padding(
+                    padding: EdgeInsets.all(8.w),
+                    child: Icon(
+                      Icons.clear,
+                      size: 18.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 14.h,
+          ),
+          isDense: true,
+        ),
+        onChanged: widget.onChanged,
       ),
     );
   }

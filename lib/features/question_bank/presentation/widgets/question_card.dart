@@ -55,12 +55,18 @@ class QuestionCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: isDark ? AppColors.surfaceDark : Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.borderDark.withOpacity(0.3)
+                  : AppColors.grey200,
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+                color: Colors.black.withOpacity(isDark ? 0.15 : 0.06),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -69,24 +75,38 @@ class QuestionCard extends StatelessWidget {
             children: [
               // Header with type badge
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 decoration: BoxDecoration(
-                  color: typeData.backgroundColor,
+                  gradient: LinearGradient(
+                    colors: [
+                      typeData.backgroundColor,
+                      typeData.backgroundColor.withOpacity(0.7),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(12.r),
+                    top: Radius.circular(16.r),
                   ),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(6.w),
+                      padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
-                        color: typeData.color.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6.r),
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(8.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: typeData.color.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Icon(
                         typeData.icon,
-                        size: 18.sp,
+                        size: 20.sp,
                         color: typeData.color,
                       ),
                     ),
@@ -105,20 +125,43 @@ class QuestionCard extends StatelessWidget {
                     ),
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
+                        horizontal: 12.w,
+                        vertical: 6.h,
                       ),
                       decoration: BoxDecoration(
-                        color: typeData.color,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Text(
-                        '${question.marks} marks',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                        gradient: LinearGradient(
+                          colors: [
+                            typeData.color,
+                            typeData.color.withOpacity(0.8),
+                          ],
                         ),
+                        borderRadius: BorderRadius.circular(20.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: typeData.color.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.star_rounded,
+                            size: 14.sp,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            '${question.marks}',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -135,10 +178,11 @@ class QuestionCard extends StatelessWidget {
                     Text(
                       question.previewText,
                       style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
                         color: isDark ? Colors.white : AppColors.textPrimary,
-                        height: 1.4,
+                        height: 1.5,
+                        letterSpacing: 0.2,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -184,34 +228,36 @@ class QuestionCard extends StatelessWidget {
 
               // Actions row
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
                 decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.grey900.withOpacity(0.3)
+                      : AppColors.grey50,
                   border: Border(
                     top: BorderSide(
-                      color: isDark ? AppColors.borderDark : AppColors.border,
+                      color: isDark ? AppColors.borderDark : AppColors.grey200,
+                      width: 1,
                     ),
+                  ),
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(16.r),
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton.icon(
+                    _buildActionButton(
+                      icon: Icons.edit_outlined,
+                      label: 'Edit',
+                      color: AppColors.primary,
                       onPressed: onEdit,
-                      icon: Icon(Icons.edit_outlined, size: 18.sp),
-                      label: const Text('Edit'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      ),
                     ),
-                    TextButton.icon(
+                    SizedBox(width: 8.w),
+                    _buildActionButton(
+                      icon: Icons.delete_outline,
+                      label: 'Delete',
+                      color: AppColors.error,
                       onPressed: onDelete,
-                      icon: Icon(Icons.delete_outline, size: 18.sp),
-                      label: const Text('Delete'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.error,
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      ),
                     ),
                   ],
                 ),
@@ -245,32 +291,75 @@ class QuestionCard extends StatelessWidget {
     required bool isDark,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.grey700 : AppColors.grey100,
-        borderRadius: BorderRadius.circular(6.r),
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  AppColors.grey700.withOpacity(0.8),
+                  AppColors.grey800.withOpacity(0.6),
+                ]
+              : [AppColors.grey100, AppColors.grey50],
+        ),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: isDark
+              ? AppColors.borderDark.withOpacity(0.3)
+              : AppColors.grey200,
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 14.sp,
-            color: isDark
-                ? AppColors.textDarkSecondary
-                : AppColors.textSecondary,
-          ),
-          SizedBox(width: 4.w),
+          Icon(icon, size: 15.sp, color: AppColors.primary),
+          SizedBox(width: 5.w),
           Text(
             label,
             style: TextStyle(
-              fontSize: 12.sp,
-              color: isDark
-                  ? AppColors.textDarkSecondary
-                  : AppColors.textSecondary,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+              color: isDark ? AppColors.textDark : AppColors.textPrimary,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(8.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            border: Border.all(color: color.withOpacity(0.3), width: 1),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18.sp, color: color),
+              SizedBox(width: 6.w),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
